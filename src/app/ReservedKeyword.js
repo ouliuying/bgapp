@@ -1,0 +1,1 @@
+export const CREATE_VIEW_DATA = "__createViewData__"
