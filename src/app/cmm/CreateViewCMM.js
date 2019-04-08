@@ -6,7 +6,7 @@ import {
   setCreateContextFieldValue,
   clearCreateContextFieldValue,
   setCreateContextViewData
-} from '../actions/createContext'
+} from '../actions/appContext'
 
 import produce from "immer"
 import {ViewFieldType} from '../modelView/ViewFieldType'
@@ -16,7 +16,7 @@ import { getRoutePath,goRoute } from '../routerHelper'
 import {
     viewDataFromCreateContext,
     getCreateContextFieldValue,
-    buildServerCreateData} from '../reducers/createContext'
+    buildServerCreateData} from '../reducers/appContext'
 import {Button,Form,Tabs,Table, MessageBox} from 'element-react'
 import {getDefaultRelationModelView} from '../modelView/relation'
 export class CreateViewCMM extends ViewCMM{

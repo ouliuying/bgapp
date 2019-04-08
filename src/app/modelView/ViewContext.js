@@ -1,9 +1,6 @@
-const CREATE_CONTEXT= 'createContext'
-const EDIT_CONTEXT = 'editContext'
-const LIST_CONTEXT = 'listContext'
+const APP_CONTEXT= 'appContext'
+
 
 export default {
-    CREATE_CONTEXT,
-    EDIT_CONTEXT,
-    LIST_CONTEXT
+    APP_CONTEXT
 }
