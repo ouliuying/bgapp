@@ -12,7 +12,8 @@ import Icon from '../../icon'
 import {Button,Form,Tabs,Table, MessageBox} from 'element-react'
 import ViewFieldStyle from './ViewFieldStyle'
 import ViewFieldTypeRegistry from './ViewFieldTypeRegistry'
-import {mapStateToProps} from './mapStateToProps'
+import {mapStateToProps} from './createViewMapStateToProps'
+import {getModelView} from './ModelViewRegistry'
 class CreateView extends React.Component{
     constructor(props){
         super(props)
@@ -50,23 +51,25 @@ class CreateView extends React.Component{
         else{
             console.log("host 为空")
         }
-        const {viewData}=self.props
+        const {viewData,ownerField}=self.props
         const  {view:viewMeta,data,triggerGroups,subViews}=viewData
-        const createData = data&&data.record
+        const createData = data && data.record
+
         return <hookView.HookProvider value={{cmmHost:self.cmmHost,parent:self}}>
                 <div className="bg-model-op-view bg-flex-full ">
-                    <hookView.Hook hookTag="toolbar"  render={()=>{
-                            return <div className="bg-model-op-view-toolbar">
-                                <button className="bg-model-op-view-toolbar-back"  onClick={()=>{
-                                    self.props.dispatch(goBack())
-                                }}>
-                                <Icon.LocationGoBack></Icon.LocationGoBack>
-                                </button>
-                        </div>
-                        }
+                {
+                    ownerField?null:<hookView.Hook hookTag="toolbar"  render={()=>{
+                        return <div className="bg-model-op-view-toolbar">
+                            <button className="bg-model-op-view-toolbar-back"  onClick={()=>{
+                                self.props.dispatch(goBack())
+                            }}>
+                            <Icon.LocationGoBack></Icon.LocationGoBack>
+                            </button>
+                    </div>
+                    }
                     }/>
-
-                    <hookView.Hook hookTag="actions"  render={()=>{
+                }
+                <hookView.Hook hookTag="actions"  render={()=>{
                         return <div className="bg-model-op-view-actions">
                                     <hookView.Hook hookTag="actions-main-group"  render={()=>{
                                         let mainActionGroup=triggerGroups&&triggerGroups.find(x=>{
@@ -303,12 +306,30 @@ class CreateView extends React.Component{
 
                             <hookView.Hook hookTag="body-relation" render={()=>{
                                     let relationViews = (subViews||[]).filter((subView)=>{
-                                        return subView.style===ViewFieldStyle.RELATION
+                                        return subView.refView.style===ViewFieldStyle.RELATION
                                     })
                                     return relationViews.length>0?(<div className="bg-model-op-view-body-relation">
                                     <Tabs activeName={relationViews[0].title} onTabClick={ (tab) => console.log(tab.props.name) }>
                                     {
-                                      
+                                      relationViews.map(v=>{
+                                          let  VComponent  = v.view && getModelView(v.view.app,v.view.model,v.view.viewType)
+                                          return <Tabs.Pane label={v.refView.title} name={v.refView.fieldName}>
+                                          {
+                                              VComponent?(
+                                                  <hookView.HookProvider value={{cmmHost:undefined,parent:undefined}}>
+                                                    <VComponent app={v.view.app} 
+                                                        model={v.view.model} 
+                                                        viewType={v.view.viewType}
+                                                        viewData={v}
+                                                        ownerField = {v.view.ownerField}
+                                                        >
+                                                    </VComponent>
+                                                  </hookView.HookProvider>
+                                                
+                                              ):null
+                                          }
+                                          </Tabs.Pane>
+                                      })
                                     }
                                     </Tabs>
                                     </div>):null
@@ -318,13 +339,10 @@ class CreateView extends React.Component{
 
                     </div>
 
-
-
                     }}></hookView.Hook>
                     {/*  body end  */}
             </div>
     </hookView.HookProvider>
-        
     }
 }
 export default hookView.withHook(withRouter(connect(mapStateToProps)(CreateView)))

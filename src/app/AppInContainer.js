@@ -7,7 +7,7 @@ import {
     Route
 } from 'react-router-dom'
 import appRouteLoader from './appRouteLoader'
-import getDefaultModelView from './modelView'
+import getModelView from './modelView/ModelViewRegistry'
 import {push} from 'connected-react-router'
 import {Menu} from 'element-react'
 import {createIconFromSvg} from '../icon/createIconFromSvg'
@@ -119,7 +119,7 @@ class AppInContainer extends React.Component{
                                                     }
                                                     else{
                                                       
-                                                        const DefComponent=getDefaultModelView(viewType)
+                                                        const DefComponent=getModelView(this.app.name,model,viewType)
                                                         return <Route path={modelViewPath} component={DefComponent} key={modelViewPath}/>
                                                     }
                                                 })

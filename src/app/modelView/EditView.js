@@ -49,7 +49,7 @@ class EditView extends React.Component{
         //             fd.fieldView.fields.map(ffd=>{
         //                 ffd.appMeta=installApps[ffd.app]
         //                 ffd.modelMeta=models[ffd.app][ffd.model]
-        //                 ffd.parentField=fd
+        //                 ffd.ownerField=fd
         //                 return ffd
         //             })
         //         }

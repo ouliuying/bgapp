@@ -9,7 +9,7 @@ import {
 import hookView from '../../HookView'
 import ViewFieldStyle from '../ViewFieldStyle'
 import ViewFieldTypeRegistry from '../ViewFieldTypeRegistry'
-import {mapStateToProps} from '../mapStateToProps'
+import {mapStateToProps} from '../createViewMapStateToProps'
 import {Button,Form,Tabs,Table, MessageBox} from 'element-react'
 class RelationListView extends React.Component{
     constructor(props){

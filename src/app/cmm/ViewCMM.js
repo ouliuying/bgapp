@@ -4,27 +4,31 @@ export class ViewCMM{
         this.model = model
         this.viewType=viewType
     }
+    
     static get s_model(){
         return "*"
     }
+
     static get s_app(){
         return "*"
     }
+
     mapTo(state,ownProps){
         return Object.assign({},ownProps)
     }
+
     init(view){
-
     }
+
     update(view){
+    }
 
-    }
     didMount(view){
-        
     }
+
     doAction(view, trigger){
-        
     }
+
 }
 
 

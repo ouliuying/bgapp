@@ -2,21 +2,22 @@ import {
     SET_CREATE_CONTEXT_FIELD_VALUE,
     CLEAR_CREATE_CONTEXT_FIELD_VALUE,
     SET_CREATE_CONTEXT_VIEW_DATA
-} from '../actions/createContext'
+} from '../actions/appContext'
 import ViewContext from '../modelView/ViewContext'
 import produce from "immer"
 import { createSelector } from 'reselect'
 import memoize from 'lodash.memoize'
 import {CREATE_VIEW_DATA} from '../ReservedKeyword'
-const initCreateContext={}
+import {getAppModelKey, updateViewField} from "../util/modelView"
+const initAppContext={}
 
 const UPDATE_NORMAL_FIELD_VALUE =0
 const SET_ARRAY_ELEMENT_FIELD_VALUE =1
 const REMOVE_ARRAY_ELEMENT =1
 
-export function createContext(state,action){
+export function appContext(state,action){
     if(typeof state == "undefined"){
-        return initCreateContext
+        return initAppContext
     }
     switch(action.type){
         case SET_CREATE_CONTEXT_FIELD_VALUE:
@@ -27,7 +28,7 @@ export function createContext(state,action){
                 if(newState.length>0){
                   newState.map(fv=>{
                     let rootField = fv[0]
-                    let key=getAppModelKey(rootField.app,rootField.model,rootField.parentField)
+                    let key=getAppModelKey(rootField.app,rootField.model,rootField.ownerField)
                     draft[CREATE_VIEW_DATA]=draft[CREATE_VIEW_DATA]||{}
                     draft[CREATE_VIEW_DATA][key]=draft[CREATE_VIEW_DATA][key]||{}
                     draft[CREATE_VIEW_DATA][key]=draft[CREATE_VIEW_DATA][key]||{
@@ -99,31 +100,35 @@ export function createContext(state,action){
 
         case SET_CREATE_CONTEXT_VIEW_DATA:
         {
-            const {app,model,viewData,ownerField}=action.payload
+            const {app,model,viewData,ownerField,refView}=action.payload
             updateViewField(viewData,ownerField)
             let key = getAppModelKey(app,model,ownerField)
-            let {view,data,triggerGroups}=viewData
+            let {view,data,triggerGroups,subViews}=viewData
+
             return produce(state,draft=>{
                draft[CREATE_VIEW_DATA]=draft[CREATE_VIEW_DATA]||{}
                draft[CREATE_VIEW_DATA][key]=draft[CREATE_VIEW_DATA][key]||{
                    app:app,
                    model:model,
-                   viewData:{
-                    view:view,
-                    data:getInitViewData(data,app,model,data),
-                    triggerGroups
-                   }
+                   viewData:Object.assign({
+                    ...viewData
+                   },{data:getInitViewData(data,app,model)})
                }
-               for(var field of view.fields){
-                   if(field.subView){
-                       let subKey = getAppModelKey(field.subView.app,field.subView.model,field)
+               
+               for(var subView of subViews){
+                   if(subView.view){
+                       let subKey = getAppModelKey(subView.view.app, 
+                        subView.view.model, 
+                        subView.view.ownerField)
                        draft[CREATE_VIEW_DATA][subKey]=draft[CREATE_VIEW_DATA][subKey]||{
-                            app:field.subView.app,
-                            model:field.subView.model,
-                            viewData:{
-                            view:field.subView,
-                            data:getInitViewData(data,app,model,field)
-                            }
+                            app:subView.view.app,
+                            model:subView.view.model,
+                            viewData:Object.assign({
+                                ...subView
+                            },{data:getInitViewData(subView.data,
+                                subView.view.app,
+                                subView.view.model,
+                                subView.view.ownerField)})
                         }
                    }
                }
@@ -148,32 +153,8 @@ function getInitViewData(data,app,model,field){
         }
     }
 }
-function getAppModelKey(app,model,ownerField){
-    let key =`${app}.${model}`
-    let pF=ownerField
-    while(pF){
-        key = `${pF.app}.${pF.model}.${pF.name}@${key}`
-        pF=ownerField.parentField
-    }
-    return key
-}
-function updateViewField(viewData,parentField){
-    let {view}=viewData
-    view.fields.map(f=>{
-        updateFieldhierarchy(f,parentField)
-    })
-}
 
 
-
-function updateFieldhierarchy(field,parentField){
-    field.parentField=parentField
-    if(field.fieldView){
-        field.fieldView.fields.map(subField=>{
-            updateFieldhierarchy(subField,field)
-        })
-    }
-}
 
 export const viewDataFromCreateContext = createSelector(state=>state[ViewContext.CREATE_CONTEXT],(createContext)=>memoize(({app,model,ownerField})=>{
     let key=getAppModelKey(app,model,ownerField)

@@ -260,12 +260,12 @@ export class CriteriaEnumSelect  extends React.Component{
         }
     }
     render(){
-        const {onCriteriaChange}=this.props
+        const {onCriteriaChange,meta,name,key}=this.props
         return <Select value={this.state.selValue} placeholder="请选择" onChange={(value)=>{onCriteriaChange && onCriteriaChange({
                 expression: eq(this.state.name,value),
                 key:this.state.key
             }
-        );
+        )
         this.setState({selValue:value})}}>
         {
           this.state.options.map(vt => {

@@ -14,82 +14,24 @@ import ViewFieldTypeRegistry from './ViewFieldTypeRegistry'
 import {getUIAppCache,corpModelsSelector} from '../../reducers/sys'
 import {getDynamicRouterAppModelViewType} from '../../reducers/router'
 import {getRoutePath} from '../routerHelper'
+import {mapStateToProps} from './listViewMapStateToProps'
 class ListView extends React.Component{
     constructor(props){
         super(props)
-        const {uiAppCache,models,...rest}=this.props
-        const {app,model,viewType}=this.props.appModelViewType
-        this.app=app
-        this.model=model
-        this.viewType=viewType
-        const modelViews=uiAppCache[app].modelViews[model].views
-        this.modelView=modelViews[viewType]
-        this.searchBox=modelViews["searchBox"]
-        if(this.searchBox){
-            var key=0
-            for(var fd of this.searchBox.fields){
-                fd.key=key
-                key++
-            }
+        const {cmmHost,parent}=this.props
+        if(!parent){
+            this.cmmHost=cmmHost
+            this.cmmHost.init(this)
         }
-        this.restProps=rest
-        this.columns=[]
-        var data={}
-        this.modelView.fields.map((fd)=>{
-            if(!fd.relationData){
-                this.columns.push({
-                    label:fd.title,
-                    prop:fd.name,
-                })
-            }
-            else{
-                const relModelData=this.getModelData(fd.relationData.targetApp,fd.relationData.targetModel)
-                const targetField=relModelData.fields[fd.relationData.targetField]
-                this.columns.push({
-                    label:relModelData.title+"/"+relModelData.fields[fd.relationData.toName].title,
-                    render:()=>{
-                        const rFd=fd
-                        return <span>{rFd.title}</span>
-                    }
-                })
-            }
-
-            data[fd.name]="x"
-        })
-        this.state={
-            data:[data],
-            pageSize:30,
-            currentPage:1,
-            total:0,
-            pageSizes:[10,20,30,40,50],
-            searchTags:[],
-            searchCriteria:{},
-            width:100
+        else{
+            this.parent=parent
+            this.cmmHost=cmmHost
         }
     }
-    fetchModelPageData(opts){
-        opts=Object.assign({},this.state,opts)
-        
-    }
-    onSizeChange(size){
-        this.setState({pageSize:size,currentPage:1})
-        this.fetchModelPageData({pageSize:size,currentPage:1})
-    }
-    onCurrentChange(currentPage){
-        this.setState({currentPage:currentPage})
-        this.fetchModelPageData({currentPage:currentPage})
-    }
-    getModelData(app,model){
-        const {models}=this.props
-        return models[app][model]
-    }
-    doAdd(){
-        var path=getRoutePath(this.app,this.model,"create")
-        this.props.dispatch(push(path))
-    }
+   
     componentDidMount(){
         window.addEventListener("resize", ()=>{this.windowSizeUpdate()});
-        this.fetchModelPageData()
+        this.cmmHost.didMount(this)
     }
     componentWillUnmount(){
         window.removeEventListener("resize", ()=>{this.windowSizeUpdate()});
@@ -113,54 +55,55 @@ class ListView extends React.Component{
         }
        
     }
+    
     render(){
         const self=this
+        const {ownerField} = self.props
         return <div className="bg-model-op-view bg-flex-full">
                 {/* toolbar begin */}
-                    <hookView.Hook hookTag="toolbar" render={()=>{
-                        return <div className="bg-model-op-view-toolbar">
-                            <button className="bg-model-op-view-toolbar-back"  onClick={()=>{
-                                self.props.dispatch(goBack())
-                            }}>
-                            <Icon.LocationGoBack></Icon.LocationGoBack>
-                            </button>
-                        </div>
-                        }
-                    }/>
+                {
+
+                        ownerField?null:<hookView.Hook hookTag="toolbar" render={()=>{
+                            return <div className="bg-model-op-view-toolbar">
+                                <button className="bg-model-op-view-toolbar-back"  onClick={()=>{
+                                    self.props.dispatch(goBack())
+                                }}>
+                                <Icon.LocationGoBack></Icon.LocationGoBack>
+                                </button>
+                            </div>
+                            }
+                        }/>
+                }
+                    
                 {/* toolbar end */}
 
 
                 {/* searchBox begin */}
                     <hookView.Hook hookTag="searchBox" render={()=>{
-                       if(!self.searchBox){
-                           return <div className="bg-model-list-view-search-box">
-                           <div className="sub-body"><Form>
-                               <Form.Item>
-                                            <Button type="danger" onClick={()=>{
-                                                                                self.doAdd()
-                                                                            }}>添加</Button>
-                                            </Form.Item>
-                           </Form>
-                           </div>
-                           </div>
-                       }
+                       const {viewData} = this.props
+                       const searchBox = viewData.view.subViews.find(x=>{
+                           x.refView.viewType == "searchBox"
+                       })
+                       const mainGroup = viewData.triggerGroup.find(x=>{
+                           x.name == "main"
+                       })
                         var criteriaControlGroups=[]
-                        var lineCnt=3
-                        var lines=parseInt(this.searchBox.fields.length/lineCnt)
-                       
-                       
-                        for(var i=0;i<lines;i++){
-                            criteriaControlGroups.push(this.searchBox.fields.slice(lineCnt*i,lineCnt*(i+1)))
-                        }
-                        if(lines*4<this.searchBox.fields.length){
-                            var rest=this.searchBox.fields.slice(lines*lineCnt)
-                            rest.push(null)
-                            criteriaControlGroups.push(rest)
-                        }
-                        else{
-                            var btn=[]
-                            btn.push(null)
-                            criteriaControlGroups.push(btn)
+                        if(this.searchBox){
+                            var lineCnt=3
+                            var lines=parseInt(this.searchBox.fields.length/lineCnt)
+                            for(var i=0;i<lines;i++){
+                                criteriaControlGroups.push(this.searchBox.fields.slice(lineCnt*i,lineCnt*(i+1)))
+                            }
+                            if(lines*4<this.searchBox.fields.length){
+                                var rest=this.searchBox.fields.slice(lines*lineCnt)
+                                rest.push(null)
+                                criteriaControlGroups.push(rest)
+                            }
+                            else{
+                                var btn=[]
+                                btn.push(null)
+                                criteriaControlGroups.push(btn)
+                            }
                         }
                         return <div className="bg-model-list-view-search-box">
                                 <div className="sub-body">
@@ -179,9 +122,22 @@ class ListView extends React.Component{
                                                                                 var searchCriteria=this.state.searchCriteria
                                                                                 searchCriteria[ckey]=criteria
                                                                                 self.setState({searchCriteria})
-                                                                            }}></Com>:<div><Button type="primary">确定</Button>&nbsp;<Button type="danger" onClick={()=>{
-                                                                                self.doAdd()
-                                                                            }}>添加</Button></div>
+                                                                            }}></Com>:<div><Button type="primary" onClick={
+                                                                                ()=>{
+                                                                                    self.cmmHost.doAction(self,{
+                                                                                        name:"search"
+                                                                                    })
+                                                                                }
+                                                                            }>确定</Button>&nbsp;
+                                                                            {
+                                                                                            mainGroup&&mainGroup.triggers.map(t=>{
+                                                                                                <Button type="danger" onClick={()=>{
+                                                                                                    self.cmmHost.doAction(self,t)
+                                                                                                }}>{t.title}</Button>
+                                                                                            })
+
+                                                                            }
+                                                                            </div>
                                                                         }    
                                                                     </Form.Item>
                                                             </Layout.Col>
@@ -190,19 +146,23 @@ class ListView extends React.Component{
                                                 </Layout.Row>
                                             
                                         }):<Layout.Row gutter="2">
-                                            <Form.Item>
-                                            <Button type="danger" onClick={()=>{
-                                                                                self.doAdd()
-                                                                            }}>添加</Button>
-                                            </Form.Item>
+                                            {
+                                                mainGroup?<Form.Item>
+                                                {
+                                                    mainGroup.triggers.map(t=>{
+                                                             <Button type="danger" onClick={()=>{
+                                                                 self.cmmHost.doAction(self,t)
+                                                             }}>{t.title}</Button>
+                                                    })
+                                                }      
+                                                </Form.Item>:null
+                                            }
                                         </Layout.Row>
                                     }
                                 </Form>
-                             
                             </div>
                             <div className="sub-search-tags">
                                         <Tag type="danger" closable={true} onClose={()=>{
-
                                         }}>搜索标签</Tag>
                             </div>
                         </div>
@@ -251,10 +211,4 @@ class ListView extends React.Component{
     }
 }
 
-function mapStateToProps(state){
-     let props= getUIAppCache(state)
-    let routerLocationState=getDynamicRouterAppModelViewType(state)
-    let models=corpModelsSelector(state)
-    return Object.assign({},props,routerLocationState,models)
-}
 export default hookView.withHook(withRouter(connect(mapStateToProps)(ListView)))

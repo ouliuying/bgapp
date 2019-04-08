@@ -1,4 +1,3 @@
-
 import {ViewCMM} from './ViewCMM'
 import {getDynamicRouterAppModelViewType} from '../../reducers/router'
 import {getAppsSelector,corpModelsSelector} from '../../reducers/sys'
@@ -19,36 +18,35 @@ import {
     buildServerCreateData} from '../reducers/createContext'
 import {Button,Form,Tabs,Table, MessageBox} from 'element-react'
 import {getDefaultRelationModelView} from '../modelView/relation'
-export class CreateViewCMM extends ViewCMM{
 
+export class ListViewCMM extends  ViewCMM{
     constructor(app,model,viewType){
-      super(app,model,viewType)
+        super(app,model,viewType)
     }
 
     static get s_viewType(){
-        return "create"
+        return "list"
     }
 
     mapTo(state, ownProps){
-      let baseProps= super.mapTo(state, ownProps);
-      const {appModelViewType,ownerField} = ownProps
-      let installApps=getAppsSelector(state)
-      const {app,model}=appModelViewType
-      let viewData=viewDataFromCreateContext(state)({app,model,ownerField})
-      let newProps= Object.assign({},installApps,{viewData})
-       return Object.assign({},baseProps,newProps,ownProps);
-    }
+        let baseProps= super.mapTo(state, ownProps);
+        const {appModelViewType,ownerField} = ownProps
+        let installApps=getAppsSelector(state)
+        const {app,model}=appModelViewType
+        let viewData=viewDataFromCreateContext(state)({app,model,ownerField})
+        let newProps= Object.assign({},installApps,{viewData})
+         return Object.assign({},baseProps,newProps,ownProps);
+      }
+
 
     init(view){
    
     }
-
+    
     update(view){
        
             
     }
-
-
 
     didMount(view){
         let {ownerField,viewData}= view.props
@@ -80,42 +78,35 @@ export class CreateViewCMM extends ViewCMM{
         })
     }
 
-
-
-  onFieldValueChange(fd,value,opType,elemTag){
-    if(opType===undefined){
-        opType=0
+    onFieldValueChange(fd,value,opType,elemTag){
+        if(opType===undefined){
+            opType=0
+        }
+        setCreateContextFieldValue([[fd,value,opType,elemTag]])
     }
-    setCreateContextFieldValue([[fd,value,opType,elemTag]])
-  }
 
-  getFieldValue(createData,field){
-      return getCreateContextFieldValue(createData,field)
-  }
-  doCreate(view){
-      let self=this
-      const {ownerField,__inner_store__:innerStore}=view.props
-      let createData= buildServerCreateData(self.app,self.model,ownerField,innerStore.state)
-      new ModelAction(this.app,this.model).call("create",createData,function(res){
-      if(res.errorCode==0){
-          var newID=res.bag["id"]
-          var editPath=getRoutePath(self.app,self.model,"edit")
-          goRoute(editPath,{id:newID})
-      }
-      else{
-          MessageBox.alert(res.description)
-      }
-      },function(err){
-          MessageBox.alert("通讯失败！")
-      })
-  }
+    getFieldValue(createData,field){
+        return getCreateContextFieldValue(createData,field)
+    }
 
-  doAction(view,trigger){
-     this[trigger.name].call(this,view)
-  }
- 
-  doCancel(view){
-      const {ownerField}=view.props
-      clearCreateContextFieldValue(this.app,this.model,ownerField)
-  }
+
+    doAction(view,trigger){
+        this[trigger.name].call(this,view)
+    }
+    search(view){
+        
+    }
+
+    onSizeChange(view,size){
+        
+    }
+    onCurrentChange(view,currentPage){
+      
+    }
+  
+    doAdd(view){
+        var path=getRoutePath(this.app,this.model,"create")
+        this.props.dispatch(push(path))
+    }
+    
 }
