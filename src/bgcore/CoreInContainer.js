@@ -5,8 +5,8 @@ import MainFrame from './MainFrame'
 import PartnerCreateView from './PartnerCreateView'
 export default function CoreInContainer(props){
     const modelViews=[
-        loadView("partner","main",MainFrame),
-        loadView("partner","create",PartnerCreateView)
+        loadView("core", "partner","main",MainFrame),
+        loadView("core","partner","create",PartnerCreateView)
         ]
     return <AppInContainer app="core" modelViews={modelViews}></AppInContainer>
 }

@@ -25,7 +25,16 @@ export const ViewFieldType={
     EmailField:'email',
     IconLabelField:'iconLabel',
     Many2OneDataSetSelectField:'many2OneDataSetSelect',
-    SingleCheckBoxField:'singleCheckbox'
+    SingleCheckBoxField:'singleCheckbox',
+    StaticField:'static'
+}
+export class StaticField extends React.Component{
+    render(){
+        const {value} = this.props
+        return <span>
+                {value}
+        </span>
+    }
 }
 export class TextField extends React.Component{
     render(){
@@ -251,24 +260,17 @@ export class Many2OneDataSetSelectField extends React.Component{
 export class CriteriaEnumSelect  extends React.Component{
     constructor(props){
         super(props)
-        const {meta,name,key}=this.props
-        this.state={
-            selValue:meta.defaultValue,
-            options:meta.options,
-            key:key,
-            name:name
-        }
     }
     render(){
-        const {onCriteriaChange,meta,name,key}=this.props
-        return <Select value={this.state.selValue} placeholder="请选择" onChange={(value)=>{onCriteriaChange && onCriteriaChange({
-                expression: eq(this.state.name,value),
-                key:this.state.key
+        const {onCriteriaChange,meta,name,value}=this.props
+        return <Select value={value} placeholder="请选择" onChange={(value)=>{onCriteriaChange && onCriteriaChange({
+                expression: eq(name,value),
+                name,
+                value
             }
-        )
-        this.setState({selValue:value})}}>
+        )}}>
         {
-          this.state.options.map(vt => {
+          meta.options.map(vt => {
             return <Select.Option key={vt.value} label={vt.label} value={vt.value} />
           })
         }

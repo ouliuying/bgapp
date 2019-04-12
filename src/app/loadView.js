@@ -1,6 +1,6 @@
 
 import {regModelView} from './modelView/ModelViewRegistry'
-export function loadView(model,viewType,component){
+export function loadView(app,model,viewType,component){
     regModelView(app,model,viewType,component)
     return {
         model,

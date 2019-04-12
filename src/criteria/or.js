@@ -5,7 +5,7 @@ function or(){
         criteriaArray.push(c)
     }
     return {
-        "__type__":OR,
+        op:OR,
         exp:criteriaArray
     }
 }

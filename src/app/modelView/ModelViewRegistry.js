@@ -16,7 +16,7 @@ const ModelViewRegistry={
     },
     get(app,model,viewType){
         let key = `${app}_${model}_${viewType}`
-        mv= this.modelViews[key]
+        let mv= this.modelViews[key]
         if(mv){
             return mv
         }

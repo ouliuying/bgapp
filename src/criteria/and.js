@@ -6,7 +6,7 @@ function and(){
         criteriaArray.push(c)
     }
     return {
-        "__type__":AND,
+        op:AND,
         exp:criteriaArray
     }
 }

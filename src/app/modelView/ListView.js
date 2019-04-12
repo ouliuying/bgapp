@@ -55,10 +55,16 @@ class ListView extends React.Component{
         }
        
     }
-    
+
     render(){
         const self=this
-        const {ownerField} = self.props
+        const {ownerField,viewData} = self.props
+        let {criterias, triggerGroups} = viewData
+        criterias=criterias||[]
+        triggerGroups=triggerGroups||[]
+        const {view} = viewData
+        const subViews = (view && view.subViews)||[]
+        const {columns,rows,currentPage,totalCount,pageSize} = self.cmmHost.getViewDatas(self,viewData)
         return <div className="bg-model-op-view bg-flex-full">
                 {/* toolbar begin */}
                 {
@@ -77,25 +83,26 @@ class ListView extends React.Component{
                     
                 {/* toolbar end */}
 
-
+                    
                 {/* searchBox begin */}
                     <hookView.Hook hookTag="searchBox" render={()=>{
                        const {viewData} = this.props
-                       const searchBox = viewData.view.subViews.find(x=>{
-                           x.refView.viewType == "searchBox"
+                       const searchCriterias = criterias
+                       const searchBox = subViews.find(x=>{
+                           return x.refView.viewType == "searchBox"
                        })
-                       const mainGroup = viewData.triggerGroup.find(x=>{
-                           x.name == "main"
+                       const mainGroup = triggerGroups.find(x=>{
+                           return x.name == "main"
                        })
                         var criteriaControlGroups=[]
                         if(this.searchBox){
                             var lineCnt=3
-                            var lines=parseInt(this.searchBox.fields.length/lineCnt)
+                            var lines=parseInt(searchBox.fields.length/lineCnt)
                             for(var i=0;i<lines;i++){
-                                criteriaControlGroups.push(this.searchBox.fields.slice(lineCnt*i,lineCnt*(i+1)))
+                                criteriaControlGroups.push(searchBox.fields.slice(lineCnt*i,lineCnt*(i+1)))
                             }
-                            if(lines*4<this.searchBox.fields.length){
-                                var rest=this.searchBox.fields.slice(lines*lineCnt)
+                            if(lines*4<searchBox.fields.length){
+                                var rest=searchBox.fields.slice(lines*lineCnt)
                                 rest.push(null)
                                 criteriaControlGroups.push(rest)
                             }
@@ -105,6 +112,7 @@ class ListView extends React.Component{
                                 criteriaControlGroups.push(btn)
                             }
                         }
+
                         return <div className="bg-model-list-view-search-box">
                                 <div className="sub-body">
                                 <Form>
@@ -115,13 +123,12 @@ class ListView extends React.Component{
                                                     fds.map((fd,index)=>{
                                                             var Com=fd?ViewFieldTypeRegistry.getComponent(fd.type):null
                                                             var title=fd?fd.title:""
+                                                            let cValue=criterias[fd.name]&&criterias[fd.name].value
                                                             return <Layout.Col span="8" key={index}>
                                                                     <Form.Item label={title} labelWidth={60}>
                                                                         {
-                                                                            Com?<Com meta={fd.meta} name={fd.name} value={fd.value} ckey={fd.key}  title={title} onCriteriaChange={(criteria,ckey)=>{
-                                                                                var searchCriteria=this.state.searchCriteria
-                                                                                searchCriteria[ckey]=criteria
-                                                                                self.setState({searchCriteria})
+                                                                            Com?<Com meta={fd.meta} name={fd.name} value={cValue} key={fd.name}  title={title} onCriteriaChange={(data)=>{
+                                                                              self.cmmHost.onCriteriaValueChange(data)
                                                                             }}></Com>:<div><Button type="primary" onClick={
                                                                                 ()=>{
                                                                                     self.cmmHost.doAction(self,{
@@ -130,11 +137,11 @@ class ListView extends React.Component{
                                                                                 }
                                                                             }>确定</Button>&nbsp;
                                                                             {
-                                                                                            mainGroup&&mainGroup.triggers.map(t=>{
-                                                                                                <Button type="danger" onClick={()=>{
+                                                                                            mainGroup?mainGroup.triggers.map(t=>{
+                                                                                                return <Button type="danger" onClick={()=>{
                                                                                                     self.cmmHost.doAction(self,t)
                                                                                                 }}>{t.title}</Button>
-                                                                                            })
+                                                                                            }):null
 
                                                                             }
                                                                             </div>
@@ -150,7 +157,7 @@ class ListView extends React.Component{
                                                 mainGroup?<Form.Item>
                                                 {
                                                     mainGroup.triggers.map(t=>{
-                                                             <Button type="danger" onClick={()=>{
+                                                             return <Button type="danger" onClick={()=>{
                                                                  self.cmmHost.doAction(self,t)
                                                              }}>{t.title}</Button>
                                                     })
@@ -163,6 +170,7 @@ class ListView extends React.Component{
                             </div>
                             <div className="sub-search-tags">
                                         <Tag type="danger" closable={true} onClose={()=>{
+
                                         }}>搜索标签</Tag>
                             </div>
                         </div>
@@ -182,24 +190,20 @@ class ListView extends React.Component{
                                 <div className="bg-model-list-view-body-control">
                               
                                     <Table style={{width: '100%'}}
-                                           columns={self.columns}
-                                            data={self.state.data}
+                                           columns={columns}
+                                            data={rows}
                                             border={true}
                                             highlightCurrentRow={true}
-                                            onCurrentChange={item=>{console.log(item)}}
-                                            onSizeChange={()=>{}}
                                             >
                                     </Table>
-                                   
                                 </div>
-
                                 <div className="bg-model-list-view-body-control-footer">
                                 <Pagination layout="total, sizes, prev, pager, next, jumper" 
-                                total={self.state.total} pageSizes={[10, 20, 30, 40]} 
-                                pageSize={self.state.pageSize} 
-                                currentPage={self.state.currentpage}
-                                onSizeChange={(size)=>{this.onSizeChange(size)}}
-                                onCurrentChange={(page)=>{this.onCurrentChange(page)}}
+                                total={totalCount} pageSizes={[10, 20, 30, 40]} 
+                                pageSize={pageSize} 
+                                currentPage={currentPage}
+                                onSizeChange={(size)=>{self.cmmHost.onSizeChange(size)}}
+                                onCurrentChange={(page)=>{self.cmmHost.onCurrentChange(page)}}
                                 />
                                 </div>
                         </div>

@@ -52,7 +52,7 @@ class CreateView extends React.Component{
             console.log("host 为空")
         }
         const {viewData,ownerField}=self.props
-        const  {view:viewMeta,data,triggerGroups,subViews}=viewData
+        const  {view,data,triggerGroups,subViews}=viewData||{}
         const createData = data && data.record
 
         return <hookView.HookProvider value={{cmmHost:self.cmmHost,parent:self}}>
@@ -118,7 +118,7 @@ class CreateView extends React.Component{
                                                         <Form labelPosition="top" >
                                                         {
                                                             
-                                                            viewMeta&&viewMeta.fields.map((field,index)=>{
+                                                            view&&view.fields.map((field,index)=>{
                                                                     let type=field.type
                                                                     let meta=field.meta
                                                                     let nValue=createData&&createData[field.name]!==undefined?createData[field.name]:""
@@ -141,7 +141,7 @@ class CreateView extends React.Component{
                                                         <Form labelPosition="top" >
                                                         {
                                                                 
-                                                                viewMeta&&viewMeta.fields.map((field,index)=>{
+                                                                view&&view.fields.map((field,index)=>{
                                                                     let type=field.type
                                                                     let meta=field.meta
                                                                     const FieldComponent=ViewFieldTypeRegistry.getComponent(type)
@@ -167,7 +167,7 @@ class CreateView extends React.Component{
                                         <hookView.Hook hookTag="body-main-label"  render={()=>{
                                             return <div className="bg-model-op-view-body-main-label">
                                                 {
-                                                    viewMeta&&viewMeta.fields.map((field,index)=>{
+                                                    view&&view.fields.map((field,index)=>{
                                                                     let type=field.type
                                                                     let key=`${field.app}_${field.model}_${field.name}`
                                                                     const FieldComponent=ViewFieldTypeRegistry.getComponent(type)
@@ -193,7 +193,7 @@ class CreateView extends React.Component{
 
                             <hookView.Hook  hookTag="body-common"  render={()=>{
                                 let commonGroupFields=[]
-                                for(var fd of (viewMeta||{}).fields||[]){
+                                for(var fd of (view||{}).fields||[]){
                                     if(fd.style===ViewFieldStyle.NORMAL){
                                         let currGF=null
                                         if(fd.colSpan>1){

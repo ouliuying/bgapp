@@ -1,6 +1,6 @@
 
 import {getDynamicRouterAppModelViewType} from '../../reducers/router'
-import {createViewCMM} from './createViewCMM'
+import {CreateViewCMM} from '../cmm/CreateViewCMM'
 export const mapStateToProps=(state,ownProps)=>{
     if(!ownProps){
         ownProps={}
@@ -21,7 +21,7 @@ export const mapStateToProps=(state,ownProps)=>{
         viewCMM.cmmHost=ownProps.cmmHost
     }
     else{
-        viewCMM.cmmHost=createViewCMM(appModelViewType.app,
+        viewCMM.cmmHost=new CreateViewCMM(appModelViewType.app,
             appModelViewType.model,
             appModelViewType.viewType)
     }

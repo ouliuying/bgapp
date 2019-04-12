@@ -24,9 +24,11 @@ export class ViewCMM{
     }
 
     didMount(view){
+
     }
 
     doAction(view, trigger){
+        
     }
 
 }

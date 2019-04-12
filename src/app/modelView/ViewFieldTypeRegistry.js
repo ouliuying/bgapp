@@ -16,6 +16,7 @@ import {TextField,
     IconLabelField,
     Many2OneDataSetSelectField,
     SingleCheckBoxField,
+    StaticField,
     // ViewFieldType
     ViewFieldType,
     //** criteria control  begin*/
@@ -79,6 +80,7 @@ registry.add(ViewFieldType.EmailField,EmailField)
 registry.add(ViewFieldType.IconLabelField,IconLabelField)
 registry.add(ViewFieldType.Many2OneDataSetSelectField,Many2OneDataSetSelectField)
 registry.add(ViewFieldType.SingleCheckBoxField,SingleCheckBoxField)
+registry.add(ViewFieldType.StaticField,StaticField)
 
 registry.add("criteriaSelect",CriteriaEnumSelect)
 registry.add("criteriaNumberRange",CriteriaNumberRangeInput)

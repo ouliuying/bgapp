@@ -7,7 +7,7 @@ import {
     Route
 } from 'react-router-dom'
 import appRouteLoader from './appRouteLoader'
-import getModelView from './modelView/ModelViewRegistry'
+import {getModelView} from './modelView/ModelViewRegistry'
 import {push} from 'connected-react-router'
 import {Menu} from 'element-react'
 import {createIconFromSvg} from '../icon/createIconFromSvg'

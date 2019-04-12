@@ -1,23 +1,22 @@
+import React from "react"
 import {ViewCMM} from './ViewCMM'
 import {getDynamicRouterAppModelViewType} from '../../reducers/router'
 import {getAppsSelector,corpModelsSelector} from '../../reducers/sys'
 import {
-  setCreateContextFieldValue,
-  clearCreateContextFieldValue,
-  setCreateContextViewData
-} from '../actions/createContext'
-
+    setListContextCriteria,
+    setListContextData,
+    removeListContextViewData
+} from '../actions/appContext'
+import { goBack,push } from 'connected-react-router';
 import produce from "immer"
 import {ViewFieldType} from '../modelView/ViewFieldType'
 import { ModelAction } from '../mq/ModelAction'
-import {CREATE_VIEW_DATA} from '../ReservedKeyword'
+import {CREATE_VIEW_DATA, RECORD_TAG,ARGS} from '../ReservedKeyword'
 import { getRoutePath,goRoute } from '../routerHelper'
-import {
-    viewDataFromCreateContext,
-    getCreateContextFieldValue,
-    buildServerCreateData} from '../reducers/createContext'
+import {viewDataFromListContext} from '../reducers/appContext'
 import {Button,Form,Tabs,Table, MessageBox} from 'element-react'
-import {getDefaultRelationModelView} from '../modelView/relation'
+
+import { and } from '../../criteria';
 
 export class ListViewCMM extends  ViewCMM{
     constructor(app,model,viewType){
@@ -32,8 +31,8 @@ export class ListViewCMM extends  ViewCMM{
         let baseProps= super.mapTo(state, ownProps);
         const {appModelViewType,ownerField} = ownProps
         let installApps=getAppsSelector(state)
-        const {app,model}=appModelViewType
-        let viewData=viewDataFromCreateContext(state)({app,model,ownerField})
+        const {app,model,viewType}=appModelViewType
+        let viewData=viewDataFromListContext(state)({app,model,viewType,ownerField})
         let newProps= Object.assign({},installApps,{viewData})
          return Object.assign({},baseProps,newProps,ownProps);
       }
@@ -42,14 +41,79 @@ export class ListViewCMM extends  ViewCMM{
     init(view){
    
     }
-    
+
     update(view){
        
             
     }
+    // const {columns,rows,currentPage,totalCount,pageSize} = self.cmmHost.getViewDatas(self,viewData)
+    getViewDatas(view,viewData){
+        let self =this
+        let {pageData,data,totalCount,view:viewMeta,triggerGroups} = viewData
+        const {app,model}=view
+        let pageSize = pageData && pageData.pageSize||10
+        let currentPage =  pageData && pageData.pageIndex||1
+        totalCount = totalCount||0
+        let columns = []
+        for(let f of ((viewMeta||{}).fields||[])){
+            columns.push({
+                label:f.title,
+                prop:f.name
+                })
+        }
+        let rows = []
+        for(let d of ((data||{}).record||[])){
+            rows.push(d)
+        }
+        columns.push({
+            label: "操作",
+            width: 120,
+            fixed: 'right',
+            render: (row, column, index)=>{
+                let tg= triggerGroups.find(x=>x.name=="opAction")
+                return tg?<span>
+                    {
+                        tg.triggers.map(t=>{
+                            return <Button type="text" size="small" onClick={()=>{
+                                produce(t,draft=>{
+                                    if(!draft.app || draft.app=="*"){
+                                        draft.app = self.app
+                                    }
+                                    if(!draft.model || draft.model=="*"){
+                                        draft.model = self.model
+                                    }
+                                    draft[ARGS]={id:rows[index]["id"],tag:rows[index][RECORD_TAG]}
+                                    self.doAction(view,draft)
+                                })
+                               
+                            }}>{t.title}</Button>
+                        })
+                    }
+                   
+                </span>:null
+            }
+        })
+     
+        return {columns,rows,currentPage,totalCount,pageSize}
 
+    }
+    getCriteria(viewData){
+        const {criterias} = viewData
+        if(criterias){
+            let expArr=[]
+            Object.keys(criterias).map(key=>{
+                let v = criterias[key]
+                expArr.push(v.expression)
+            })
+            if(expArr.length>0){
+                return and(...expArr)
+            }
+        }
+    }
     didMount(view){
         let {ownerField,viewData}= view.props
+        const {pageData} = viewData
+        let criteria = this.getCriteria(viewData)
         if(viewData && viewData.view){
             return
         }
@@ -62,14 +126,18 @@ export class ListViewCMM extends  ViewCMM{
             },
             reqData:{
                 app:this.app,
-                model:this.model
+                model:this.model,
+                criteria,
+                pageIndex:(pageData&&pageData.pageIndex)||1,
+                pageSize:(pageData&&pageData.pageSize)||10,
             }
         }
         var self=this
         new ModelAction(this.app,this.model).call("loadModelViewType",reqParam,function(data){
-        data.bag && setCreateContextViewData(
+        data.bag && setListContextData(
             self.app,
             self.model,
+            self.viewType,
             data.bag,
             ownerField,
         )
@@ -78,20 +146,17 @@ export class ListViewCMM extends  ViewCMM{
         })
     }
 
-    onFieldValueChange(fd,value,opType,elemTag){
-        if(opType===undefined){
-            opType=0
-        }
-        setCreateContextFieldValue([[fd,value,opType,elemTag]])
+    onCriteriaValueChange(data){
+        let self=this
+        setListContextCriteria(self.app,self.model,self.viewType,data.name,data)
     }
 
-    getFieldValue(createData,field){
-        return getCreateContextFieldValue(createData,field)
-    }
-
+ 
 
     doAction(view,trigger){
-        this[trigger.name].call(this,view)
+        if(this[trigger.name]){
+            this[trigger.name].call(this,view,trigger)
+        }
     }
     search(view){
         
@@ -103,10 +168,35 @@ export class ListViewCMM extends  ViewCMM{
     onCurrentChange(view,currentPage){
       
     }
-  
-    doAdd(view){
+    toDetail(view,trigger){
+        let routerPath = getRoutePath(trigger.app,trigger.model,trigger.viewType)
+        let arg = trigger[ARGS]
+        let id = arg.id
+        goRoute(routerPath+"/"+arg.id,{modelID:id})
+    }
+    doDelete(view,trigger){
+        let arg = trigger[ARGS]
+        let {id,tag}=arg
+        let self=this
+        const {ownerField,__inner_store__:innerStore}=view.props
+
+        new ModelAction(this.app,this.model).call("delete",{
+            id
+        },function(res){
+        if(res.errorCode==0){
+           //(app,model,viewType,tags,ownerField)
+            removeListContextViewData(self.app,self.model,self.viewType,[tag],ownerField)
+        }
+        else{
+            MessageBox.alert(res.description)
+        }
+        },function(err){
+            MessageBox.alert("通讯失败！")
+        })
+    }
+    toAdd(view){
         var path=getRoutePath(this.app,this.model,"create")
-        this.props.dispatch(push(path))
+        view.props.dispatch(push(path))
     }
     
 }

@@ -5,7 +5,8 @@ import {getAppsSelector,corpModelsSelector} from '../../reducers/sys'
 import {
   setCreateContextFieldValue,
   clearCreateContextFieldValue,
-  setCreateContextViewData
+  setCreateContextViewData,
+  setCreateContextViewDataToSource
 } from '../actions/appContext'
 
 import produce from "immer"
@@ -18,7 +19,6 @@ import {
     getCreateContextFieldValue,
     buildServerCreateData} from '../reducers/appContext'
 import {Button,Form,Tabs,Table, MessageBox} from 'element-react'
-import {getDefaultRelationModelView} from '../modelView/relation'
 export class CreateViewCMM extends ViewCMM{
 
     constructor(app,model,viewType){
@@ -33,8 +33,8 @@ export class CreateViewCMM extends ViewCMM{
       let baseProps= super.mapTo(state, ownProps);
       const {appModelViewType,ownerField} = ownProps
       let installApps=getAppsSelector(state)
-      const {app,model}=appModelViewType
-      let viewData=viewDataFromCreateContext(state)({app,model,ownerField})
+      const {app,model,viewType}=appModelViewType
+      let viewData=viewDataFromCreateContext(state)({app,model,viewType,ownerField})
       let newProps= Object.assign({},installApps,{viewData})
        return Object.assign({},baseProps,newProps,ownProps);
     }
@@ -44,20 +44,24 @@ export class CreateViewCMM extends ViewCMM{
     }
 
     update(view){
-       
-            
     }
-
-
-
     didMount(view){
-        let {ownerField,viewData}= view.props
+        let self= this
+        let {ownerField, viewData, datasourceKey}= view.props
         if(viewData && viewData.view){
+            setCreateContextViewData(
+                self.app,
+                self.model,
+                self.viewType,
+                viewData,
+                ownerField,
+                datasourceKey
+            )
             return
         }
         var reqParam={
             viewType:this.viewType,
-            ownerField:ownerField&&{
+            ownerField:ownerField && {
                 app:ownerField.app,
                 model:ownerField.model,
                 name:ownerField.name
@@ -67,13 +71,14 @@ export class CreateViewCMM extends ViewCMM{
                 model:this.model
             }
         }
-        var self=this
         new ModelAction(this.app,this.model).call("loadModelViewType",reqParam,function(data){
         data.bag && setCreateContextViewData(
             self.app,
             self.model,
+            self.viewType,
             data.bag,
             ownerField,
+            datasourceKey
         )
         },function(err){
             console.log(err)
@@ -89,25 +94,34 @@ export class CreateViewCMM extends ViewCMM{
     setCreateContextFieldValue([[fd,value,opType,elemTag]])
   }
 
-  getFieldValue(createData,field){
-      return getCreateContextFieldValue(createData,field)
-  }
+  
+  
   doCreate(view){
       let self=this
-      const {ownerField,__inner_store__:innerStore}=view.props
-      let createData= buildServerCreateData(self.app,self.model,ownerField,innerStore.state)
-      new ModelAction(this.app,this.model).call("create",createData,function(res){
-      if(res.errorCode==0){
-          var newID=res.bag["id"]
-          var editPath=getRoutePath(self.app,self.model,"edit")
-          goRoute(editPath,{id:newID})
+      const {ownerField,__inner_store__:innerStore,datasourceKey}=view.props
+      if(datasourceKey){
+        setCreateContextViewDataToSource(self.app,self.model,self.viewType,ownerField,datasourceKey)
       }
-      else{
-          MessageBox.alert(res.description)
+      else
+      {
+        let createData= buildServerCreateData(self.app,self.model,self.viewType,ownerField,innerStore.state)
+        new ModelAction(this.app,this.model).call("create",createData,function(res){
+            if(res.errorCode==0){
+                var newID=res.bag["id"]
+                var editPath=getRoutePath(self.app,self.model,"detail/"+newID)
+                goRoute(editPath,{id:newID})
+            }
+            else{
+                MessageBox.alert(res.description)
+            }
+            },function(err){
+                MessageBox.alert("通讯失败！")
+            })
       }
-      },function(err){
-          MessageBox.alert("通讯失败！")
-      })
+      const {external} = this.props
+      if(external && external.close){
+        external.close()
+      }
   }
 
   doAction(view,trigger){
@@ -116,6 +130,10 @@ export class CreateViewCMM extends ViewCMM{
  
   doCancel(view){
       const {ownerField}=view.props
-      clearCreateContextFieldValue(this.app,this.model,ownerField)
+      clearCreateContextFieldValue(this.app,this.model,this.viewType, ownerField)
+      const {external} = view.props
+      if(external && external.close){
+        external.close()
+      }
   }
 }
