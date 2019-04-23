@@ -17,6 +17,7 @@ import {getAppViewsMenu} from './reducers/appInContainer'
 import {ModelAction} from './mq/ModelAction'
 import HookContext from './HookContext';
 import {setAppInContainerViewMenu} from './actions/appInContainer'
+import {getDynamicRouterApp} from '../reducers/router'
 class AppInContainer extends React.Component{
     constructor(props){
         super(props)
@@ -38,8 +39,9 @@ class AppInContainer extends React.Component{
     componentDidMount(){
         let self=this
         //const currApp=this.props.currApp
+        const {routerApp} = this.props
         new ModelAction("core","app").call("loadAppContainer",{
-            app:self.app.name,
+            app:routerApp,
             menu:{
                 app:self.app.name,
                 menu:"main"
@@ -57,7 +59,7 @@ class AppInContainer extends React.Component{
 
     render(){
         var self=this
-        const {views,menu,modelViews:appModelViews} = this.props
+        const {views,menu,modelViews:appModelViews,routerApp} = this.props
         let dyMenu=menu||{
             subMenu:[]
         }
@@ -104,7 +106,7 @@ class AppInContainer extends React.Component{
                             Object.keys(dyViews).map((key,index)=>{
                                 let model = key
                                 let modelViews= dyViews[key]
-                                let modelPath="/app/dynamic/"+this.app.name+"/"+model
+                                let modelPath="/app/dynamic/"+routerApp+"/"+model
                                 return <Route path={modelPath} key={modelPath} render={props=>{
                                     return (
                                         <Switch>
@@ -138,7 +140,8 @@ class AppInContainer extends React.Component{
 
 function inMapStateToProps(state){
     let app=getCurrentApp(state)
+    let routerApp=getDynamicRouterApp(state)
     let vm = getAppViewsMenu(state)(app.currApp.name)
-    return Object.assign({},app,vm)
+    return Object.assign({},app,vm,routerApp)
 }
 export default withRouter(connect(inMapStateToProps)(AppInContainer))

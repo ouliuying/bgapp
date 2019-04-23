@@ -188,7 +188,7 @@ class ListView extends React.Component{
                                 </div>
 
                                 <div className="bg-model-list-view-body-control">
-                              
+
                                     <Table style={{width: '100%'}}
                                            columns={columns}
                                             data={rows}

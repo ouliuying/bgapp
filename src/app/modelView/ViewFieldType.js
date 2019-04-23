@@ -6,9 +6,13 @@ import {eq,gt_eq,and,lt,lt_eq,iLike,like} from '../../criteria/index'
 import {ModelAction} from  '../mq/ModelAction'
 import ViewType from './ViewType'
 import {getRoutePath} from '../routerHelper'
-import {push} from 'connected-react-router'
+import {push,withRouter} from 'connected-react-router'
 import {ReducerRegistry} from '../../ReducerRegistry'
+import {getModelView} from './ModelViewRegistry'
+import {ModalSheetManager} from './ModalSheetManager'
+import ViewRefType from './ViewRefType'
 import moment from 'moment'
+
 export const ViewFieldType={
     TextField:'text',
     SingleLineTextField:'singleLineText',
@@ -205,7 +209,7 @@ export class IconLabelField extends React.Component{
     }
 }
 
-export class Many2OneDataSetSelectField extends React.Component{
+class InnerMany2OneDataSetSelectField extends React.Component{
     constructor(props){
         super(props)
     }
@@ -215,13 +219,34 @@ export class Many2OneDataSetSelectField extends React.Component{
             onChange && onChange(value)
         }
         else{
-            let path=getRoutePath(relationData.targetApp,
-                relationData.targetModel,ViewType.LIST)
-            const {store}=ReducerRegistry
-            store.dispatch(push(path,{
-                mode:"selectMode",
-                app:relationData.targetApp,model:relationData.targetModel,viewType:ViewType.LIST
-            }))
+            // let path=getRoutePath(relationData.targetApp,
+            //     relationData.targetModel,ViewType.LIST)
+            // const {store}=ReducerRegistry
+            // store.dispatch(push(path,{
+            //     mode:"selectMode",
+            //     app:relationData.targetApp,
+            //     model:relationData.targetModel,
+            //     viewType:ViewType.LIST
+            // }))
+            const {meta,onChange,field,...rest} = this.props
+            let options =(meta||{}).optsions||[] 
+            let external = {
+                setOptionFieldValue(data){
+                    data&&options.push(data)
+                    data && onChange && onChange(data["id"])
+                }
+            }
+            let view = getModelView(relationData.targetApp,relationData.targetModel,ViewType.LIST)
+            view && (
+                ModalSheetManager.openModal(view,{
+                    app:relationData.app,
+                    model:relationData.targetModel,
+                    viewType:ViewType.LIST,
+                    external,
+                    ownerField:field,
+                    viewRefType:ViewRefType.SINGLE_SELECTION
+                },{...rest})
+            )
         }
     }
     render(){
@@ -256,6 +281,8 @@ export class Many2OneDataSetSelectField extends React.Component{
       </Select>
     }
 }
+
+export const Many2OneDataSetSelectField = withRouter(InnerMany2OneDataSetSelectField)
 
 export class CriteriaEnumSelect  extends React.Component{
     constructor(props){

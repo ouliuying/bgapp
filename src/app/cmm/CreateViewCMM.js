@@ -83,9 +83,7 @@ export class CreateViewCMM extends ViewCMM{
         },function(err){
             console.log(err)
         })
-    }
-
-
+}
 
   onFieldValueChange(fd,value,opType,elemTag){
     if(opType===undefined){
@@ -118,7 +116,7 @@ export class CreateViewCMM extends ViewCMM{
                 MessageBox.alert("通讯失败！")
             })
       }
-      const {external} = this.props
+      const {external} = view.props
       if(external && external.close){
         external.close()
       }

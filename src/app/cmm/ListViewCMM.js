@@ -55,25 +55,50 @@ export class ListViewCMM extends  ViewCMM{
         let currentPage =  pageData && pageData.pageIndex||1
         totalCount = totalCount||0
         let columns = []
-        for(let f of ((viewMeta||{}).fields||[])){
-            columns.push({
-                label:f.title,
-                prop:f.name
-                })
-        }
         let rows = []
         for(let d of ((data||{}).record||[])){
             rows.push(d)
         }
+        for(let f of ((viewMeta||{}).fields||[])){
+            if(!f.relationData){
+                columns.push({
+                    label:f.title,
+                    prop:f.name
+                    })
+            }
+            else{
+                columns.push({
+                    label:f.title,
+                    prop:f.name,
+                    render:(row, column, index)=>{
+                        console.log(`${JSON.stringify(row)}.${JSON.stringify(column)}.${index}`)
+                        let d =row[column.prop]
+                        if(d instanceof Object && d.record){
+                            if(d.record instanceof Array){
+                                return (d.record[0]||{})[f.relationData.toName]
+                            }
+                            else{
+                                return d.record[f.relationData.toName]
+                            }
+                        }
+                        else{
+                            return ""
+                        }
+                    }
+                })
+            }
+           
+        }
+     
         columns.push({
             label: "操作",
             width: 120,
-            fixed: 'right',
             render: (row, column, index)=>{
                 let tg= triggerGroups.find(x=>x.name=="opAction")
-                return tg?<span>
+                let selActionTg = triggerGroups.find(x=>x.name=="selAction")
+                return <span>
                     {
-                        tg.triggers.map(t=>{
+                        tg && tg.triggers.map(t=>{
                             return <Button type="text" size="small" onClick={()=>{
                                 produce(t,draft=>{
                                     if(!draft.app || draft.app=="*"){
@@ -82,15 +107,31 @@ export class ListViewCMM extends  ViewCMM{
                                     if(!draft.model || draft.model=="*"){
                                         draft.model = self.model
                                     }
-                                    draft[ARGS]={id:rows[index]["id"],tag:rows[index][RECORD_TAG]}
+                                    draft[ARGS]={id:row["id"],tag:row[RECORD_TAG]}
                                     self.doAction(view,draft)
                                 })
                                
                             }}>{t.title}</Button>
                         })
                     }
-                   
-                </span>:null
+                    {
+                        selActionTg && selActionTg.triggers.map(t=>{
+                            return <Button type="text" size="small" onClick={()=>{
+                                produce(t,draft=>{
+                                    if(!draft.app || draft.app=="*"){
+                                        draft.app = self.app
+                                    }
+                                    if(!draft.model || draft.model=="*"){
+                                        draft.model = self.model
+                                    }
+                                    draft[ARGS]={id:row[index]["id"],tag:row[index][RECORD_TAG],data:row}
+                                    self.doAction(view,draft)
+                                })
+                               
+                            }}>{t.title}</Button>
+                        })
+                    }
+                </span>
             }
         })
      
@@ -111,7 +152,7 @@ export class ListViewCMM extends  ViewCMM{
         }
     }
     didMount(view){
-        let {ownerField,viewData}= view.props
+        let {ownerField,viewData,viewRefType}= view.props
         const {pageData} = viewData
         let criteria = this.getCriteria(viewData)
         if(viewData && viewData.view){
@@ -119,6 +160,7 @@ export class ListViewCMM extends  ViewCMM{
         }
         var reqParam={
             viewType:this.viewType,
+            viewRefType:viewRefType,
             ownerField:ownerField&&{
                 app:ownerField.app,
                 model:ownerField.model,
@@ -198,5 +240,8 @@ export class ListViewCMM extends  ViewCMM{
         var path=getRoutePath(this.app,this.model,"create")
         view.props.dispatch(push(path))
     }
-    
+    doSelSingleItem(view,trigger){
+        let arg = trigger[ARGS]
+        
+    }
 }

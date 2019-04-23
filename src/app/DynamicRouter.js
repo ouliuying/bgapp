@@ -12,19 +12,14 @@ const appInContainers={
         loading: () => <div/>,
     })
 }
+function TestApp(){
+    return <div>test</div>
+}
 class DynamicRouter extends React.Component{
 
     render(){
         return <Switch>
         {
-            // this.props.uiAppCache!=undefined && Object.keys(this.props.uiAppCache).map((key,index)=>{
-            //     let appCacheUI=this.props.uiAppCache[key]
-            //     if(appCacheUI==undefined || appCacheUI.app==undefined || appCacheUI.app.uiInServer<1){
-            //         return null
-            //     }
-            //     let {rPath,AppContainer}=createAppContainer(appCacheUI,self.props.uiAppCache)
-            //     return <Route path={rPath} component={withRouter(connect(inMapStateToProps)(AppContainer))} key="1"></Route>
-            // })
             Object.keys(appInContainers).map(key=>{
                 const AppInContainer=appInContainers[key]
                 const rPath="/app/dynamic/"+key

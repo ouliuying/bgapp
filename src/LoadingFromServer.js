@@ -20,6 +20,7 @@ class LoadingFromServer extends React.Component{
     static contextTypes = {
         store: PropTypes.object,
     }
+    
     componentDidMount(){
         var dispatch=this.store.dispatch;
         req("/ac/bgworkcore/partner/getme",{},{

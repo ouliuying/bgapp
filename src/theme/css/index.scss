@@ -417,3 +417,9 @@ button:focus {
     border-style: dashed;
     border-color: #19b352;
 }
+.bg-waiting-sheet{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}

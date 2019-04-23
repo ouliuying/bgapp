@@ -128,7 +128,7 @@ class EditView extends React.Component{
                                                                         <Form.Item label={field.title} key={`form-item${key}`}>
                                                                                 <FieldComponent onChange={(value)=>{
                                                                                     host.onFieldValueChange(field,value)
-                                                                                }} value={nValue } key={key} meta={meta} title={field.title} relationData={field.relationData}></FieldComponent>    
+                                                                                }} value={nValue } key={key} meta={meta} title={field.title} relationData={field.relationData}  field={field}>></FieldComponent>    
                                                                         </Form.Item>
                                                                     ):null
                                                                 })
@@ -151,7 +151,7 @@ class EditView extends React.Component{
                                                                         <Form.Item label={field.title} key={`form-item${key}`}>
                                                                             <FieldComponent onChange={(value)=>{
                                                                                     host.onFieldValueChange(field,value)
-                                                                                }} value={nValue} key={key} meta={meta} title={field.title} relationData={field.relationData}></FieldComponent>    
+                                                                                }} value={nValue} key={key} meta={meta} title={field.title} relationData={field.relationData} field={field}></FieldComponent>    
                                                                         </Form.Item>
                                                                     ):null
                                                                 })
@@ -269,14 +269,14 @@ class EditView extends React.Component{
                                                                     <Form.Item label={gfs.fields[0].title}>
                                                                         <Com1 {...props1} onChange={(value)=>{
                                                                                     host.onFieldValueChange(gfs.fields[0],value)
-                                                                                }} key={key1} value={value1} meta={meta1} relationData={gfs.fields[0].relationData}></Com1>
+                                                                                }} key={key1} value={value1} meta={meta1} relationData={gfs.fields[0].relationData} field={gfs.fields[0]}></Com1>
                                                                     </Form.Item>
                                                                     </div>
                                                                     <div className="bg-model-op-view-body-common-two-col-second">
                                                                     {Com2!=null && (<Form.Item label={gfs.fields[1].title}>
                                                                         <Com2 {...props2} onChange={(value)=>{
                                                                                     host.onFieldValueChange(gfs.fields[1],value)
-                                                                                }} key={key2} value={value2} meta={meta2} relationData={gfs.fields[1].relationData}></Com2>
+                                                                                }} key={key2} value={value2} meta={meta2} relationData={gfs.fields[1].relationData} field={gfs.fields[1]}></Com2>
                                                                     </Form.Item>)
                                                                 }
                                                                     </div>
@@ -286,7 +286,7 @@ class EditView extends React.Component{
                                                                     <Form.Item label={gfs.fields[0].title}>
                                                                         <Com1 {...props1} onChange={(value)=>{
                                                                                     host.onFieldValueChange(gfs.fields[0],value)
-                                                                                }} key={key1} value={value1} meta={meta1} relationData={gfs.fields[0].relationData}></Com1>
+                                                                                }} key={key1} value={value1} meta={meta1} relationData={gfs.fields[0].relationData}  field={gfs.fields[0]}></Com1>
                                                                     </Form.Item>  
                                                                 </div>
                                                             
