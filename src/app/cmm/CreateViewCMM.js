@@ -83,13 +83,10 @@ export class CreateViewCMM extends ViewCMM{
         },function(err){
             console.log(err)
         })
-}
-
-  onFieldValueChange(fd,value,opType,elemTag){
-    if(opType===undefined){
-        opType=0
     }
-    setCreateContextFieldValue([[fd,value,opType,elemTag]])
+
+  onFieldValueChange(fd,value){
+    setCreateContextFieldValue([[fd,value]])
   }
 
   

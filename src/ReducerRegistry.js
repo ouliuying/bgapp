@@ -6,11 +6,11 @@ import createHistory from 'history/createBrowserHistory'
 import { connectRouter, routerMiddleware} from 'connected-react-router'
 import { persistStore,persistReducer} from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
-import { SSL_OP_ALL } from 'constants';
+import ViewContext from './app/modelView/ViewContext'
 const persistConfig = {
     key: 'root',
     storage:storage,
-    blacklist: [/*ViewContext.CREATE_CONTEXT,ViewContext.EDIT_CONTEXT,ViewContext.LIST_CONTEXT,*/"router"]
+    blacklist: [ViewContext.APP_CONTEXT,"router","modalSheetQueue"]
 }
 
 export class ReducerRegistry {

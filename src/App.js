@@ -8,7 +8,8 @@ import {
     Route,
     matchPath
 } from 'react-router'
-
+import {ReactReduxContext} from 'react-redux'
+import ModalSheetQueueContainer from './app/modelView/ModalSheetQueueContainer'
 import {connect} from 'react-redux'
 
 import Login from './Login'
@@ -41,25 +42,37 @@ class App extends Component {
     }
     render() {
         //return this.isLogin()?(<AppFrame/>):(<Login/>)
-        return <Switch>
-            <Route exact path="/" render={ props=>
-                this.isLogin()?(<Redirect to={{
-                    pathname: "/app",
-                    state: { from: props.location }
-                  }}></Redirect>):(<Redirect to={{
-                    pathname: "/login",
-                    state: { from: props.location }
-                  }}></Redirect>)
-            }/>
-            <Route path="/login" component={Login}></Route>
-            <Route path="/app" render={
-                props=>
-                this.isLogin()?(<AppFrame/>):(<Redirect to={{
-                    pathname: "/login",
-                    state: { from: props.location }
-                  }}></Redirect>)
-            }></Route>
-        </Switch>
+        return <ReactReduxContext.Consumer>
+            {
+                context=>{
+
+                    return <><Switch>
+                    <Route exact path="/" render={ props=>
+                        this.isLogin()?(<Redirect to={{
+                            pathname: "/app",
+                            state: { from: props.location }
+                          }}></Redirect>):(<Redirect to={{
+                            pathname: "/login",
+                            state: { from: props.location }
+                          }}></Redirect>)
+                    }/>
+                    <Route path="/login" component={Login}></Route>
+                    <Route path="/app" render={
+                        props=>
+                        this.isLogin()?(<AppFrame/>):(<Redirect to={{
+                            pathname: "/login",
+                            state: { from: props.location }
+                          }}></Redirect>)
+                    }></Route>
+                </Switch>
+                <ModalSheetQueueContainer></ModalSheetQueueContainer>
+                    
+        </>
+                }
+            
+            }
+            </ReactReduxContext.Consumer>
+            
     }
 }
 function mapStateToProps(state){

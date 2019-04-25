@@ -71,7 +71,6 @@ export class ListViewCMM extends  ViewCMM{
                     label:f.title,
                     prop:f.name,
                     render:(row, column, index)=>{
-                        console.log(`${JSON.stringify(row)}.${JSON.stringify(column)}.${index}`)
                         let d =row[column.prop]
                         if(d instanceof Object && d.record){
                             if(d.record instanceof Array){
@@ -95,7 +94,7 @@ export class ListViewCMM extends  ViewCMM{
             width: 120,
             render: (row, column, index)=>{
                 let tg= triggerGroups.find(x=>x.name=="opAction")
-                let selActionTg = triggerGroups.find(x=>x.name=="selAction")
+                let selSingleItemActionTg = triggerGroups.find(x=>x.name=="selSingleItemAction")
                 return <span>
                     {
                         tg && tg.triggers.map(t=>{
@@ -111,11 +110,11 @@ export class ListViewCMM extends  ViewCMM{
                                     self.doAction(view,draft)
                                 })
                                
-                            }}>{t.title}</Button>
+                            }} key={t.name}>{t.title}</Button>
                         })
                     }
                     {
-                        selActionTg && selActionTg.triggers.map(t=>{
+                        selSingleItemActionTg && selSingleItemActionTg.triggers.map(t=>{
                             return <Button type="text" size="small" onClick={()=>{
                                 produce(t,draft=>{
                                     if(!draft.app || draft.app=="*"){
@@ -124,11 +123,13 @@ export class ListViewCMM extends  ViewCMM{
                                     if(!draft.model || draft.model=="*"){
                                         draft.model = self.model
                                     }
-                                    draft[ARGS]={id:row[index]["id"],tag:row[index][RECORD_TAG],data:row}
+                                    draft[ARGS]={id:row["id"],tag:row[RECORD_TAG],data:row}
                                     self.doAction(view,draft)
+                                    const {external} = view.props
+                                    external && external.close && external.close()
                                 })
                                
-                            }}>{t.title}</Button>
+                            }} key={t.name}>{t.title}</Button>
                         })
                     }
                 </span>
@@ -155,9 +156,6 @@ export class ListViewCMM extends  ViewCMM{
         let {ownerField,viewData,viewRefType}= view.props
         const {pageData} = viewData
         let criteria = this.getCriteria(viewData)
-        if(viewData && viewData.view){
-            return
-        }
         var reqParam={
             viewType:this.viewType,
             viewRefType:viewRefType,
@@ -242,6 +240,7 @@ export class ListViewCMM extends  ViewCMM{
     }
     doSelSingleItem(view,trigger){
         let arg = trigger[ARGS]
-        
+       const {external} = view.props
+       external && external.selSingleItemAction && external.selSingleItemAction(arg.data)
     }
 }

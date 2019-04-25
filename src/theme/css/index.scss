@@ -423,3 +423,192 @@ button:focus {
     left: 50%;
     transform: translate(-50%, -50%);
 }
+.bg-waiting-sheet-show {
+    position: relative;
+    display: flex;
+    height:80px;
+    align-items:center;
+}
+
+.bg-waiting-g{
+    width:20px;
+    height:0px;
+    background: $primary-background-color;
+    margin:2px;
+}
+
+
+ @keyframes bg-waiting-g1 {
+    0% {
+        height: 0px;
+        background:$primary-background-color;
+      }
+      100% {
+        height:80px;
+        background:#e67e22;
+      }
+  }
+  
+.bg-waiting-g1 {
+    animation-name: bg-waiting-g1;
+    animation-duration: 0.8s; 
+    animation-timing-function: ease-out; 
+    animation-delay: 0.0s;
+    animation-direction: alternate;
+    animation-iteration-count: infinite;
+    animation-fill-mode: none;
+    animation-play-state: running; 
+  }
+  @keyframes bg-waiting-g2 {
+    0% {
+        height: 0px;
+        background:$primary-background-color;
+      }
+      100% {
+        height:80px;
+        background:#e67e22;
+      }
+  }
+  
+.bg-waiting-g2 {
+    animation-name: bg-waiting-g2;
+    animation-duration: 0.8s; 
+    animation-timing-function: ease-out; 
+    animation-delay: 0.1s;
+    animation-direction: alternate;
+    animation-iteration-count: infinite;
+    animation-fill-mode: none;
+    animation-play-state: running; 
+  }
+
+  @keyframes bg-waiting-g3 {
+    0% {
+        height: 0px;
+        background:$primary-background-color;
+      }
+      100% {
+        height:80px;
+        background:#e67e22;
+      }
+  }
+  
+.bg-waiting-g3 {
+    animation-name: bg-waiting-g3;
+    animation-duration: 0.8s; 
+    animation-timing-function: ease-out; 
+    animation-delay: 0.2s;
+    animation-direction: alternate;
+    animation-iteration-count: infinite;
+    animation-fill-mode: none;
+    animation-play-state: running; 
+  }
+
+  @keyframes bg-waiting-g4 {
+    0% {
+        height: 0px;
+        background:$primary-background-color;
+      }
+      100% {
+        height:80px;
+        background:#e67e22;
+      }
+  }
+  
+.bg-waiting-g4 {
+    animation-name: bg-waiting-g4;
+    animation-duration: 0.8s; 
+    animation-timing-function: ease-out; 
+    animation-delay: 0.3s;
+    animation-direction: alternate;
+    animation-iteration-count: infinite;
+    animation-fill-mode: none;
+    animation-play-state: running; 
+  }
+
+  @keyframes bg-waiting-g5 {
+    0% {
+        height: 0px;
+        background:$primary-background-color;
+      }
+      100% {
+        height:80px;
+        background:#e67e22;
+      }
+  }
+  
+  .bg-waiting-g5 {
+    animation-name: bg-waiting-g5;
+    animation-duration: 0.8s; 
+    animation-timing-function: ease-out; 
+    animation-delay: 0.4s;
+    animation-direction: alternate;
+    animation-iteration-count: infinite;
+    animation-fill-mode: none;
+    animation-play-state: running; 
+  }
+
+  @keyframes bg-waiting-g6 {
+    0% {
+        height: 0px;
+        background:$primary-background-color;
+      }
+      100% {
+        height:80px;
+        background:#e67e22;
+      }
+  }
+  
+  .bg-waiting-g6 {
+    animation-name: bg-waiting-g6;
+    animation-duration: 0.8s; 
+    animation-timing-function: ease-out; 
+    animation-delay: 0.5s;
+    animation-direction: alternate;
+    animation-iteration-count: infinite;
+    animation-fill-mode: none;
+    animation-play-state: running; 
+  }
+
+  @keyframes bg-waiting-g7 {
+    0% {
+        height: 0px;
+        background:$primary-background-color;
+      }
+      100% {
+        height:80px;
+        background:#e67e22;
+      }
+  }
+  
+  .bg-waiting-g7 {
+    animation-name: bg-waiting-g7;
+    animation-duration: 0.8s; 
+    animation-timing-function: ease-out; 
+    animation-delay: 0.6s;
+    animation-direction: alternate;
+    animation-iteration-count: infinite;
+    animation-fill-mode: none;
+    animation-play-state: running; 
+  }
+
+  @keyframes bg-waiting-g8 {
+    0% {
+        height: 0px;
+        background:$primary-background-color;
+      }
+      100% {
+        height:80px;
+        background:#e67e22;
+      }
+  }
+  
+  .bg-waiting-g8{
+    animation-name: bg-waiting-g8;
+    animation-duration: 0.8s; 
+    animation-timing-function: ease-out; 
+    animation-delay: 0.7s;
+    animation-direction: alternate;
+    animation-iteration-count: infinite;
+    animation-fill-mode: none;
+    animation-play-state: running; 
+  }

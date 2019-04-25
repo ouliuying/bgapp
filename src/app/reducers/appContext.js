@@ -4,8 +4,8 @@ import {
     SET_CREATE_CONTEXT_VIEW_DATA,
     SET_LIST_CONTEXT_CRITERIA,
     SET_LIST_CONTEXT_VIEW_DATA,
-    SET_LIST_CONTEXT_PAEG_DATA,
-    UPDATE_LIST_CONTEXT_VIEW_DATA,
+   // SET_LIST_CONTEXT_PAEG_DATA,
+    //UPDATE_LIST_CONTEXT_VIEW_DATA,
     SET_DETAIL_CONTEXT_VIEW_DATA,
     SET_EDIT_CONTEXT_VIEW_DATA,
     SET_EDIT_CONTEXT_FIELD_VALUE,
@@ -21,7 +21,10 @@ import ViewType from '../modelView/ViewType'
 import {CREATE_VIEW_DATA, LIST_VIEW_DATA, DETAIL_VIEW_DATA, EDIT_VIEW_DATA,RECORD_TAG} from '../ReservedKeyword'
 import { ReducerRegistry } from '../../ReducerRegistry';
 const initAppContext={}
-
+initAppContext[EDIT_VIEW_DATA]={}
+initAppContext[CREATE_VIEW_DATA]={}
+initAppContext[DETAIL_VIEW_DATA]={}
+initAppContext[LIST_VIEW_DATA]={}
 export function appContext(state,action){
     if(typeof state == "undefined"){
         return initAppContext
@@ -36,8 +39,6 @@ export function appContext(state,action){
                   newState.map(fv=>{
                     let rootField = fv[0]
                     let key=getAppModelViewKey(rootField.app,rootField.model,rootField.viewType,rootField.ownerField)
-                    draft[CREATE_VIEW_DATA]=draft[CREATE_VIEW_DATA]||{}
-                    draft[CREATE_VIEW_DATA][key]=draft[CREATE_VIEW_DATA][key]||{}
                     draft[CREATE_VIEW_DATA][key]=draft[CREATE_VIEW_DATA][key]||{
                       app:rootField.app,
                       model:rootField.model,
@@ -63,8 +64,6 @@ export function appContext(state,action){
                     newFieldValues.map(fv=>{
                       let rootField = fv[0]
                       let key=getAppModelViewKey(rootField.app,rootField.model,rootField.viewType,rootField.ownerField)
-                      draft[EDIT_VIEW_DATA]=draft[EDIT_VIEW_DATA]||{}
-                      draft[EDIT_VIEW_DATA][key]=draft[EDIT_VIEW_DATA][key]||{}
                       draft[EDIT_VIEW_DATA][key]=draft[EDIT_VIEW_DATA][key]||{
                         app:rootField.app,
                         model:rootField.model,
@@ -117,8 +116,6 @@ export function appContext(state,action){
             let {app,model,viewType,ownerField}=action.payload
             return produce(state,draft=>{
                 let key=getAppModelViewKey(app,model,viewType,ownerField)
-                draft[CREATE_VIEW_DATA]=draft[CREATE_VIEW_DATA]||{}
-                draft[CREATE_VIEW_DATA][key]=draft[CREATE_VIEW_DATA][key]||{}
                 draft[CREATE_VIEW_DATA][key]=draft[CREATE_VIEW_DATA][key]||{
                     app,
                     model,
@@ -174,24 +171,24 @@ export function appContext(state,action){
                 setListViewData(draft,viewData,ownerField)
             })
         }
-        case UPDATE_LIST_CONTEXT_VIEW_DATA:{
-            const { app,
-                    model,
-                    viewType,
-                    viewData,
-                    ownerField,
-                    refView }=action.payload
-                return produce(state,draft=>{
-                    updateListViewData(draft,viewData,ownerField)
-                })
-        }
-        case SET_LIST_CONTEXT_PAEG_DATA:
-        {
-            const {app,model,viewType,pageIndex,pageSize,ownerField}  = action.payload
-            return produce(state,draft=>{
-                setListViewPageData(draft,app,model,viewType,pageSize,pageIndex,ownerField)
-            })
-        }
+        // case UPDATE_LIST_CONTEXT_VIEW_DATA:{
+        //     const { app,
+        //             model,
+        //             viewType,
+        //             viewData,
+        //             ownerField,
+        //             refView }=action.payload
+        //         return produce(state,draft=>{
+        //             updateListViewData(draft,viewData,ownerField)
+        //         })
+        // }
+        // case SET_LIST_CONTEXT_PAEG_DATA:
+        // {
+        //     const {app,model,viewType,pageIndex,pageSize,ownerField}  = action.payload
+        //     return produce(state,draft=>{
+        //         setListViewPageData(draft,app,model,viewType,pageSize,pageIndex,ownerField)
+        //     })
+        // }
         case REMOVE_LIST_CONTEXT_VIEW_DATA:
         {
             const {app,model,viewType,tags,ownerField}  = action.payload
@@ -268,7 +265,6 @@ function setContextViewDataToSource(draft,data,datasourceKey){
 function setCreateViewData(draft,viewData,ownerField,datasourceKey){
     let {view,data,triggerGroups}=viewData
     let key = getAppModelViewKey(view.app,view.model,view.viewType,ownerField)
-    draft[CREATE_VIEW_DATA]=draft[CREATE_VIEW_DATA]||{}
     draft[CREATE_VIEW_DATA][key]=draft[CREATE_VIEW_DATA][key]||{
         app:view.app,
         model:view.model,
@@ -281,7 +277,6 @@ function setCreateViewData(draft,viewData,ownerField,datasourceKey){
 function setListViewData(draft,viewData,ownerField){
     let {view,data,triggerGroups}=viewData
     let key = getAppModelViewKey(view.app,view.model,view.viewType,ownerField)
-    draft[LIST_VIEW_DATA]=draft[LIST_VIEW_DATA]||{}
     draft[LIST_VIEW_DATA][key]=draft[LIST_VIEW_DATA][key]||{
         app:view.app,
         model:view.model,
@@ -308,41 +303,38 @@ function getInitListViewData(data, view, ownerField){
     }
     return data
 }
-function setListViewPageData(draft,app,model,viewType,pageSize,pageIndex,ownerField){
-    let key = getAppModelViewKey(app,model,viewType,ownerField)
-    draft[LIST_VIEW_DATA]=draft[LIST_VIEW_DATA]||{}
-    let oldData= (draft[LIST_VIEW_DATA][key]=draft[LIST_VIEW_DATA][key]||{
-        app:app,
-        model:model,
-        viewData:{}
-    })["viewData"]
-    oldData.pageData={pageIndex,pageSize}
-    draft[LIST_VIEW_DATA][key]=oldData
-}
+// function setListViewPageData(draft,app,model,viewType,pageSize,pageIndex,ownerField){
+//     let key = getAppModelViewKey(app,model,viewType,ownerField)
+//     let oldData= (draft[LIST_VIEW_DATA][key]=draft[LIST_VIEW_DATA][key]||{
+//         app:app,
+//         model:model,
+//         viewData:{}
+//     })["viewData"]
+//     oldData.pageData={pageIndex,pageSize}
+//     draft[LIST_VIEW_DATA][key]=oldData
+// }
 
 
-function updateListViewData(draft,viewData,ownerField){
-    let {view,data,triggerGroups}=viewData
-    let key = getAppModelViewKey(view.app,view.model,view.viewType,ownerField)
-    draft[LIST_VIEW_DATA]=draft[LIST_VIEW_DATA]||{}
-    let oldData= (draft[LIST_VIEW_DATA][key]=draft[LIST_VIEW_DATA][key]||{
-        app:view.app,
-        model:view.model,
-        viewData:{}
-    })["viewData"]
+// function updateListViewData(draft,viewData,ownerField){
+//     let {view,data,triggerGroups}=viewData
+//     let key = getAppModelViewKey(view.app,view.model,view.viewType,ownerField)
+//     let oldData= (draft[LIST_VIEW_DATA][key]=draft[LIST_VIEW_DATA][key]||{
+//         app:view.app,
+//         model:view.model,
+//         viewData:{}
+//     })["viewData"]
 
-    Object.keys(viewData).map(key=>{
-        oldData[key]=viewData[key]
-    })
-    draft[LIST_VIEW_DATA][key]=oldData
-}
+//     Object.keys(viewData).map(key=>{
+//         oldData[key]=viewData[key]
+//     })
+//     draft[LIST_VIEW_DATA][key]=oldData
+// }
 
 
 
 function setModelViewCriteria(draft,app,model,viewType,ownerField,name,criteria){
     let key = getAppModelViewKey(app,model,viewType,ownerField)
     if(viewType == ViewType.LIST){
-        draft[LIST_VIEW_DATA]=draft[LIST_VIEW_DATA]||{}
         if(draft[LIST_VIEW_DATA][key]){
             draft[LIST_VIEW_DATA][key]["viewData"]=draft[LIST_VIEW_DATA][key]["viewData"]||{}
             draft[LIST_VIEW_DATA][key]["viewData"]["criterias"] = draft[LIST_VIEW_DATA][key]["viewData"]["criterias"]||{}
@@ -353,7 +345,6 @@ function setModelViewCriteria(draft,app,model,viewType,ownerField,name,criteria)
 function setDetailContextViewData(draft,app,model,viewType,viewData,ownerField){
     let {view,data,triggerGroups}=viewData
     let key = getAppModelViewKey(view.app,view.model,view.viewType,ownerField)
-    draft[DETAIL_VIEW_DATA]=draft[DETAIL_VIEW_DATA]||{}
     draft[DETAIL_VIEW_DATA][key]=draft[DETAIL_VIEW_DATA][key]||{
         app:view.app,
         model:view.model,
@@ -377,7 +368,6 @@ function setDetailContextViewData(draft,app,model,viewType,viewData,ownerField){
 function setEditContextViewData(draft,app,model,viewType,viewData,ownerField){
     let {view,data,triggerGroups}=viewData
     let key = getAppModelViewKey(view.app,view.model,view.viewType,ownerField)
-    draft[EDIT_VIEW_DATA]=draft[EDIT_VIEW_DATA]||{}
     draft[EDIT_VIEW_DATA][key]=draft[EDIT_VIEW_DATA][key]||{
         app:view.app,
         model:view.model,
@@ -446,29 +436,15 @@ export function getAppModelViewKey(app,model,viewType,ownerField){
 }
 
 export function updateViewField(viewData,ownerField){
-    let {view,subViews}=viewData
+    let {view}=viewData
     if(view){
         view.ownerField=ownerField
-        if(ownerField){
-            ownerField.subView = view
-        }
         if(view.fields){
             view.fields.map(f=>{
-
                 f.ownerField = ownerField
                 return true
             })
         }
-    
-       if(subViews){
-        subViews.map(subView=>{
-            let refField = view.fields.find(f=>{
-                return f.name == subView.refView.fieldName
-            })
-            subView.view && updateViewField(subView, refField)
-        })
-       }
-        
     }
 }
 

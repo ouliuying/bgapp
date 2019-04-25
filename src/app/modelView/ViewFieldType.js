@@ -6,7 +6,7 @@ import {eq,gt_eq,and,lt,lt_eq,iLike,like} from '../../criteria/index'
 import {ModelAction} from  '../mq/ModelAction'
 import ViewType from './ViewType'
 import {getRoutePath} from '../routerHelper'
-import {push,withRouter} from 'connected-react-router'
+import {push} from 'connected-react-router'
 import {ReducerRegistry} from '../../ReducerRegistry'
 import {getModelView} from './ModelViewRegistry'
 import {ModalSheetManager} from './ModalSheetManager'
@@ -40,21 +40,33 @@ export class StaticField extends React.Component{
         </span>
     }
 }
+
 export class TextField extends React.Component{
     render(){
-        const {type,...rest}=this.props
-        return type==="singleLine"?(
-            <Input placeholder="请输入内容" {...rest}/>
-        ):(
-            <Input type="textarea" {...rest} placeholder="请输入内容"/>
-        )
+        const {type,value,onChange}=this.props
+        try{
+            return type==="singleLine"?(
+                <Input placeholder="请输入内容"  value={value} onChange={(value)=>{
+                    onchange(value)
+                }}/>
+            ):(
+                <Input type="textarea" value={value} placeholder="请输入内容" onchange={(value)=>{
+                    onchange(value)
+                }}/>
+            )
+        }
+        catch(err){
+
+        }
+        return <></>
+    
     }
 }
 export class SingleLineTextField extends React.Component{
 
     render(){
         return <TextField type="singleLine" {...this.props}>
-
+            
         </TextField>
     }
 }
@@ -168,12 +180,19 @@ export class DateField extends React.Component{
         return moment(date).format("YYYY-MM-DD")
     }
     render(){
-        const {onChange,value}=this.props
-        let setValue=this.toDate(value)
-        return <DatePicker onChange={(value)=>{
-            let strValue=this.fromDate(value)
-            onChange && onChange(strValue)}
-        } value={setValue}></DatePicker>
+        try{
+            const {onChange,value}=this.props
+            let setValue=this.toDate(value)
+            return <DatePicker onChange={(value)=>{
+                let strValue=this.fromDate(value)
+                onChange && onChange(strValue)}
+            } value={setValue}></DatePicker>
+        }
+        catch(err){
+
+        }
+        return <></>
+       
     }
 }
 
@@ -209,43 +228,38 @@ export class IconLabelField extends React.Component{
     }
 }
 
-class InnerMany2OneDataSetSelectField extends React.Component{
+export class Many2OneDataSetSelectField extends React.Component{
     constructor(props){
         super(props)
+        this.state={selItem:null}
     }
     onChange(value){
+        let self=this
         const {onChange,relationData}=this.props
         if(value!=="更多选择..."){
             onChange && onChange(value)
         }
         else{
-            // let path=getRoutePath(relationData.targetApp,
-            //     relationData.targetModel,ViewType.LIST)
-            // const {store}=ReducerRegistry
-            // store.dispatch(push(path,{
-            //     mode:"selectMode",
-            //     app:relationData.targetApp,
-            //     model:relationData.targetModel,
-            //     viewType:ViewType.LIST
-            // }))
-            const {meta,onChange,field,...rest} = this.props
+            const {meta,onChange,field} = this.props
             let options =(meta||{}).optsions||[] 
             let external = {
-                setOptionFieldValue(data){
-                    data&&options.push(data)
-                    data && onChange && onChange(data["id"])
+                selSingleItemAction(data){
+                    self.setState({
+                        selItem:data
+                    })
+                    data && onChange && onChange(parseInt(data["id"]),data)
                 }
             }
             let view = getModelView(relationData.targetApp,relationData.targetModel,ViewType.LIST)
             view && (
                 ModalSheetManager.openModal(view,{
-                    app:relationData.app,
+                    app:relationData.targetApp,
                     model:relationData.targetModel,
                     viewType:ViewType.LIST,
                     external,
                     ownerField:field,
                     viewRefType:ViewRefType.SINGLE_SELECTION
-                },{...rest})
+                })
             )
         }
     }
@@ -256,10 +270,19 @@ class InnerMany2OneDataSetSelectField extends React.Component{
         if(meta && meta.options){
             meta.options.map(r=>{
                 options.push({
-                    value:r["id"],
+                    value:parseInt(r["id"]),
                     label:r[relationData.toName]
                 })
             })
+        }
+        if(self.state.selItem!=null){
+            let id = parseInt(self.state.selItem["id"])
+            if(options.findIndex(x=>x.value == id)<0){
+                options.push({
+                    value:id,
+                    lablel:self.state.selItem[relationData.toName]
+                })  
+            }
         }
         return <Select onChange={(value)=>{
            self.onChange(value)
@@ -282,7 +305,7 @@ class InnerMany2OneDataSetSelectField extends React.Component{
     }
 }
 
-export const Many2OneDataSetSelectField = withRouter(InnerMany2OneDataSetSelectField)
+//export const Many2OneDataSetSelectField = withRouter(InnerMany2OneDataSetSelectField)
 
 export class CriteriaEnumSelect  extends React.Component{
     constructor(props){

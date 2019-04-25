@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import {URLCodeHelper} from './urlcode-helper'
 import {TypeHelper} from './type-helper'
-import { hideGlobalOverlay,showGlobalOverlay } from './GlobalOverlay';
+import {showGlobalOverlay } from './GlobalOverlay';
  const APPLICATION_X_WWW_FORM_URLENCODED='application/x-www-form-urlencoded'
  const APPLICATION_JSON='application/json'
 const RESPONE_JSON='json'
@@ -47,7 +47,7 @@ function req(url,data=null,reqInfo=null,successFun,failFun){
         pReqInfo.headers["content-type"]=APPLICATION_JSON
         pData=JSON.stringify(pData)
     }
-    showGlobalOverlay()
+    let hideGlobalOverlay=showGlobalOverlay()
     if(pReqInfo.method==HTTP_POST){
         pReqInfo.headers["content-length"]=pData.length
         return fetch(url,{
