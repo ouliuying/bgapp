@@ -14,7 +14,8 @@ import { getRoutePath,goRoute } from '../routerHelper'
 import {
     viewDataFromDetailContext} from '../reducers/appContext'
 import {Button,Form,Tabs,Table, MessageBox} from 'element-react'
-
+import {createViewParam,createEditParam} from '../modelView/ViewParam'
+import ViewType from '../modelView/ViewType'
 export class DetailViewCMM extends ViewCMM{
 
     constructor(app,model,viewType){
@@ -27,7 +28,8 @@ export class DetailViewCMM extends ViewCMM{
 
     mapTo(state, ownProps){
       let baseProps= super.mapTo(state, ownProps);
-      const {appModelViewType,ownerField} = ownProps
+      const {appModelViewType,viewParam} = ownProps
+      const {ownerField} = (viewParam||{})
       let installApps=getAppsSelector(state)
       const {app,model,viewType}=appModelViewType
       let viewData=viewDataFromDetailContext(state)({app,model,viewType,ownerField})
@@ -45,30 +47,71 @@ export class DetailViewCMM extends ViewCMM{
     }
 
     getModelID(view){
-        let {modelID} = view.props
+        let {modelID,viewParam} = view.props
+        const {modelID:vModelID} = viewParam||{}
+        if(vModelID){
+            return vModelID
+        }
         if(!modelID){
             modelID = this.getModelIDFromPath(view)
         }
         return modelID
     }
 
+    getSubRefViewParam(view,subRefView,ownerField){
+        const {viewData} = view.props
+        const {data}=(viewData||{})
+        let ownerFieldValue = (data.record||{})[ownerField.name]
+        return createViewParam(ownerField,ownerFieldValue,null,null)
+    }
+
     getModelIDFromPath(view){
-        let state = view.props["__inner_store__"].state
+        const {viewParam} = view.props
+        let state = (viewParam||{}).orgState
         let pathname = state.router.location.pathname
         let items=pathname.split('/')
-        return items[6]
+        return items.length>6?items[6]:undefined
+    }
+     
+    getOwnerFieldRawFieldValue(app,model,ownerField,ownerFieldValue){
+        if(ownerField && ownerFieldValue!=null && ownerFieldValue!=undefined){
+          if(ownerFieldValue instanceof Object){
+             if(ownerFieldValue.record){
+                 if(app==ownerField.relationData.targetApp && model==ownerField.relationData.targetModel){
+                     return ownerFieldValue.record[ownerField.relationData.targetField]
+                 }
+                 else if(app == ownerField.relationData.relationApp && model == ownerField.relationApp.relationModel){
+                  return ownerFieldValue.record[ownerField.relationData.relationField]
+                 }
+             }
+             else{
+                if(app==ownerField.relationData.targetApp && model==ownerField.relationData.targetModel){
+                  return ownerFieldValue[ownerField.relationData.targetField]
+                }
+                else if(app == ownerField.relationData.relationApp && model == ownerField.relationApp.relationModel){
+                return ownerFieldValue[ownerField.relationData.relationField]
+                }
+             }
+          }
+          else{
+            return ownerFieldValue
+          }
+        }
     }
 
     didMount(view){
-        let {ownerField,viewData}= view.props
+        let {viewParam,viewData}= view.props
+        const {ownerField,ownerFieldValue} = viewParam
         let modelID = this.getModelID(view)
+        let rawOwnerFieldValue = this.getOwnerFieldRawFieldValue(this.app,this.model,ownerField,ownerFieldValue)
         var reqParam={
             viewType:this.viewType,
-            ownerField:ownerField&&{
+            ownerField:ownerField?{
                 app:ownerField.app,
                 model:ownerField.model,
-                name:ownerField.name
-            },
+                name:ownerField.name,
+                value:rawOwnerFieldValue
+            }:undefined,
             reqData:{
                 app:this.app,
                 model:this.model,
@@ -88,14 +131,23 @@ export class DetailViewCMM extends ViewCMM{
             console.log(err)
         })
     }
+
     doAction(view,trigger){
         this[trigger.name].call(this,view)
     }
     toEdit(view,trigger){
         var id = this.getModelID(view)
-        let rPath = getRoutePath(this.app,this.model,"edit")
-        rPath=rPath+"/"+id
-        goRoute(rPath,{modelID:id})
+        const {viewParam,viewRefType} = view.props
+        if((viewParam||{}).ownerField){
+            const {ownerField,ownerFieldValue,orgState} = viewParam
+            let eViewParam = createEditParam(ownerField,ownerFieldValue,undefined,orgState,id)
+            this.showAppModelViewInModalQueue(this.app,this.model,ViewType.EDIT,viewRefType,eViewParam)
+        }
+        else{
+            let rPath = getRoutePath(this.app,this.model,ViewType.EDIT)
+            rPath=rPath+"/"+id
+            goRoute(rPath,{modelID:id})
+        }
     }
     doCancel(view){
         

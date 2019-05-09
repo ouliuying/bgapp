@@ -30,6 +30,7 @@ class ListView extends React.Component{
     }
    
     componentDidMount(){
+        console.log("listview componentDidMount")
         window.addEventListener("resize", ()=>{this.windowSizeUpdate()});
         this.cmmHost.didMount(this)
     }
@@ -58,7 +59,8 @@ class ListView extends React.Component{
 
     render(){
         const self=this
-        const {ownerField,viewData} = self.props
+        const {viewParam,viewData} = self.props
+        const {ownerField} = (viewParam||{})
         let {criterias, triggerGroups} = viewData
         criterias=criterias||[]
         triggerGroups=triggerGroups||[]
@@ -159,7 +161,7 @@ class ListView extends React.Component{
                                                     mainGroup.triggers.map(t=>{
                                                              return <Button type="danger" onClick={()=>{
                                                                  self.cmmHost.doAction(self,t)
-                                                             }}>{t.title}</Button>
+                                                             }} key={t.name}>{t.title}</Button>
                                                     })
                                                 }      
                                                 </Form.Item>:null

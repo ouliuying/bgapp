@@ -4,8 +4,7 @@ import {getDynamicRouterAppModelViewType} from '../../reducers/router'
 import {getAppsSelector,corpModelsSelector} from '../../reducers/sys'
 import {
   setEditContextFieldValue,
-  setEditContextViewData,
-  setEditContextViewDataToSource
+  setEditContextViewData
 } from '../actions/appContext'
 
 import produce from "immer"
@@ -16,6 +15,8 @@ import {
     viewDataFromEditContext,
     buildServerEditData} from '../reducers/appContext'
 import {Button,Form,Tabs,Table, MessageBox} from 'element-react'
+import {createViewParam} from '../modelView/ViewParam'
+import _ from "lodash"
 export class EditViewCMM extends ViewCMM{
 
     constructor(app,model,viewType){
@@ -28,7 +29,8 @@ export class EditViewCMM extends ViewCMM{
 
     mapTo(state, ownProps){
       let baseProps= super.mapTo(state, ownProps);
-      const {appModelViewType,ownerField} = ownProps
+      const {appModelViewType,viewParam} = ownProps
+      const {ownerField} = (viewParam||{})
       let installApps=getAppsSelector(state)
       const {app,model,viewType}=appModelViewType
       let viewData=viewDataFromEditContext(state)({app,model,viewType,ownerField})
@@ -42,31 +44,47 @@ export class EditViewCMM extends ViewCMM{
     update(view){
 
     }
+    getSubRefViewParam(view,subRefView,ownerField){
+        const {viewData} = view.props
+        const {data}=(viewData||{})
+        let ownerFieldValue = (data.record||{})[ownerField.name]
+        return createViewParam(ownerField,ownerFieldValue,null,null)
+    }
     getModelID(view){
-        let {modelID} = view.props
+
+        let {modelID,viewParam} = view.props
+        const {modelID:vModelID} = viewParam||{}
+        if(vModelID){
+            return vModelID
+        }
         if(!modelID){
             modelID = this.getModelIDFromPath(view)
         }
         return modelID
     }
 
+
     getModelIDFromPath(view){
-        let state = view.props["__inner_store__"].state
+        const {viewParam} = view.props
+        let state = (viewParam||{}).orgState
         let pathname = state.router.location.pathname
         let items=pathname.split('/')
-        return items[6]
+        return items.length>6?items[6]:undefined
     }
 
     reloadEditContextData(view){
-        let {ownerField,viewData}= view.props
+        let {viewParam,viewData}= view.props
+        let {ownerField,ownerFieldValue} = (viewParam||{})
         let modelID = this.getModelID(view)
+        let rawFieldValue = this.getOwnerFieldRawFieldValue(this.app,this.model,ownerField,ownerFieldValue)
         var reqParam={
             viewType:this.viewType,
-            ownerField:ownerField&&{
+            ownerField:ownerField?{
                 app:ownerField.app,
                 model:ownerField.model,
-                name:ownerField.name
-            },
+                name:ownerField.name,
+                value:rawFieldValue
+            }:undefined,
             reqData:{
                 app:this.app,
                 model:this.model,
@@ -86,25 +104,99 @@ export class EditViewCMM extends ViewCMM{
             console.log(err)
         })
     }
+    
     didMount(view){
       this.reloadEditContextData(view)
     }
-    onFieldValueChange(fd,value,opType,elemTag){
-        if(opType===undefined){
-            opType=0
+
+
+    
+    getOwnerRelationFieldValues(view){
+        const {viewParam} = view.props
+        let {ownerField,ownerFieldValue,viewData} = (viewParam||{})
+        if(ownerField.relationData.targetApp==this.app && ownerField.relationData.targetModel==this.model){
+           if(ownerFieldValue instanceof Object){
+              let rawValue = ownerFieldValue.record?ownerFieldValue.record[ownerField.relationData.targetField]:ownerFieldValue[ownerField.relationData.targetField]
+              if(rawValue){
+                let fd=viewData.view.fields.find(x=>x.name==ownerField.relationData.targetField)
+                return fd?[fd,rawValue]:undefined
+              }
+           }
+           else{
+             let fd=viewData.view.fields.find(x=>x.name==ownerField.relationData.targetField)
+             if(fd){
+               return [fd,ownerFieldValue]
+             }
+           }
         }
-        setEditContextFieldValue([[fd,value,opType,elemTag]])
+        else if(ownerField.relationData.relationApp==this.app && ownerField.relationData.relationModel == this.model){
+          if(ownerFieldValue instanceof Object){
+            let rawValue = ownerFieldValue.record?ownerFieldValue.record[ownerField.relationData.relationField]:ownerFieldValue[ownerField.relationData.relationField]
+            if(rawValue){
+              let fd=viewData.view.fields.find(x=>x.name==ownerField.relationData.relationField)
+              return fd?[fd,rawValue]:undefined
+            }
+         }
+         else{
+           let fd=viewData.view.fields.find(x=>x.name==ownerField.relationData.relationField)
+           if(fd){
+             return [fd,ownerFieldValue]
+           }
+         }
+        }
+      }
+
+    onFieldValueChange(fd,value,view){
+        let relationFieldValues =this.getOwnerRelationFieldValues(view)
+        if(!relationFieldValues){
+            setEditContextFieldValue([[fd,value]])
+        }
+        else{
+            setEditContextFieldValue([[fd,value],relationFieldValues])
+        }
+        
     }
 
- 
+    getOwnerFieldRawFieldValue(app,model,ownerField,ownerFieldValue){
+        if(ownerField && ownerFieldValue!=null && ownerFieldValue!=undefined){
+          if(ownerFieldValue instanceof Object){
+             if(ownerFieldValue.record){
+                 if(app==ownerField.relationData.targetApp && model==ownerField.relationData.targetModel){
+                     return ownerFieldValue.record[ownerField.relationData.targetField]
+                 }
+                 else if(app == ownerField.relationData.relationApp && model == ownerField.relationApp.relationModel){
+                  return ownerFieldValue.record[ownerField.relationData.relationField]
+                 }
+             }
+             else{
+                if(app==ownerField.relationData.targetApp && model==ownerField.relationData.targetModel){
+                  return ownerFieldValue[ownerField.relationData.targetField]
+                }
+                else if(app == ownerField.relationData.relationApp && model == ownerField.relationApp.relationModel){
+                return ownerFieldValue[ownerField.relationData.relationField]
+                }
+             }
+          }
+          else{
+            return ownerFieldValue
+          }
+        }
+    }
+
     doSave(view){
         let self=this
-        const {ownerField,__inner_store__:innerStore,datasourceKey,external}=view.props
-        let editData= buildServerEditData(self.app,self.model,self.viewType,ownerField,innerStore.state)
+        const {viewParam,viewData} = view.props
+        let datasource = _.cloneDeep(viewData.data||{})
+        const {ownerField,orgState,external}=(viewParam||{})
+        let editData= buildServerEditData(self.app,self.model,self.viewType,ownerField,orgState)
         new ModelAction(this.app,this.model).call("edit",editData,function(res){
         if(res.errorCode==0){
-            if(datasourceKey){
-                setEditContextViewDataToSource(self.app,self.model,self.viewType,ownerField,datasourceKey)
+            
+            if(external && external.close){
+              if(external && external.setDatasource){
+                 external.setDatasource(datasource)
+              }
+              external.close()
             }
             else{
                 let modelID = self.getModelID(view)
@@ -115,12 +207,10 @@ export class EditViewCMM extends ViewCMM{
         else{
             MessageBox.alert(res.description)
         }
+       
         },function(err){
             MessageBox.alert("通讯失败！")
         })
-        if(external && external.close){
-            external.close()
-        }
     }
 
     doAction(view,trigger){

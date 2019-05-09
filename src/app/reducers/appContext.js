@@ -4,14 +4,11 @@ import {
     SET_CREATE_CONTEXT_VIEW_DATA,
     SET_LIST_CONTEXT_CRITERIA,
     SET_LIST_CONTEXT_VIEW_DATA,
-   // SET_LIST_CONTEXT_PAEG_DATA,
-    //UPDATE_LIST_CONTEXT_VIEW_DATA,
     SET_DETAIL_CONTEXT_VIEW_DATA,
     SET_EDIT_CONTEXT_VIEW_DATA,
     SET_EDIT_CONTEXT_FIELD_VALUE,
-    SET_CREATE_CONTEXT_VIEW_DATA_TO_SOURCE,
-    SET_EDIT_CONTEXT_VIEW_DATA_TO_SOURCE,
-    REMOVE_LIST_CONTEXT_VIEW_DATA
+    REMOVE_LIST_CONTEXT_VIEW_DATA_RECORD,
+    UPDATE_LIST_CONTEXT_VIEW_DATA_RECORD
 } from '../actions/appContext'
 import ViewContext from '../modelView/ViewContext'
 import produce from "immer"
@@ -20,6 +17,9 @@ import memoize from 'lodash.memoize'
 import ViewType from '../modelView/ViewType'
 import {CREATE_VIEW_DATA, LIST_VIEW_DATA, DETAIL_VIEW_DATA, EDIT_VIEW_DATA,RECORD_TAG} from '../ReservedKeyword'
 import { ReducerRegistry } from '../../ReducerRegistry';
+import {nextRecordTag} from '../../lib/tag-helper'
+import { bindRecordTag } from '../fieldHelper';
+import {getViewTypeViewDataContextkey} from "../modelView/ModelViewRegistry"
 const initAppContext={}
 initAppContext[EDIT_VIEW_DATA]={}
 initAppContext[CREATE_VIEW_DATA]={}
@@ -81,36 +81,6 @@ export function appContext(state,action){
                 }
             })
         }
-        case SET_CREATE_CONTEXT_VIEW_DATA_TO_SOURCE:
-        {
-            let {app,model,viewType,ownerField,datasourceKey} = action.payload
-            return produce(state,draft=>{
-                let key = getAppModelViewKey(app,model,viewType,ownerField)
-                try
-                {
-                    let data = draft[CREATE_VIEW_DATA][key]["viewData"]["data"]
-                    setContextViewDataToSource(draft,data,datasourceKey)
-                }
-                catch{
-
-                }
-            })
-        }
-        case SET_EDIT_CONTEXT_VIEW_DATA_TO_SOURCE:
-        {
-            let {app,model,viewType,ownerField,datasourceKey} = action.payload
-            return produce(state,draft=>{
-                let key = getAppModelViewKey(app,model,viewType,ownerField)
-                try
-                {
-                    let data = draft[CREATE_VIEW_DATA][key]["viewData"]["data"]
-                    setContextViewDataToSource(draft,data,datasourceKey)
-                }
-                catch{
-
-                }
-            })
-        }
         case CLEAR_CREATE_CONTEXT_FIELD_VALUE:
         {
             let {app,model,viewType,ownerField}=action.payload
@@ -135,25 +105,10 @@ export function appContext(state,action){
         }
         case SET_CREATE_CONTEXT_VIEW_DATA:
         {
-            const {app,model,viewType,viewData,ownerField,datasourceKey}=action.payload
+            const {app,model,viewType,viewData,ownerField}=action.payload
             updateViewField(viewData,ownerField)
             return produce(state,draft=>{
-               setCreateViewData(draft,viewData,ownerField,datasourceKey)
-               if(viewData.subViews){
-                for(let subView of viewData.subViews){
-                    if(subView.view){
-                        let subKey = getAppModelViewKey(subView.view.app, 
-                         subView.view.model, subView.view.viewType,
-                         subView.view.ownerField)
-                         if(subView.view.viewType ==ViewType.CREATE){
-                             setCreateViewData(draft,subView,subView.view.ownerField)
-                         }
-                         else if(subView.view.viewType == ViewType.LIST){
-                             setListViewData(draft,subView,subView.view.ownerField)
-                         }
-                    }
-                }
-               }
+               setCreateViewData(draft,viewData,ownerField)
             })
         }
         case SET_LIST_CONTEXT_CRITERIA:
@@ -171,37 +126,43 @@ export function appContext(state,action){
                 setListViewData(draft,viewData,ownerField)
             })
         }
-        // case UPDATE_LIST_CONTEXT_VIEW_DATA:{
-        //     const { app,
-        //             model,
-        //             viewType,
-        //             viewData,
-        //             ownerField,
-        //             refView }=action.payload
-        //         return produce(state,draft=>{
-        //             updateListViewData(draft,viewData,ownerField)
-        //         })
-        // }
-        // case SET_LIST_CONTEXT_PAEG_DATA:
-        // {
-        //     const {app,model,viewType,pageIndex,pageSize,ownerField}  = action.payload
-        //     return produce(state,draft=>{
-        //         setListViewPageData(draft,app,model,viewType,pageSize,pageIndex,ownerField)
-        //     })
-        // }
-        case REMOVE_LIST_CONTEXT_VIEW_DATA:
+        case REMOVE_LIST_CONTEXT_VIEW_DATA_RECORD:
         {
             const {app,model,viewType,tags,ownerField}  = action.payload
             return produce(state,draft=>{
                 let key =getAppModelViewKey(app,model,viewType,ownerField)
                 try{
-                    let record = draft[LIST_VIEW_DATA]["viewData"]["data"]["record"]
+                    draft[LIST_VIEW_DATA][key]["viewData"]["data"]["record"]=draft[LIST_VIEW_DATA][key]["viewData"]["data"]["record"]||[]
+                    let record = draft[LIST_VIEW_DATA][key]["viewData"]["data"]["record"]
                     record = record.filter(x=>tags.indexOf(x[RECORD_TAG])<0)
-                    draft[LIST_VIEW_DATA]["viewData"]["data"]["record"]=record
+                    draft[LIST_VIEW_DATA][key]["viewData"]["data"]["record"]=record
                 }
-                catch
+                catch(err)
                 {
-
+                    console.log(err)
+                }
+            })
+        }
+        case UPDATE_LIST_CONTEXT_VIEW_DATA_RECORD:
+        {
+            const {app,model,viewType,record,ownerField} = action.payload
+            return produce(state,draft=>{
+                let key = getAppModelViewKey(app,model,viewType,ownerField)
+                try{
+                    let tag = record[RECORD_TAG]
+                    if(tag){
+                        draft[LIST_VIEW_DATA][key]["viewData"]["data"]["record"]= draft[LIST_VIEW_DATA][key]["viewData"]["data"]["record"]||[]
+                        let index = draft[LIST_VIEW_DATA][key]["viewData"]["data"]["record"].findIndex(x=>x[RECORD_TAG]==tag)
+                        if(index>-1){
+                            draft[LIST_VIEW_DATA][key]["viewData"]["data"]["record"][index]=record
+                        }
+                        else{
+                            draft[LIST_VIEW_DATA][key]["viewData"]["data"]["record"].unshift(record)
+                        }
+                    }
+                }
+                catch(err){
+                    console.log(err)
                 }
             })
         }
@@ -224,65 +185,29 @@ export function appContext(state,action){
     }
 }
 
-function setContextViewDataToSource(draft,data,datasourceKey){
-    if(datasourceKey){
-        try
-        {
-            draft[LIST_VIEW_DATA][datasourceKey]["viewData"]=draft[LIST_VIEW_DATA][datasourceKey]["viewData"]||{
-                app:data.app,
-                model:data.model,
-                viewData:{
-                    app:data.app,
-                    model:data.model,
-                    data:{
-                        app:data.app,
-                        model:data.model,
-                        record:[]
-                    }
-                }
-            }
-            let record =  draft[LIST_VIEW_DATA][datasourceKey]["viewData"]["data"].record||[]
-            let tag = data.record[RECORD_TAG]
-            if(tag){
-                let index = record.findIndex(x=>x[RECORD_TAG]==tag)
-                if(index>-1){
-                    record[index]=data.record
-                }
-                else{
-                    record.push(data.record)
-                }
-                draft[LIST_VIEW_DATA][datasourceKey]["viewData"]["data"].record=record
-            }
-        }
-        catch
-        {
 
-        }
-        
-    }
-}
 
-function setCreateViewData(draft,viewData,ownerField,datasourceKey){
+function setCreateViewData(draft,viewData,ownerField){
     let {view,data,triggerGroups}=viewData
     let key = getAppModelViewKey(view.app,view.model,view.viewType,ownerField)
-    draft[CREATE_VIEW_DATA][key]=draft[CREATE_VIEW_DATA][key]||{
+    draft[CREATE_VIEW_DATA][key]={
         app:view.app,
         model:view.model,
         viewData:Object.assign({
          ...viewData
-        },{data:getInitCreateViewData(data,view, ownerField, datasourceKey)})
+        },{data:getInitCreateViewData(data,view, ownerField)})
     }
 }
 
 function setListViewData(draft,viewData,ownerField){
     let {view,data,triggerGroups}=viewData
     let key = getAppModelViewKey(view.app,view.model,view.viewType,ownerField)
-    draft[LIST_VIEW_DATA][key]=draft[LIST_VIEW_DATA][key]||{
+    draft[LIST_VIEW_DATA][key]={
         app:view.app,
         model:view.model,
-        viewData:Object.assign({
+        viewData:{
          ...viewData
-        })
+        }
     }
     if(!draft[LIST_VIEW_DATA][key]["viewData"]){
         draft[LIST_VIEW_DATA][key]={
@@ -298,40 +223,11 @@ function setListViewData(draft,viewData,ownerField){
 function getInitListViewData(data, view, ownerField){
     if(data && data.record){
         data.record.map(x=>{
-            x[RECORD_TAG] = x["id"]
+            x[RECORD_TAG] = nextRecordTag()
         })
     }
     return data
 }
-// function setListViewPageData(draft,app,model,viewType,pageSize,pageIndex,ownerField){
-//     let key = getAppModelViewKey(app,model,viewType,ownerField)
-//     let oldData= (draft[LIST_VIEW_DATA][key]=draft[LIST_VIEW_DATA][key]||{
-//         app:app,
-//         model:model,
-//         viewData:{}
-//     })["viewData"]
-//     oldData.pageData={pageIndex,pageSize}
-//     draft[LIST_VIEW_DATA][key]=oldData
-// }
-
-
-// function updateListViewData(draft,viewData,ownerField){
-//     let {view,data,triggerGroups}=viewData
-//     let key = getAppModelViewKey(view.app,view.model,view.viewType,ownerField)
-//     let oldData= (draft[LIST_VIEW_DATA][key]=draft[LIST_VIEW_DATA][key]||{
-//         app:view.app,
-//         model:view.model,
-//         viewData:{}
-//     })["viewData"]
-
-//     Object.keys(viewData).map(key=>{
-//         oldData[key]=viewData[key]
-//     })
-//     draft[LIST_VIEW_DATA][key]=oldData
-// }
-
-
-
 function setModelViewCriteria(draft,app,model,viewType,ownerField,name,criteria){
     let key = getAppModelViewKey(app,model,viewType,ownerField)
     if(viewType == ViewType.LIST){
@@ -345,7 +241,7 @@ function setModelViewCriteria(draft,app,model,viewType,ownerField,name,criteria)
 function setDetailContextViewData(draft,app,model,viewType,viewData,ownerField){
     let {view,data,triggerGroups}=viewData
     let key = getAppModelViewKey(view.app,view.model,view.viewType,ownerField)
-    draft[DETAIL_VIEW_DATA][key]=draft[DETAIL_VIEW_DATA][key]||{
+    draft[DETAIL_VIEW_DATA][key]={
         app:view.app,
         model:view.model,
         viewData:Object.assign({
@@ -368,7 +264,7 @@ function setDetailContextViewData(draft,app,model,viewType,viewData,ownerField){
 function setEditContextViewData(draft,app,model,viewType,viewData,ownerField){
     let {view,data,triggerGroups}=viewData
     let key = getAppModelViewKey(view.app,view.model,view.viewType,ownerField)
-    draft[EDIT_VIEW_DATA][key]=draft[EDIT_VIEW_DATA][key]||{
+    draft[EDIT_VIEW_DATA][key]={
         app:view.app,
         model:view.model,
         viewData:Object.assign({
@@ -386,35 +282,7 @@ function setEditContextViewData(draft,app,model,viewType,viewData,ownerField){
     }
     draft[EDIT_VIEW_DATA][key]["viewData"]["data"]=getInitCreateViewData(data, view, ownerField)
 }
-function getInitCreateViewData(data,view,ownerField,datasourceKey){
-    if(!datasourceKey){
-        return data
-    }
-    else{
-        if(ownerField){
-            let tag = ownerField[RECORD_TAG]
-            if(tag){
-                let state = ReducerRegistry.Store.getState()
-                let datasource = (((state[ViewContext.APP_CONTEXT]||{})[LIST_VIEW_DATA])||{})[datasourceKey]
-                if(datasource){
-                    try{
-                        let dataRecrod = datasource.viewData.data.record.find(x=>x[RECORD_TAG]==tag)
-                        if(dataRecrod){
-                            return {
-                                app:view.app,
-                                model:view.model,
-                                record:dataRecrod,
-                            }
-                        }
-                    }
-                    catch{
-
-                    }
-                    
-                }
-            }
-        }
-    }
+function getInitCreateViewData(data,view,ownerField){
     return data
 }
 
@@ -422,7 +290,7 @@ export function getAppModelViewKey(app,model,viewType,ownerField){
     let key =`${app}.${model}.${viewType}`
     let pF=ownerField
     while(pF){
-        let tag = ownerField[RECORD_TAG]
+        let tag = pF[RECORD_TAG]
         if(!tag){
             key = `${pF.app}.${pF.model}.${pF.viewType}.${pF.name}@${key}`
         }
@@ -430,7 +298,7 @@ export function getAppModelViewKey(app,model,viewType,ownerField){
             key = `${pF.app}.${pF.model}.${pF.viewType}.${pF.name}.${tag}@${key}`
         }
         
-        pF = ownerField.ownerField
+        pF = pF.ownerField
     }
     return key
 }
@@ -472,11 +340,63 @@ export const viewDataFromEditContext = createSelector(state=>state[ViewContext.A
     return appContext[EDIT_VIEW_DATA][key]["viewData"]
 }))
 
-
-
-
-
-function buildServerCreateDataObject(view,dataRecord,state,subViews){
+function removeRedundancyProperty(modelData){
+    if(modelData && modelData.record){
+        if(modelData.record instanceof Array){
+            var rModelData = {
+                app:modelData.app,
+                model:modelData.model,
+                record:[]
+            }
+            modelData.record.map(r=>{
+                if(r["id"]!=undefined){
+                    rModelData.record.push({
+                        id:modelData.record.id
+                    })
+                }
+                else{
+                    let nr = removeRedundancyRecordProperty(r)
+                    rModelData.record.push(nr)
+                }
+            })
+            return rModelData
+        }
+        else{
+            if(modelData.record["id"]!=undefined){
+                return {
+                    app:modelData.app,
+                    model:modelData.model,
+                    record:{
+                        id:modelData.record.id
+                    }
+                }
+            }
+            else{
+                let nr = removeRedundancyRecordProperty(modelData.record)
+                return  {
+                         app:modelData.app,
+                         model:modelData.model,
+                         record:nr
+                        }
+            }
+        }
+    }
+    return modelData
+}
+function removeRedundancyRecordProperty(record){
+    let nr = {}
+    Object.keys(record).map(key=>{
+        let keyValue = record[key]
+        if(keyValue instanceof Object){
+            nr[key]=removeRedundancyProperty(keyValue)
+        }
+        else{
+            nr[key]=keyValue
+        }
+    })
+    return nr
+}
+function buildServerModelDataObject(view,dataRecord,state,subViews){
     let record={}
     if(dataRecord.hasOwnProperty("id")){
         record["id"]=dataRecord["id"]
@@ -485,26 +405,48 @@ function buildServerCreateDataObject(view,dataRecord,state,subViews){
         if(!f.relationData){
             let value = dataRecord[f.name]
             if(value!==undefined && value!==null){
-                record[f.name]=value
+                record[f.name]=removeRedundancyProperty(value)
             }
         }
         else if(f.relationData.type=="Many2Many"){
             let value = dataRecord[f.name]
             if(value!==undefined && value!==null){
+                if(value instanceof Object){
+                    value = removeRedundancyProperty(value)
+                }
+                else{
+                    value={
+                        app:f.relationApp.targetApp,
+                        app:f.relationApp.targetModel,
+                        record:{
+                            id:value
+                        }
+                    }
+                }
                record["relRegistries"]=record["relRegistries"]||{}
                record["relRegistries"][f.relationData.relationModel]=record["relRegistries"][f.relationData.relationModel]||{
                    app:f.relationData.relationApp,
                    model:f.relationData.relationModel,
                }
                let r={}
-               r[f.relationData.relationField]={
-                   app:f.relationData.targetApp,
-                   model:f.relationData.targetModel,
-                   record:{}
-               }
-               r[f.relationData.relationField].record[f.relationData.targetField]=value
+               r[f.relationData.relationField]=value
                record["relRegistries"][f.relationData.relationModel]["record"]= record["relRegistries"][f.relationData.relationModel]["record"]||[r]
-               record["relRegistries"][f.relationData.relationModel]["record"][0][f.relationData.relationField]["record"][f.relationData.targetField]=value
+               record["relRegistries"][f.relationData.relationModel]["record"][0][f.relationData.relationField]=value
+            }
+            else{
+                let {relationApp:app,relationModel:model} = f.relationData
+                let subView = (subViews||[]).find(x=>{
+                    return x.refView.fieldName == f.name
+                })
+                if(subView){
+                    let contextKey = getViewTypeViewDataContextkey(subView.refView.viewType)
+                    let createData=buildServerViewTypeData(app,model,subView.refView.viewType,contextKey,f,state)
+                    createData=removeRedundancyProperty(createData)
+                    if(createData.record && createData.record.length>0){
+                        record["relRegistries"]=record["relRegistries"]||{}
+                        record["relRegistries"][f.relationData.relationModel]=createData
+                    }
+                }
             }
         }
         else if(f.relationData.type=="One2Many"){
@@ -513,20 +455,23 @@ function buildServerCreateDataObject(view,dataRecord,state,subViews){
                     return x.refView.fieldName == f.name
                 })
                 if(subView){
-                    let createData=buildServerCreateData(app,model,subView.refView.viewType,f,state)
+                    let contextKey = getViewTypeViewDataContextkey(subView.refView.viewType)
+                    let createData=buildServerViewTypeData(app,model,subView.refView.viewType,contextKey,f,state)
+                    createData=removeRedundancyProperty(createData)
                     if(createData.record && createData.record.length>0){
                         record[f.name]=createData
                     }
                 }
-               
         }
-        else if(f.relationData.type=="VirtualOne2One"){
+        else if(f.relationData.type=="VirtualOne2One" || f.relationData.type=="One2One"){
             let {targetApp:app,targetModel:model} = f.relationData
             let subView = subViews.find(x=>{
                 return x.refView.fieldName == f.name
             })
             if(subView){
-                let createData=buildServerCreateData(app,model,subView.refView.viewType,f,state)
+                let contextKey = getViewTypeViewDataContextkey(subView.refView.viewType)
+                let createData=buildServerViewTypeData(app,model,subView.refView.viewType,contextKey,f,state)
+                createData=removeRedundancyProperty(createData)
                 if(createData.record && Object.keys(createData.record).length>0){
                     record[f.name]=createData
                 }
@@ -535,7 +480,7 @@ function buildServerCreateDataObject(view,dataRecord,state,subViews){
         else{
             let value = dataRecord[f.name]
             if(value!==undefined && value!==null){
-                record[f.name]=value
+                record[f.name]=removeRedundancyProperty(value)
             }
         }
     })
@@ -543,74 +488,60 @@ function buildServerCreateDataObject(view,dataRecord,state,subViews){
 }
 
 //TODO 
-function buildServerCreateDataArray(view,dataRecordArray,state,triggerGroups){
+function buildServerModelDataArray(app,model,viewType,data,ownerField,state){
     let records = []
-    dataRecordArray.map(dr =>{
-        let tag=dr[RECORD_TAG]
-        let toAddGroup = triggerGroups.find(x=>{
-            for(let t of x.triggers){
-                if(t.name == "toAdd"){
-                    return true
-                }
-            }
-        }
-        )
-        if(toAddGroup){
-            let t= toAddGroup.triggers.find(x=>x.name == "toAdd")
-            produce(view.ownerFiled,draft=>{
-                draft[RECORD_TAG]=tag
-                let key = getAppModelViewKey(view.app,view.model,t.viewType,draft)
-                let viewData= state.appContext[CREATE_VIEW_DATA][key]["viewData"]
-                if(viewData){
-                    let r =buildServerCreateDataObject(viewData.view,viewData.data.record,state,viewData.subViews)
-                    if(r && Object.keys(r.record).length>0){
-                        records.push(r)
+    if(ownerField){
+        (data.record||[]).map((r)=>{
+                let tag = r[RECORD_TAG]
+                if(tag){
+                    let tagOwnerField = bindRecordTag(ownerField,tag)
+                    let addData = buildServerCreateData(app,model,ViewType.CREATE,tagOwnerField,state)
+                    if(addData && addData.record && Object.keys(addData.record).length>0){
+                        let nr={}
+                        Object.keys(addData.record).map(key=>{
+                            if(r[key]!=undefined){
+                                nr[key]=r[key]
+                            }
+                            else{
+                                nr[key]=addData.record[key]
+                            }
+                        })
+                        records.push(nr)
                     }
                 }
-            })
-        }
-    })
+        })
+    }
     return records
 }
 
 export function buildServerCreateData(app,model,viewType,ownerField,state){
-    let createData={
-        app,
-        model
-    }
-    let rootKey = getAppModelViewKey(app,model,viewType,ownerField)
-    let modelData = (state[ViewContext.APP_CONTEXT][CREATE_VIEW_DATA]||{})[rootKey]
-    if(modelData){
-
-        if(modelData.viewData.data.record instanceof Array){
-            createData.record=buildServerCreateDataArray(modelData.viewData.view,
-                modelData.viewData.data.record||[],state,modelData.viewData.triggerGroups)
-        }
-        else{
-            createData.record=buildServerCreateDataObject(modelData.viewData.view,
-                modelData.viewData.data.record||{},state,modelData.viewData.subViews)
-        }
-    }
-    return createData
+    return buildServerViewTypeData(app,model,viewType,CREATE_VIEW_DATA,ownerField,state)
 }
 
 export function buildServerEditData(app,model,viewType,ownerField,state){
-    let editData={
+    return buildServerViewTypeData(app,model,viewType,EDIT_VIEW_DATA,ownerField,state)
+}
+export function buildServerListData(app,model,viewType,ownerField,state){
+    return buildServerViewTypeData(app,model,viewType,LIST_VIEW_DATA,ownerField,state)
+}
+
+function buildServerViewTypeData(app,model,viewType,viewDataConextkey,ownerField,state){
+     let serverData={
         app,
         model
     }
     let rootKey = getAppModelViewKey(app,model,viewType,ownerField)
-    let modelData = (state[ViewContext.APP_CONTEXT][EDIT_VIEW_DATA]||{})[rootKey]
+    let modelData = (state[ViewContext.APP_CONTEXT][viewDataConextkey]||{})[rootKey]
     if(modelData){
 
         if(modelData.viewData.data.record instanceof Array){
-            editData.record=buildServerCreateDataArray(modelData.viewData.view,
-                modelData.viewData.data.record||[],state,modelData.viewData.triggerGroups)
+            serverData.record=buildServerModelDataArray(app,model,viewType,
+                modelData.viewData.data,ownerField,state)
         }
         else{
-            editData.record=buildServerCreateDataObject(modelData.viewData.view,
+            serverData.record=buildServerModelDataObject(modelData.viewData.view,
                 modelData.viewData.data.record||{},state,modelData.viewData.subViews)
         }
     }
-    return editData
+    return serverData
 }

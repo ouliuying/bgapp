@@ -27,15 +27,15 @@ export class ModalSheet extends React.Component{
 
     render(){
         let self = this
-        const {view:ComView,sheetIndex,title,...rest} = this.props
-        let {external} = this.props
+        const {view:ComView,sheetIndex,title,viewParam,...rest} = this.props
+        let {external} = (viewParam||{})
 
         external=Object.assign(external||{},{
             close:()=>{
                 self.unHookElement()
             }
         })
-
+        let newViweParam = Object.assign({},viewParam,{external})
         let sheetTag = "sheet" + sheetIndex
         return <div sheetTag={sheetTag}>
                 <Dialog  title={title}
@@ -48,7 +48,7 @@ export class ModalSheet extends React.Component{
                     }}
                 >
                 <Dialog.Body>  
-                   <ComView external={external} {...rest} inModalQueue={true}></ComView> 
+                   <ComView  {...rest} inModalQueue={true} viewParam={newViweParam}></ComView> 
                 </Dialog.Body>
                 <Dialog.Footer>
                 </Dialog.Footer>
@@ -194,12 +194,18 @@ export const ModalSheetManager={
         return this.sheetIndex++
     },
     openWaiting(props){
-        let hookDiv = document.createElement("div")
+        var hookDiv = document.createElement("div")
         document.body.appendChild(hookDiv)
         let sheetIndex = this.nextSheetIndex()
         ReactDOM.render(<WaitingSheet  {...props} sheetIndex={sheetIndex}/>,hookDiv)
         return function(){
-            document.body.removeChild(hookDiv)
+            try{
+                document.body.removeChild(hookDiv)
+            }
+            catch(err){
+
+            }
+           
         }
     },
     openConfirm(props){

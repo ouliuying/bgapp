@@ -5,19 +5,22 @@ import {getAppsSelector,corpModelsSelector} from '../../reducers/sys'
 import {
     setListContextCriteria,
     setListContextData,
-    removeListContextViewData
+    removeListContextViewDataRecord,
+    updateListContextViewDataRecord
 } from '../actions/appContext'
 import { goBack,push } from 'connected-react-router';
-import produce from "immer"
 import {ViewFieldType} from '../modelView/ViewFieldType'
 import { ModelAction } from '../mq/ModelAction'
 import {CREATE_VIEW_DATA, RECORD_TAG,ARGS} from '../ReservedKeyword'
 import { getRoutePath,goRoute } from '../routerHelper'
 import {viewDataFromListContext} from '../reducers/appContext'
 import {Button,Form,Tabs,Table, MessageBox} from 'element-react'
-
-import { and } from '../../criteria';
-
+import {createDetailParam,createViewParam} from '../modelView/ViewParam'
+import { and } from '../../criteria'
+import ViewType from "../modelView/ViewType"
+import {produce} from 'immer'
+import {bindRecordTag} from '../fieldHelper'
+import {nextRecordTag} from '../../lib/tag-helper'
 export class ListViewCMM extends  ViewCMM{
     constructor(app,model,viewType){
         super(app,model,viewType)
@@ -29,13 +32,14 @@ export class ListViewCMM extends  ViewCMM{
 
     mapTo(state, ownProps){
         let baseProps= super.mapTo(state, ownProps);
-        const {appModelViewType,ownerField} = ownProps
+        const {appModelViewType,viewParam} = ownProps
+        const {ownerField} = (viewParam||{})
         let installApps=getAppsSelector(state)
         const {app,model,viewType}=appModelViewType
         let viewData=viewDataFromListContext(state)({app,model,viewType,ownerField})
         let newProps= Object.assign({},installApps,{viewData})
-         return Object.assign({},baseProps,newProps,ownProps);
-      }
+        return Object.assign({},baseProps,newProps,ownProps)
+    }
 
 
     init(view){
@@ -139,6 +143,7 @@ export class ListViewCMM extends  ViewCMM{
         return {columns,rows,currentPage,totalCount,pageSize}
 
     }
+
     getCriteria(viewData){
         const {criterias} = viewData
         if(criterias){
@@ -152,18 +157,48 @@ export class ListViewCMM extends  ViewCMM{
             }
         }
     }
+
+    getOwnerFieldRawFieldValue(app,model,ownerField,ownerFieldValue){
+        if(ownerField && ownerFieldValue!=null && ownerFieldValue!=undefined){
+          if(ownerFieldValue instanceof Object){
+             if(ownerFieldValue.record){
+                 if(app==ownerField.relationData.targetApp && model==ownerField.relationData.targetModel){
+                     return ownerFieldValue.record[ownerField.relationData.targetField]
+                 }
+                 else if(app == ownerField.relationData.relationApp && model == ownerField.relationApp.relationModel){
+                  return ownerFieldValue.record[ownerField.relationData.relationField]
+                 }
+             }
+             else{
+                if(app==ownerField.relationData.targetApp && model==ownerField.relationData.targetModel){
+                  return ownerFieldValue[ownerField.relationData.targetField]
+                }
+                else if(app == ownerField.relationData.relationApp && model == ownerField.relationApp.relationModel){
+                return ownerFieldValue[ownerField.relationData.relationField]
+                }
+             }
+          }
+          else{
+            return ownerFieldValue
+          }
+        }
+    }
+
     didMount(view){
-        let {ownerField,viewData,viewRefType}= view.props
+        let {viewParam,viewData,viewRefType}= view.props
+        const {ownerField,ownerFieldValue}=viewParam||{}
         const {pageData} = viewData
         let criteria = this.getCriteria(viewData)
+        let rawOwnerFieldValue = this.getOwnerFieldRawFieldValue(this.app,this.model,ownerField,ownerFieldValue)
         var reqParam={
             viewType:this.viewType,
             viewRefType:viewRefType,
-            ownerField:ownerField&&{
+            ownerField:ownerField?{
                 app:ownerField.app,
                 model:ownerField.model,
-                name:ownerField.name
-            },
+                name:ownerField.name,
+                value:rawOwnerFieldValue,
+            }:undefined,
             reqData:{
                 app:this.app,
                 model:this.model,
@@ -198,6 +233,7 @@ export class ListViewCMM extends  ViewCMM{
             this[trigger.name].call(this,view,trigger)
         }
     }
+
     search(view){
         
     }
@@ -205,42 +241,116 @@ export class ListViewCMM extends  ViewCMM{
     onSizeChange(view,size){
         
     }
+
     onCurrentChange(view,currentPage){
       
     }
+
     toDetail(view,trigger){
-        let routerPath = getRoutePath(trigger.app,trigger.model,trigger.viewType)
+        let self =this
+        const {viewParam,viewRefType} = view.props
         let arg = trigger[ARGS]
         let id = arg.id
-        goRoute(routerPath+"/"+arg.id,{modelID:id})
+        if((viewParam||{}).ownerField){
+            if(id){
+                const {ownerField,ownerFieldValue,orgState} = viewParam
+                let dViewParam = createDetailParam(ownerField,ownerFieldValue,undefined,orgState,id)
+                this.showAppModelViewInModalQueue(trigger.app,trigger.model,trigger.viewType,viewRefType,dViewParam)
+            }
+            else{
+                const {ownerField,ownerFieldValue,orgState} = viewParam
+                const external={
+                  getDatasource:(tag)=>{return self.getDatasource(view,tag)},
+                  setDatasource:(datasource)=>{self.setDatasource(view,datasource)}
+                }
+                let tag =arg.tag
+                let bindOwnerField = bindRecordTag(ownerField,tag)
+                let dViewParam = createViewParam(bindOwnerField,ownerFieldValue,external,orgState)
+                this.showAppModelViewInModalQueue(this.app,this.model,ViewType.CREATE,viewRefType,dViewParam)
+            }
+        }
+        else{
+            let routerPath = getRoutePath(trigger.app,trigger.model,trigger.viewType)
+            goRoute(routerPath+"/"+arg.id,{modelID:id})
+        }
     }
+
     doDelete(view,trigger){
         let arg = trigger[ARGS]
         let {id,tag}=arg
         let self=this
-        const {ownerField,__inner_store__:innerStore}=view.props
-
-        new ModelAction(this.app,this.model).call("delete",{
-            id
-        },function(res){
-        if(res.errorCode==0){
-           //(app,model,viewType,tags,ownerField)
-            removeListContextViewData(self.app,self.model,self.viewType,[tag],ownerField)
+        const {viewParam} = view.props
+        const {ownerField,orgState}=(viewParam||{})
+        if(id){
+            new ModelAction(this.app,this.model).call("delete",{
+                id
+            },function(res){
+            if(res.errorCode==0){
+                removeListContextViewDataRecord(self.app,self.model,self.viewType,[tag],ownerField)
+            }
+            else{
+                MessageBox.alert(res.description)
+            }
+            },function(err){
+                MessageBox.alert("通讯失败！")
+            })
         }
         else{
-            MessageBox.alert(res.description)
+            removeListContextViewDataRecord(self.app,self.model,self.viewType,[tag],ownerField)
         }
-        },function(err){
-            MessageBox.alert("通讯失败！")
-        })
+        
+    }
+
+    getDatasource(view,tag){
+        const {viewData} = view.props
+        var r = ((((viewData||{}).data||{})["record"]||[]).find(x=>x[RECORD_TAG]==tag))||{}
+        let ret= {
+            app:this.app,
+            model:this.model,
+            record:r
+        }
+         ret[RECORD_TAG]=tag
+         return ret
+    }
+
+    buildFromSingleDatasource(data){
+        let tag = data[RECORD_TAG]
+        return bindRecordTag(data.record,tag)
+        
+    }
+    setDatasource(view,data){
+        let record = this.buildFromSingleDatasource(data)
+        this.updateOrAddRecordToListViewData(view,record)
+    }
+    updateOrAddRecordToListViewData(view,record){
+        const {viewParam} = view.props
+        updateListContextViewDataRecord(this.app,this.model,this.viewType,record,(viewParam||{}).ownerField)
     }
     toAdd(view){
-        var path=getRoutePath(this.app,this.model,"create")
-        view.props.dispatch(push(path))
+        const {viewParam,viewRefType} = view.props
+        let self = this
+        if((viewParam||{}).ownerField){
+            const {ownerField,ownerFieldValue,orgState} = viewParam
+            const external={
+              getDatasource:(tag)=>{return self.getDatasource(view,tag)},
+              setDatasource:(datasource)=>{self.setDatasource(view,datasource)}
+            }
+            let tag = nextRecordTag()
+            let bindOwnerField = bindRecordTag(ownerField,tag)
+            let dViewParam = createViewParam(bindOwnerField,ownerFieldValue,external,orgState)
+            this.showAppModelViewInModalQueue(this.app,this.model,ViewType.CREATE,viewRefType,dViewParam)
+        }
+        else{
+            var path=getRoutePath(this.app,this.model,ViewType.CREATE)
+            view.props.dispatch(push(path))
+        }
     }
+
     doSelSingleItem(view,trigger){
         let arg = trigger[ARGS]
-       const {external} = view.props
-       external && external.selSingleItemAction && external.selSingleItemAction(arg.data)
+        const {viewParam} = view.props
+        const {external} = (viewParam||{})
+        external && external.selSingleItemAction && external.selSingleItemAction(arg.data)
+        external && external.close && external.close(view)
     }
 }

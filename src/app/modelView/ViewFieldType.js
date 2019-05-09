@@ -12,6 +12,7 @@ import {getModelView} from './ModelViewRegistry'
 import {ModalSheetManager} from './ModalSheetManager'
 import ViewRefType from './ViewRefType'
 import moment from 'moment'
+import { createViewParam } from './ViewParam';
 
 export const ViewFieldType={
     TextField:'text',
@@ -32,6 +33,7 @@ export const ViewFieldType={
     SingleCheckBoxField:'singleCheckbox',
     StaticField:'static'
 }
+
 export class StaticField extends React.Component{
     render(){
         const {value} = this.props
@@ -47,11 +49,11 @@ export class TextField extends React.Component{
         try{
             return type==="singleLine"?(
                 <Input placeholder="请输入内容"  value={value} onChange={(value)=>{
-                    onchange(value)
+                    onChange(value)
                 }}/>
             ):(
-                <Input type="textarea" value={value} placeholder="请输入内容" onchange={(value)=>{
-                    onchange(value)
+                <Input type="textarea" value={value} placeholder="请输入内容" onChange={(value)=>{
+                    onChange(value)
                 }}/>
             )
         }
@@ -233,35 +235,43 @@ export class Many2OneDataSetSelectField extends React.Component{
         super(props)
         this.state={selItem:null}
     }
-    onChange(value){
-        let self=this
-        const {onChange,relationData}=this.props
-        if(value!=="更多选择..."){
-            onChange && onChange(value)
+    onChange(idValue){
+        const {meta,onChange}=this.props
+        let selItem = meta.options.find(x=>parseInt(x.record["id"])==parseInt(idValue))
+        if(!selItem){
+            selItem=this.state.selItem
         }
-        else{
-            const {meta,onChange,field} = this.props
-            let options =(meta||{}).optsions||[] 
+        selItem && onChange && onChange(selItem)
+    }
+    selMore(){
+            let self=this
+            const {onChange,field,relationData} = this.props
             let external = {
                 selSingleItemAction(data){
+                   let selItem={
+                            app:relationData.targetApp,
+                            model:relationData.targetModel,
+                            record:data
+                        }
                     self.setState({
-                        selItem:data
+                        selItem:selItem
                     })
-                    data && onChange && onChange(parseInt(data["id"]),data)
+                   onChange && onChange(selItem)
                 }
+              
             }
             let view = getModelView(relationData.targetApp,relationData.targetModel,ViewType.LIST)
+            let viewParam = createViewParam(field,undefined,external,undefined)
             view && (
                 ModalSheetManager.openModal(view,{
                     app:relationData.targetApp,
                     model:relationData.targetModel,
                     viewType:ViewType.LIST,
-                    external,
-                    ownerField:field,
+                    viewParam,
                     viewRefType:ViewRefType.SINGLE_SELECTION
                 })
             )
-        }
+        
     }
     render(){
         var self=this
@@ -270,23 +280,24 @@ export class Many2OneDataSetSelectField extends React.Component{
         if(meta && meta.options){
             meta.options.map(r=>{
                 options.push({
-                    value:parseInt(r["id"]),
-                    label:r[relationData.toName]
+                    value:parseInt(r.record["id"]),
+                    label:r.record[relationData.toName]
                 })
             })
         }
         if(self.state.selItem!=null){
-            let id = parseInt(self.state.selItem["id"])
+            let id = parseInt(self.state.selItem.record["id"])
             if(options.findIndex(x=>x.value == id)<0){
                 options.push({
                     value:id,
-                    lablel:self.state.selItem[relationData.toName]
+                    lablel:self.state.selItem.record[relationData.toName]
                 })  
             }
         }
-        return <Select onChange={(value)=>{
-           self.onChange(value)
-        }} value={value}>
+        let idValue =value?parseInt(value.record["id"]):undefined
+        return <Select onChange={(idValue)=>{
+           self.onChange(idValue)
+        }} value={idValue}>
         {
           options.map(ds => {
             return (
@@ -296,11 +307,11 @@ export class Many2OneDataSetSelectField extends React.Component{
             )
           })
         }
-        <Select.Option key="__NONE__" value="更多选择..." label="更多选择...">
-            <div>
-                <span>更多选择...</span>
+        <div className="bg-many2one-select-more-btn-container">
+            <Button type="text" onClick={()=>{
+                    self.selMore()
+            }}>选择更多。。。</Button>
             </div>
-        </Select.Option>
       </Select>
     }
 }

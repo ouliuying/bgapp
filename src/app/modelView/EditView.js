@@ -26,6 +26,16 @@ class EditView extends React.Component{
             this.parent=parent
             this.cmmHost=cmmHost
         }
+        const {viewData}=this.props
+        const  {subViews}=viewData||{}
+        let relationViews = (subViews||[]).filter((subView)=>{
+            return subView.refView.style===ViewFieldStyle.RELATION
+        })
+        let currRelView=null
+        if(relationViews&&relationViews.length>0){
+            currRelView=relationViews[0]
+        }
+        this.state={currRelView}
     }
     componentDidMount(){
         let {cmmHost} = this.props
@@ -51,10 +61,13 @@ class EditView extends React.Component{
         else{
             console.log("host 为空")
         }
-        const {viewData,ownerField}=self.props
+        const {viewData,viewParam}=self.props
+        const {ownerField} = (viewParam||{})
         const  {view:viewMeta,data,triggerGroups,subViews}=viewData
         const editData = data && data.record
-
+        let relationViews = (subViews||[]).filter((subView)=>{
+            return subView.refView.style===ViewFieldStyle.RELATION
+        })
         return <hookView.HookProvider value={{cmmHost:self.cmmHost,parent:self}}>
                 <div className="bg-model-op-view bg-flex-full ">
                 {
@@ -305,23 +318,25 @@ class EditView extends React.Component{
                             </div>
 
                             <hookView.Hook hookTag="body-relation" render={()=>{
-                                    let relationViews = (subViews||[]).filter((subView)=>{
-                                        return subView.refView.style===ViewFieldStyle.RELATION
-                                    })
+                                    let currRelView=self.state.currRelView?self.state.currRelView:((relationViews && relationViews.length>0)?relationViews[0]:null)
                                     return relationViews.length>0?(<div className="bg-model-op-view-body-relation">
-                                    <Tabs activeName={relationViews[0].title} onTabClick={ (tab) => console.log(tab.props.name) }>
+                                    <Tabs activeName={currRelView.title} onTabClick={ (tab) => {
+                                            let currRelView=relationViews.find(x=>x.refView.fieldName == tab.props.name)
+                                            self.setState({
+                                                currRelView
+                                            })
+                                     }}>
                                     {
                                       relationViews.map(v=>{
                                           let  VComponent  = v.view && getModelView(v.view.app,v.view.model,v.view.viewType)
                                           return <Tabs.Pane label={v.refView.title} name={v.refView.fieldName}>
                                           {
-                                              VComponent?(
+                                              (currRelView.refView.fieldName==v.refView.fieldName) && VComponent?(
                                                   <hookView.HookProvider value={{cmmHost:undefined,parent:undefined}}>
                                                     <VComponent app={v.view.app} 
                                                         model={v.view.model} 
                                                         viewType={v.view.viewType}
-                                                        viewData={v}
-                                                        ownerField = {v.view.ownerField}
+                                                        viewParam={self.cmmHost.getSubRefViewParam(self,v,v.view.ownerField)}
                                                         >
                                                     </VComponent>
                                                   </hookView.HookProvider>

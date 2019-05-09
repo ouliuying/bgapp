@@ -1,8 +1,16 @@
 import {getDynamicRouterAppModelViewType} from '../../reducers/router'
 import {ListViewCMM} from '../cmm/ListViewCMM'
+import {createViewParam} from './ViewParam'
 export const mapStateToProps=(state,ownProps)=>{
     if(!ownProps){
         ownProps={}
+    }
+    let {viewParam} = ownProps
+    if(viewParam){
+        viewParam.orgState=state
+    }
+    else{
+        viewParam = createViewParam(null,null,null,state)
     }
     let routerLocationState=getDynamicRouterAppModelViewType(state)
     let appModelViewType=routerLocationState.appModelViewType
@@ -24,6 +32,5 @@ export const mapStateToProps=(state,ownProps)=>{
             appModelViewType.model,
             appModelViewType.viewType)
     }
-    const innerStore={state,ownProps,__inner_store__:1}
-    return viewCMM.cmmHost.mapTo(state,Object.assign({},ownProps,{appModelViewType},viewCMM,{__inner_store__:innerStore}))
+    return viewCMM.cmmHost.mapTo(state,Object.assign({},ownProps,{appModelViewType},viewCMM,{viewParam}))
 }

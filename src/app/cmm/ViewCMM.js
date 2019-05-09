@@ -1,3 +1,5 @@
+import {getModelView} from '../modelView/ModelViewRegistry'
+import {ModalSheetManager} from '../modelView/ModalSheetManager'
 export class ViewCMM{
     constructor(app,model,viewType){
         this.app=app
@@ -31,6 +33,18 @@ export class ViewCMM{
         
     }
 
+    showAppModelViewInModalQueue(app,model,viewType,viewRefType,viewParam){
+        let view = getModelView(app,model,viewType)
+        view && (
+            ModalSheetManager.openModal(view,{
+                app,
+                model,
+                viewType,
+                viewParam,
+                viewRefType
+            })
+        )
+    }
 }
 
 
