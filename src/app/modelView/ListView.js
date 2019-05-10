@@ -31,14 +31,14 @@ class ListView extends React.Component{
    
     componentDidMount(){
         console.log("listview componentDidMount")
-        window.addEventListener("resize", ()=>{this.windowSizeUpdate()});
+       // window.addEventListener("resize", ()=>{this.windowSizeUpdate()});
         this.cmmHost.didMount(this)
     }
     componentWillUnmount(){
-        window.removeEventListener("resize", ()=>{this.windowSizeUpdate()});
+       // window.removeEventListener("resize", ()=>{this.windowSizeUpdate()});
     }
     componentWillMount(){
-        this.windowSizeUpdate();
+      //  this.windowSizeUpdate();
     }
     windowSizeUpdate(){
         try
@@ -182,7 +182,8 @@ class ListView extends React.Component{
 
                 {/* list view body begin*/}
                    <hookView.Hook hookTag="listViewBody" render={()=>{
-                        return <div className="bg-model-list-view-body bg-flex-full"  style={{width:self.state.width-360}}>
+                       //  style={{width:self.state.width-360}}
+                        return <div className="bg-model-list-view-body bg-flex-full">
                                 <div className="bg-model-list-view-body-control-header">
                                     <Button.Group>
                                         <Button type="primary" icon="search"></Button>

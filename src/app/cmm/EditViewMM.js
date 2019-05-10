@@ -145,7 +145,6 @@ export class EditViewCMM extends ViewCMM{
          }
         }
       }
-
     onFieldValueChange(fd,value,view){
         let relationFieldValues =this.getOwnerRelationFieldValues(view)
         if(!relationFieldValues){

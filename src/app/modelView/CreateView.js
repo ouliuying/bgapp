@@ -27,11 +27,6 @@ class CreateView extends React.Component{
             this.parent=parent
             this.cmmHost=cmmHost
         }
-        const {viewData,viewParam}=this.props
-        const  {subViews}=viewData||{}
-        let relationViews = (subViews||[]).filter((subView)=>{
-            return subView.refView.style===ViewFieldStyle.RELATION
-        })
         this.subViewStatus=[]
     }
     componentDidMount(){
