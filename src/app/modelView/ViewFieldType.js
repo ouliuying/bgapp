@@ -261,7 +261,7 @@ export class Many2OneDataSetSelectField extends React.Component{
               
             }
             let view = getModelView(relationData.targetApp,relationData.targetModel,ViewType.LIST)
-            let viewParam = createViewParam(field,undefined,external,undefined)
+            let viewParam = createViewParam(undefined,undefined,external,undefined)
             view && (
                 ModalSheetManager.openModal(view,{
                     app:relationData.targetApp,

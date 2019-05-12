@@ -6,14 +6,10 @@ import {
   setDetailContextViewData
 } from '../actions/appContext'
 
-import produce from "immer"
-import {ViewFieldType} from '../modelView/ViewFieldType'
 import { ModelAction } from '../mq/ModelAction'
-import {CREATE_VIEW_DATA} from '../ReservedKeyword'
 import { getRoutePath,goRoute } from '../routerHelper'
 import {
     viewDataFromDetailContext} from '../reducers/appContext'
-import {Button,Form,Tabs,Table, MessageBox} from 'element-react'
 import {createViewParam,createEditParam} from '../modelView/ViewParam'
 import ViewType from '../modelView/ViewType'
 export class DetailViewCMM extends ViewCMM{
@@ -23,7 +19,7 @@ export class DetailViewCMM extends ViewCMM{
     }
 
     static get s_viewType(){
-        return "detail"
+        return ViewType.DETAIL
     }
 
     mapTo(state, ownProps){

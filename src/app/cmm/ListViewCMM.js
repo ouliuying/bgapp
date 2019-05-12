@@ -27,7 +27,7 @@ export class ListViewCMM extends  ViewCMM{
     }
 
     static get s_viewType(){
-        return "list"
+        return ViewType.LIST
     }
 
     mapTo(state, ownProps){
@@ -341,11 +341,16 @@ export class ListViewCMM extends  ViewCMM{
             this.showAppModelViewInModalQueue(this.app,this.model,ViewType.CREATE,viewRefType,dViewParam)
         }
         else{
+            self.closeModalSheet(view)
             var path=getRoutePath(this.app,this.model,ViewType.CREATE)
             view.props.dispatch(push(path))
         }
     }
-
+    closeModalSheet(view){
+        const {viewParam} = view.props
+        const {external} = (viewParam||{})
+        external && external.close && external.close(view)
+    }
     doSelSingleItem(view,trigger){
         let arg = trigger[ARGS]
         const {viewParam} = view.props

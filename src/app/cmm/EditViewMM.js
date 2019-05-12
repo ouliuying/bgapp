@@ -17,6 +17,7 @@ import {
 import {Button,Form,Tabs,Table, MessageBox} from 'element-react'
 import {createViewParam} from '../modelView/ViewParam'
 import _ from "lodash"
+import ViewType from '../modelView/ViewType';
 export class EditViewCMM extends ViewCMM{
 
     constructor(app,model,viewType){
@@ -24,7 +25,7 @@ export class EditViewCMM extends ViewCMM{
     }
 
     static get s_viewType(){
-        return "edit"
+        return ViewType.EDIT
     }
 
     mapTo(state, ownProps){
@@ -112,39 +113,41 @@ export class EditViewCMM extends ViewCMM{
 
     
     getOwnerRelationFieldValues(view){
-        const {viewParam} = view.props
-        let {ownerField,ownerFieldValue,viewData} = (viewParam||{})
+      const {viewParam,viewData} = view.props
+      let {ownerField,ownerFieldValue} = (viewParam||{})
+      if(ownerField){
         if(ownerField.relationData.targetApp==this.app && ownerField.relationData.targetModel==this.model){
-           if(ownerFieldValue instanceof Object){
-              let rawValue = ownerFieldValue.record?ownerFieldValue.record[ownerField.relationData.targetField]:ownerFieldValue[ownerField.relationData.targetField]
-              if(rawValue){
-                let fd=viewData.view.fields.find(x=>x.name==ownerField.relationData.targetField)
-                return fd?[fd,rawValue]:undefined
-              }
-           }
-           else{
-             let fd=viewData.view.fields.find(x=>x.name==ownerField.relationData.targetField)
-             if(fd){
-               return [fd,ownerFieldValue]
-             }
-           }
-        }
-        else if(ownerField.relationData.relationApp==this.app && ownerField.relationData.relationModel == this.model){
           if(ownerFieldValue instanceof Object){
-            let rawValue = ownerFieldValue.record?ownerFieldValue.record[ownerField.relationData.relationField]:ownerFieldValue[ownerField.relationData.relationField]
-            if(rawValue){
-              let fd=viewData.view.fields.find(x=>x.name==ownerField.relationData.relationField)
-              return fd?[fd,rawValue]:undefined
+             let rawValue = ownerFieldValue.record?ownerFieldValue.record[ownerField.relationData.targetField]:ownerFieldValue[ownerField.relationData.targetField]
+             if(rawValue){
+               let fd=viewData.view.fields.find(x=>x.name==ownerField.relationData.targetField)
+               return fd?[fd,rawValue]:undefined
+             }
+          }
+          else if(ownerFieldValue!=undefined){
+            let fd=viewData.view.fields.find(x=>x.name==ownerField.relationData.targetField)
+            if(fd){
+              return [ownerField,ownerFieldValue]
             }
-         }
-         else{
-           let fd=viewData.view.fields.find(x=>x.name==ownerField.relationData.relationField)
-           if(fd){
-             return [fd,ownerFieldValue]
+          }
+       }
+       else if(ownerField.relationData.relationApp==this.app && ownerField.relationData.relationModel == this.model){
+         if(ownerFieldValue instanceof Object){
+           let rawValue = ownerFieldValue.record?ownerFieldValue.record[ownerField.relationData.relationField]:ownerFieldValue[ownerField.relationData.relationField]
+           if(rawValue){
+             let fd=viewData.view.fields.find(x=>x.name==ownerField.relationData.relationField)
+             return fd?[fd,rawValue]:undefined
            }
-         }
         }
+        else if(ownerFieldValue!=undefined){
+          let fd=viewData.view.fields.find(x=>x.name==ownerField.relationData.relationField)
+          if(fd){
+            return [fd,ownerFieldValue]
+          }
+        }
+       }
       }
+    }
     onFieldValueChange(fd,value,view){
         let relationFieldValues =this.getOwnerRelationFieldValues(view)
         if(!relationFieldValues){

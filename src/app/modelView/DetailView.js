@@ -9,7 +9,7 @@ import {
 import hookView from '../HookView'
 import { goBack,push } from 'connected-react-router';
 import Icon from '../../icon'
-import {Button,Form,Tabs,Table, MessageBox} from 'element-react'
+import {Button,Form,Tabs,Table, MessageBox} from "../../ui"
 import ViewFieldStyle from './ViewFieldStyle'
 import ViewFieldTypeRegistry from './ViewFieldTypeRegistry'
 import {mapStateToProps} from './detailViewMapStateToProps'

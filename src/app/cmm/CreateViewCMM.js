@@ -6,7 +6,6 @@ import {
   setCreateContextFieldValue,
   clearCreateContextFieldValue,
   setCreateContextViewData,
-  setCreateContextViewDataToSource
 } from '../actions/appContext'
 
 import produce from "immer"
@@ -16,9 +15,8 @@ import {CREATE_VIEW_DATA} from '../ReservedKeyword'
 import { getRoutePath,goRoute } from '../routerHelper'
 import {
     viewDataFromCreateContext,
-    getCreateContextFieldValue,
     buildServerCreateData} from '../reducers/appContext'
-import {Button,Form,Tabs,Table, MessageBox} from 'element-react'
+import {Button,Form,Tabs,Table, MessageBox} from "../../ui"
 import {createViewParam,createDetailParam} from '../modelView/ViewParam'
 import ViewType from '../modelView/ViewType'
 import {RECORD_TAG} from '../ReservedKeyword'
@@ -30,7 +28,7 @@ export class CreateViewCMM extends ViewCMM{
     }
 
     static get s_viewType(){
-        return "create"
+        return ViewType.CREATE
     }
 
     mapTo(state, ownProps){

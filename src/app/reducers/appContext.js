@@ -280,12 +280,28 @@ function setEditContextViewData(draft,app,model,viewType,viewData,ownerField){
             })
         }    
     }
-    draft[EDIT_VIEW_DATA][key]["viewData"]["data"]=getInitCreateViewData(data, view, ownerField)
+    draft[EDIT_VIEW_DATA][key]["viewData"]["data"]=getInitEditViewData(data, view, ownerField)
 }
 function getInitCreateViewData(data,view,ownerField){
-    return data
+    if(data){
+        return data
+    }
+    return {
+        app:view.app,
+        model:view.model,
+        record:{}
+    }
 }
-
+function getInitEditViewData(data,view,ownerField){
+    if(data){
+        return data
+    }
+    return {
+        app:view.app,
+        model:view.model,
+        record:{}
+    }
+}
 export function getAppModelViewKey(app,model,viewType,ownerField){
     let key =`${app}.${model}.${viewType}`
     let pF=ownerField

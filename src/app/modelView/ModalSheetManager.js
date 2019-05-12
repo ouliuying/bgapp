@@ -62,28 +62,28 @@ class WaitingSheet extends React.Component{
         let {sheetIndex} = this.props
         return <div style={{zIndex:sheetIndex}} className="bg-waiting-sheet">
             <div class="bg-waiting-sheet-show">
-                <div class="bg-waiting-g bg-waiting-g1">
+                <div className="bg-waiting-g bg-waiting-g1">
 
                 </div>
-                <div class="bg-waiting-g bg-waiting-g2">
+                <div className="bg-waiting-g bg-waiting-g2">
 
                 </div>
-                <div class="bg-waiting-g bg-waiting-g3">
+                <div className="bg-waiting-g bg-waiting-g3">
 
                 </div>
-                <div class="bg-waiting-g bg-waiting-g4">
+                <div className="bg-waiting-g bg-waiting-g4">
 
                 </div>
-                <div class="bg-waiting-g bg-waiting-g5">
+                <div className="bg-waiting-g bg-waiting-g5">
 
                 </div>
-                <div class="bg-waiting-g bg-waiting-g6">
+                <div className="bg-waiting-g bg-waiting-g6">
 
                 </div>
-                <div class="bg-waiting-g bg-waiting-g7">
+                <div className="bg-waiting-g bg-waiting-g7">
 
                 </div>
-                <div class="bg-waiting-g bg-waiting-g8">
+                <div className="bg-waiting-g bg-waiting-g8">
 
                 </div>
             </div>

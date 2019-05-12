@@ -6,7 +6,7 @@ import {
     Route
 } from 'react-router-dom'
 import {push} from 'connected-react-router'
-import {Button,Table,Pagination, Form, Layout,Tag} from 'element-react'
+import {Button,Table,Pagination, Form, Layout,Tag} from "../../ui"
 import hookView from '../../app/HookView'
 import { goBack } from 'connected-react-router';
 import Icon from '../../icon'
