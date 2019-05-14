@@ -6,7 +6,7 @@ import {
     Route
 } from 'react-router-dom'
 import {push} from 'connected-react-router'
-import {Button,Table,Pagination, Form, Layout,Tag} from "../../ui"
+import {Button,Table,Pagination, Form,Tag,Row, Col} from "../../ui"
 import hookView from '../../app/HookView'
 import { goBack } from 'connected-react-router';
 import Icon from '../../icon'
@@ -15,6 +15,7 @@ import {getUIAppCache,corpModelsSelector} from '../../reducers/sys'
 import {getDynamicRouterAppModelViewType} from '../../reducers/router'
 import {getRoutePath} from '../routerHelper'
 import {mapStateToProps} from './listViewMapStateToProps'
+import { RECORD_TAG } from '../ReservedKeyword';
 class ListView extends React.Component{
     constructor(props){
         super(props)
@@ -117,17 +118,17 @@ class ListView extends React.Component{
 
                         return <div className="bg-model-list-view-search-box">
                                 <div className="sub-body">
-                                <Form>
+                                <Form labelAlign={"left"}>
                                     {
                                         criteriaControlGroups.length>0?criteriaControlGroups.map((fds,index)=>{
-                                            return <Layout.Row gutter="2" key={index}>
+                                            return <Row key={index}>
                                                 {
                                                     fds.map((fd,index)=>{
                                                             var Com=fd?ViewFieldTypeRegistry.getComponent(fd.type):null
                                                             var title=fd?fd.title:""
                                                             let cValue=criterias[fd.name]&&criterias[fd.name].value
-                                                            return <Layout.Col span="8" key={index}>
-                                                                    <Form.Item label={title} labelWidth={60}>
+                                                            return <Col span="8" key={index}>
+                                                                    <Form.Item label={title}>
                                                                         {
                                                                             Com?<Com meta={fd.meta} name={fd.name} value={cValue} key={fd.name}  title={title} onCriteriaChange={(data)=>{
                                                                               self.cmmHost.onCriteriaValueChange(data)
@@ -149,12 +150,12 @@ class ListView extends React.Component{
                                                                             </div>
                                                                         }    
                                                                     </Form.Item>
-                                                            </Layout.Col>
+                                                            </Col>
                                                     })
                                                 }
-                                                </Layout.Row>
+                                                </Row>
                                             
-                                        }):<Layout.Row gutter="2">
+                                        }):<Row>
                                             {
                                                 mainGroup?<Form.Item>
                                                 {
@@ -166,7 +167,7 @@ class ListView extends React.Component{
                                                 }      
                                                 </Form.Item>:null
                                             }
-                                        </Layout.Row>
+                                        </Row>
                                     }
                                 </Form>
                             </div>
@@ -194,9 +195,12 @@ class ListView extends React.Component{
 
                                     <Table style={{width: '100%'}}
                                            columns={columns}
-                                            data={rows}
-                                            border={true}
-                                            highlightCurrentRow={true}
+                                           dataSource={rows}
+                                            bordered={true}
+                                            rowKey={(record)=>{
+                                                return record[RECORD_TAG]
+                                            }}
+                                            pagination={false}
                                             >
                                     </Table>
                                 </div>

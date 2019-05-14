@@ -25,23 +25,21 @@ export class AppNav extends Component {
                 this.props.shortcutApps.map(sApp=>{
                     const AppIcon=createIconFromSvg({
                         src:sApp.icon,
-                        svgStyle:{width:14,height:14,fill:'#0ab73d'}
+                        svgStyle:{width:22,height:22,fill:'#bfcbd9'}
                     })
 
-                    return (<button className="bg-app-shortcut-action-btn" onClick={()=>{
+                    return (<a className="bg-app-shortcut-action-btn" onClick={()=>{
                         setCurrApp({currApp:sApp})
                         this.props.dispatch(push(`/app/dynamic/${sApp.name}`))}
                         } key={sApp.name}>
-                        
-                            <AppIcon></AppIcon> {sApp.title}
-                        
-                    </button>)
+                            <AppIcon></AppIcon><span> {sApp.title}</span>
+                    </a>)
                 })
             }
             
-            <button className="bg-app-shortcut-add">
+            <a className="bg-app-shortcut-action-btn">
             <Icon.AddRmApp></Icon.AddRmApp>
-            </button>
+            </a>
 
          
         </div>

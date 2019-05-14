@@ -1,1 +1,1 @@
-export * from 'element-react'
+export * from 'antd'

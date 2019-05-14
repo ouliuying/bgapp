@@ -14,7 +14,7 @@ import { getRoutePath,goRoute } from '../routerHelper'
 import {
     viewDataFromEditContext,
     buildServerEditData} from '../reducers/appContext'
-import {Button,Form,Tabs,Table, MessageBox} from 'element-react'
+import {ModalSheetManager} from '../modelView/ModalSheetManager'
 import {createViewParam} from '../modelView/ViewParam'
 import _ from "lodash"
 import ViewType from '../modelView/ViewType';
@@ -207,11 +207,11 @@ export class EditViewCMM extends ViewCMM{
             }
         }
         else{
-            MessageBox.alert(res.description)
+          ModalSheetManager.alert({title:"提示",msg:res.description})
         }
        
         },function(err){
-            MessageBox.alert("通讯失败！")
+          ModalSheetManager.alert({title:"提示",msg:"通讯失败！"})
         })
     }
 

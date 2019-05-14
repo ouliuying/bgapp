@@ -1,6 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {Dialog,Button} from '../../ui'
+import Dialog from 'rc-dialog'
+import {Modal} from '../../ui'
 import {ReactReduxContext} from 'react-redux'
 import {openModalSheet,closeModalSheet} from '../actions/modalSheetQueue'
 export class ModalSheet extends React.Component{
@@ -15,15 +16,6 @@ export class ModalSheet extends React.Component{
     unHookElement(){
         closeModalSheet(this)
     }
-    componentDidMount(){
-        const {sheetIndex} = this.props
-        let sheetTag = "sheet" + sheetIndex
-        let selfSheetDom = document.querySelector("div[sheetTag='"+sheetTag+"']  .el-dialog__wrapper")
-        if(selfSheetDom){
-            selfSheetDom.style=selfSheetDom.style||{}
-            selfSheetDom.style["z-index"]=sheetIndex 
-        }
-    }
 
     render(){
         let self = this
@@ -36,24 +28,20 @@ export class ModalSheet extends React.Component{
             }
         })
         let newViweParam = Object.assign({},viewParam,{external})
-        let sheetTag = "sheet" + sheetIndex
-        return <div sheetTag={sheetTag}>
-                <Dialog  title={title}
-                    closeOnClickModal={false}
-                    size="large"
-                    visible={true}
-                    onCancel={ () => {self.unHookElement()} }
-                    onClose={()=>{
-                        self.unHookElement()
-                    }}
-                >
-                <Dialog.Body>  
-                   <ComView  {...rest} inModalQueue={true} viewParam={newViweParam}></ComView> 
-                </Dialog.Body>
-                <Dialog.Footer>
-                </Dialog.Footer>
-            </Dialog>
-        </div>
+        //copy from element-react and antd
+       return  <div className="bg-sheet-dialog" style={{zIndex:sheetIndex}}>
+            <div class="bg-sheet-dialog-header">
+                <span>标题</span>
+                <button onClick={()=>{
+                    self.unHookElement()
+                }}>
+                    <i aria-label="图标: close" class="anticon anticon-close ant-modal-close-icon"><svg viewBox="64 64 896 896" class="" data-icon="close" width="1em" height="1em" fill="currentColor" aria-hidden="true" focusable="false"><path d="M563.8 512l262.5-312.9c4.4-5.2.7-13.1-6.1-13.1h-79.8c-4.7 0-9.2 2.1-12.3 5.7L511.6 449.8 295.1 191.7c-3-3.6-7.5-5.7-12.3-5.7H203c-6.8 0-10.5 7.9-6.1 13.1L459.4 512 196.9 824.9A7.95 7.95 0 0 0 203 838h79.8c4.7 0 9.2-2.1 12.3-5.7l216.5-258.1 216.5 258.1c3 3.6 7.5 5.7 12.3 5.7h79.8c6.8 0 10.5-7.9 6.1-13.1L563.8 512z"></path></svg></i>
+                </button>
+            </div>
+            <div class="bg-sheet-dialog-body">
+                <ComView  {...rest} inModalQueue={true} viewParam={newViweParam}></ComView> 
+            </div>
+       </div>
     }
 }
 
@@ -61,7 +49,7 @@ class WaitingSheet extends React.Component{
     render(){
         let {sheetIndex} = this.props
         return <div style={{zIndex:sheetIndex}} className="bg-waiting-sheet">
-            <div class="bg-waiting-sheet-show">
+            <div className="bg-waiting-sheet-show">
                 <div className="bg-waiting-g bg-waiting-g1">
 
                 </div>
@@ -92,22 +80,22 @@ class WaitingSheet extends React.Component{
 }
 
 class ConfirmSheet extends React.Component{
-    
+    constructor(props){
+        super(props)
+        this.state={
+            show:true
+        }
+    }
     unHookElement(){
         const {sheetHookElement}= this.props
         if(sheetHookElement){
-            document.body.removeChild(sheetHookElement)
-        }
-        sheetHookElement=null
-    }
+            try{
+                document.body.removeChild(sheetHookElement)
+            }
+            catch{
 
-    componentDidMount(){
-        const {sheetIndex} = this.props
-        let sheetTag = "sheet" + sheetIndex
-        let selfSheetDom = document.querySelector("div[sheetTag='"+sheetTag+"'] > .el-dialog__wrapper")
-        if(selfSheetDom){
-            selfSheetDom.style=selfSheetDom.style||{}
-            selfSheetDom.style["z-index"]=sheetIndex 
+            }
+        
         }
     }
 
@@ -116,69 +104,79 @@ class ConfirmSheet extends React.Component{
         const {sheetIndex,title,msg,cancel,ok} = this.props
         let cCancel = cancel||function(){}
         let cOk = ok||function(){}
-        let sheetTag = "sheet" + sheetIndex
-        return <div sheetTag={sheetTag}>
-            <Dialog
+        return <Modal
+                zIndex={sheetIndex}
                 title={title}
-                size="tiny"
-                visible={ true }
-                onCancel={ () =>{ cCancel();self.unHookElement(); }}
-                lockScroll={ false }
-            >
-                <Dialog.Body>
-                <span>{msg}</span>
-                </Dialog.Body>
-                <Dialog.Footer>
-                <Button onClick={ () =>{ cCancel();self.unHookElement(); }}>取消</Button>
-                <Button type="primary" onClick={ () => {
-                    cOk();
-                    self.unHookElement();
-                } }>确定</Button>
-                </Dialog.Footer>
-            </Dialog>
-        </div>
+                visible={this.state.show}
+                destroyOnClose={true}
+                afterClose={()=>{
+                    this.unHookElement();
+                }}
+                onOk={()=>{
+                    this.setState({
+                        show:false
+                    })
+                    cOk()}
+                }
+                onCancel={
+                    ()=>{cCancel()
+                    this.setState({
+                        show:false
+                    })
+                }
+                }
+                okText="确认"
+                cancelText="取消"
+                >
+                     <span>{msg}</span>
+                </Modal>
     }
 }
 
 class AlertSheet extends React.Component{
+    constructor(props){
+        super(props)
+        this.state={
+            show:true
+        }
+    }
     unHookElement(){
         const {sheetHookElement}= this.props
-        if(sheetHookElement){
+        try{
             document.body.removeChild(sheetHookElement)
         }
-        sheetHookElement=null
-    }
+        catch(err){
+            console.log(err)
 
-    componentDidMount(){
-        const {sheetIndex} = this.props
-        let sheetTag = "sheet" + sheetIndex
-        let selfSheetDom = document.querySelector("div[sheetTag='"+sheetTag+"'] > .el-dialog__wrapper")
-        if(selfSheetDom){
-            selfSheetDom.style=selfSheetDom.style||{}
-            selfSheetDom.style["z-index"]=sheetIndex 
         }
     }
-
     render(){
         let self = this
         const {sheetIndex,title,msg} = this.props
-        let sheetTag = "sheet" + sheetIndex
-        return <div sheetTag={sheetTag}>
-            <Dialog
+        return <div><Modal
+                zIndex={sheetIndex}
                 title={title}
-                size="tiny"
-                visible={ true}
-                onCancel={()=>self.unHookElement()}
-                lockScroll={false}>
-                <Dialog.Body>
-                <span>{msg}</span>
-                </Dialog.Body>
-                <Dialog.Footer>
-                <Button type="primary" onClick={ () => {
-                    self.unHookElement()
-                } }>确定</Button>
-                </Dialog.Footer>
-            </Dialog>
+                destroyOnClose={true}
+                visible={this.state.show}
+                onCancel={()=>{
+                    this.unHookElement();
+                    this.setState({
+                        show:false
+                    })
+                }}
+                onOk={()=>{
+                    this.unHookElement();
+                    this.setState({
+                        show:false
+                    })
+                }}
+                afterClose={()=>{
+                }}
+                okText="确认"
+                cancelText="取消"
+                >
+              <span>{msg}</span>
+        </Modal>
         </div>
     }
 }
@@ -209,16 +207,42 @@ export const ModalSheetManager={
         }
     },
     openConfirm(props){
-        let hookDiv = document.createElement("div")
-        document.body.appendChild(hookDiv)
         let sheetIndex = this.nextSheetIndex()
-        ReactDOM.render(<ConfirmSheet  {...props} sheetIndex={sheetIndex} sheetHookElement={hookDiv}/>,hookDiv)
+        const {title,msg,ok,cancel} =props
+        let cCancel = cancel||function(){}
+        let cOk = ok||function(){}
+        let confirm=Modal.confirm({
+            zIndex:sheetIndex,
+            onCancel:()=>{
+                cCancel()
+                confirm.destroy()
+            },
+            onOk:()=>{
+                cOk()
+                confirm.destroy()
+            }
+        })
+        confirm.update({
+            title:title,
+            content:msg
+        })
     },
     openAlert(props){
-        let hookDiv = document.createElement("div")
-        document.body.appendChild(hookDiv)
         let sheetIndex = this.nextSheetIndex()
-        ReactDOM.render(<AlertSheet  {...props} sheetIndex={sheetIndex} sheetHookElement={hookDiv}/>,hookDiv)
+        const{title,msg}=props
+        let alert=Modal.info({
+            zIndex:sheetIndex,
+            onCancel:()=>{
+                alert.destroy()
+            },
+            onOk:()=>{
+                alert.destroy()
+            }
+        })
+        alert.update({
+            title:title,
+            content:msg
+        })
     }
 }
 

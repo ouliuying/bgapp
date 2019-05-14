@@ -1,5 +1,6 @@
 import React from 'react'
-import {Input,DatePicker,Select,DateRangePicker,Notification,Button,Upload,Checkbox} from 'element-react'
+import {Input,DatePicker,Select,notification ,Button,Upload,Checkbox} from "../../ui"
+
 import {createIconFromSvg} from "../../icon/createIconFromSvg"
 import Icon from '../../icon'
 import {eq,gt_eq,and,lt,lt_eq,iLike,like} from '../../criteria/index'
@@ -11,9 +12,10 @@ import {ReducerRegistry} from '../../ReducerRegistry'
 import {getModelView} from './ModelViewRegistry'
 import {ModalSheetManager} from './ModalSheetManager'
 import ViewRefType from './ViewRefType'
-import moment from 'moment'
 import { createViewParam } from './ViewParam';
-
+import moment from 'moment';
+const {RangePicker} = DatePicker
+const { TextArea } = Input
 export const ViewFieldType={
     TextField:'text',
     SingleLineTextField:'singleLineText',
@@ -48,12 +50,12 @@ export class TextField extends React.Component{
         const {type,value,onChange}=this.props
         try{
             return type==="singleLine"?(
-                <Input placeholder="请输入内容"  value={value} onChange={(value)=>{
-                    onChange(value)
+                <Input placeholder="请输入内容"  value={value} onChange={(evt)=>{
+                    onChange(evt.target.value)
                 }}/>
             ):(
-                <Input type="textarea" value={value} placeholder="请输入内容" onChange={(value)=>{
-                    onChange(value)
+                <TextArea value={value} placeholder="请输入内容" onChange={(evt)=>{
+                    onChange(evt.target.value)
                 }}/>
             )
         }
@@ -86,8 +88,8 @@ export class TelephoneField extends React.Component{
     render(){
         const {value,onChange,...rest}=this.props
         const telephone=this.getTelephone(value)
-        return <Input {...rest} value={telephone} onChange={(value)=>{
-            onChange(value)
+        return <Input {...rest} value={telephone} onChange={(evt)=>{
+            onChange(evt.target.value)
         }} placeholder="输入电话号码"></Input>
     }
 }
@@ -98,8 +100,8 @@ export class MobileField extends React.Component{
     render(){
         const {value,onChange,...rest}=this.props
         const mobile=this.getMobile(value)
-        return <Input {...rest} value={mobile} onChange={(value)=>{
-            onChange(value)
+        return <Input {...rest} value={mobile} onChange={(evt)=>{
+            onChange(evt.target.value)
         }} placeholder="输入手机号码"></Input>
     }
 }
@@ -110,8 +112,8 @@ export class NumberField extends React.Component{
     render(){
         const {value,onChange,getNumber,...rest}=this.props
         const number=(getNumber||this.getNumber)(value)
-        return <Input {...rest} value={number} onChange={(value)=>{
-            onChange(value)
+        return <Input {...rest} value={number} onChange={(evt)=>{
+            onChange(evt.target.value)
         }}></Input>
     }
 }
@@ -160,12 +162,12 @@ export class SingleCheckBoxField extends React.Component{
         const{meta,value,onChange}=this.props
 
         return value>0?<Checkbox checked label={(meta||{}).label}   onChange={
-            (value)=>{
-                onChange && onChange(value?1:0)
+            (evt)=>{
+                onChange && onChange(evt.target.value?1:0)
             }
         }></Checkbox>:<Checkbox  label={(meta||{}).label}  onChange={
-            (value)=>{
-                onChange && onChange(value?1:0)
+            (evt)=>{
+                onChange && onChange(evt.target.value?1:0)
             }
         }></Checkbox>
     }
@@ -173,20 +175,33 @@ export class SingleCheckBoxField extends React.Component{
 
 export class DateField extends React.Component{
     toDate(value){
-        if(!value){
-            return new Date()
+        if(typeof value === "string"){
+            if(value==""){
+                return moment(new Date())
+            }
+            return  moment(value,["YYYY-MM-DD HH:mm:ss","YYYY-MM-DD"])
         }
-        return moment(value).toDate()
+        else if(value==undefined || value==null || value==""){
+            return moment(new Date())
+        }
+        else{
+            return moment(new Date())
+        }
     }
-    fromDate(date){
-        return moment(date).format("YYYY-MM-DD")
+    formatDate(value){
+        if(value){
+            return value.format("YYYY-MM-DD HH:mm:ss")
+        }
+        else{
+           return moment(new Date()).format("YYYY-MM-DD HH:mm:ss")
+        }
     }
     render(){
         try{
             const {onChange,value}=this.props
-            let setValue=this.toDate(value)
+            let setValue = this.toDate(value)
             return <DatePicker onChange={(value)=>{
-                let strValue=this.fromDate(value)
+                let strValue = this.formatDate(value)
                 onChange && onChange(strValue)}
             } value={setValue}></DatePicker>
         }
@@ -205,8 +220,8 @@ export class EmailField extends React.Component{
     render(){
         const {value,onChange,...rest}=this.props
         const email=this.getEmail(value)
-        return <Input {...rest} value={email} onChange={(value)=>{
-            onChange(value)
+        return <Input {...rest} value={email} onChange={(evt)=>{
+            onChange(evt.target.value)
         }} placeholder="输入Email"></Input>
     }
 }
@@ -290,12 +305,12 @@ export class Many2OneDataSetSelectField extends React.Component{
             if(options.findIndex(x=>x.value == id)<0){
                 options.push({
                     value:id,
-                    lablel:self.state.selItem.record[relationData.toName]
+                    label:self.state.selItem.record[relationData.toName]
                 })  
             }
         }
         let idValue =value?parseInt(value.record["id"]):undefined
-        return <Select onChange={(idValue)=>{
+        return <><Select onChange={(idValue)=>{
            self.onChange(idValue)
         }} value={idValue}>
         {
@@ -307,12 +322,13 @@ export class Many2OneDataSetSelectField extends React.Component{
             )
           })
         }
-        <div className="bg-many2one-select-more-btn-container">
+      </Select>
+      <span className="bg-many2one-select-more-btn-container">
             <Button type="text" onClick={()=>{
                     self.selMore()
             }}>选择更多。。。</Button>
-            </div>
-      </Select>
+            </span> 
+      </>
     }
 }
 
@@ -359,11 +375,11 @@ export class CriteriaNumberRangeInput extends React.Component{
     }
     render(){
         return <div>
-            <Input placeholder="最小值" value={this.state.minValue} onChange={(value)=>{
-                    this.onValueChange({minValue:value})
+            <Input placeholder="最小值" value={this.state.minValue} onChange={(evt)=>{
+                    this.onValueChange({minValue:evt.target.value})
             }}></Input> - <Input placeholder="最大值" value={this.state.maxValue} onChange={
-                (value)=>{
-                    this.onValueChange({maxValue:value})
+                (evt)=>{
+                    this.onValueChange({maxValue:evt.target.value})
                 }
             }></Input>
         </div>
@@ -396,12 +412,12 @@ export class CriteriaNumberGreaterEqualInput extends React.Component{
         const {value}=this.props
         this.state={value:value}
     }
-    onChange(value){
-        this.setState({value:value})
+    onChange(evt){
+        this.setState({value:evt.target.value})
         const {onCriteriaChange,key,name}=this.props
         onCriteriaChange({
             key:key,
-            expression:gt_eq(name,value)
+            expression:gt_eq(name,evt.target.value)
         })
     }
     render(){
@@ -416,12 +432,12 @@ export class CriteriaNumberEqualInput extends React.Component{
         const {value}=this.props
         this.state={value:value}
     }
-    onChange(value){
-        this.setState({value:value})
+    onChange(evt){
+        this.setState({value:evt.target.value})
         const {onCriteriaChange,key,name}=this.props
         onCriteriaChange({
             key:key,
-            expression:eq(name,value)
+            expression:eq(name,evt.target.value)
         })
     }
     render(){
@@ -436,11 +452,11 @@ export class CriteriaStringILikeEqualInput extends React.Component{
         const {value}=this.props
         this.state={value:value}
     }
-    onChange(value){
-        this.setState({value:value})
+    onChange(evt){
+        this.setState({value:evt.target.value})
         const {onCriteriaChange,ckey,name}=this.props
         onCriteriaChange(
-            iLike(name,value),
+            iLike(name,evt.target.value),
             ckey
         )
     }
@@ -460,11 +476,11 @@ export class CriteriaStringLikeEqualInput extends React.Component{
         const {value}=this.props
         this.state={value:value}
     }
-    onChange(value){
-        this.setState({value:value})
+    onChange(evt){
+        this.setState({value:evt.target.value})
         const {onCriteriaChange,ckey,name}=this.props
         onCriteriaChange(
-            like(name,value),
+            like(name,evt.target.value),
             ckey
         )
     }
@@ -481,11 +497,11 @@ export class CriteriaStringEqualInput extends React.Component{
         const {value}=this.props
         this.state={value}
     }
-    onChange(value){
-        this.setState({value:value})
+    onChange(evt){
+        this.setState({value:evt.target.value})
         const {onCriteriaChange,ckey,name}=this.props
         onCriteriaChange(
-            eq(name,value),
+            eq(name,evt.target.value),
             ckey
         )
     }
@@ -505,18 +521,18 @@ export class CriteriaMobileEqualInput extends React.Component{
         const {value}=this.props
         this.state={value:value}
     }
-    onChange(value){
-        if(!/^[0-9]{1,11}$/g.test(value) && value!=""){
+    onChange(evt){
+        if(!/^[0-9]{1,11}$/g.test(evt.target.value) && evt.target.value!=""){
             Notification.error({
                 title: '手机号',
                 message: '必须输入数字。。。'
               });
               return;
         }
-        this.setState({value:value})
+        this.setState({value:evt.target.value})
         const {onCriteriaChange,ckey,name}=this.props
         onCriteriaChange(
-            eq(name,value),
+            eq(name,evt.target.value),
             ckey
         )
     }
@@ -535,12 +551,12 @@ export class CriteriaDateEqualInput extends React.Component{
         const {value}=this.props
         this.state={value:value}
     }
-    onChange(value){
-        this.setState({value:value})
+    onChange(evt){
+        this.setState({value:evt.target.value})
         const {onCriteriaChange,key,name}=this.props
         onCriteriaChange({
             key:key,
-            expression:eq(name,value)
+            expression:eq(name,evt.target.value)
         })
     }
     render(){
@@ -555,12 +571,12 @@ export class CriteriaDateTimeEqualInput extends React.Component{
         const {value}=this.props
         this.state={value:value}
     }
-    onChange(value){
-        this.setState({value:value})
+    onChange(evt){
+        this.setState({value:evt.target.value})
         const {onCriteriaChange,key,name}=this.props
         onCriteriaChange({
             key:key,
-            expression:eq(name,value)
+            expression:eq(name,evt.target.value)
         })
     }
     render(){
@@ -576,12 +592,12 @@ export class CriteriaDateStartInput extends React.Component{
         const {value}=this.props
         this.state={value:value}
     }
-    onChange(value){
-        this.setState({value:value})
+    onChange(evt){
+        this.setState({value:evt.target.value})
         const {onCriteriaChange,key,name}=this.props
         onCriteriaChange({
             key:key,
-            expression:gt_eq(name,value)
+            expression:gt_eq(name,evt.target.value)
         })
     }
     render(){
@@ -597,12 +613,12 @@ export class CriteriaDateEndInput extends React.Component{
         const {value}=this.props
         this.state={value:value}
     }
-    onChange(value){
-        this.setState({value:value})
+    onChange(evt){
+        this.setState({value:evt.target.value})
         const {onCriteriaChange,key,name}=this.props
         onCriteriaChange({
             key:key,
-            expression:lt_eq(name,value)
+            expression:lt_eq(name,evt.target.value)
         })
     }
     render(){
@@ -617,12 +633,12 @@ export class CriteriaDateTimeStartInput extends React.Component{
         const {value}=this.props
         this.state={value:value}
     }
-    onChange(value){
-        this.setState({value:value})
+    onChange(evt){
+        this.setState({value:evt.target.value})
         const {onCriteriaChange,key,name}=this.props
         onCriteriaChange({
             key:key,
-            expression:gt_eq(name,value)
+            expression:gt_eq(name,evt.target.value)
         })
     }
     render(){
@@ -637,12 +653,12 @@ export class CriteriaDateTimeEndInput extends React.Component{
         const {value}=this.props
         this.state={value:value}
     }
-    onChange(value){
-        this.setState({value:value})
+    onChange(evt){
+        this.setState({value:evt.target.value})
         const {onCriteriaChange,key,name}=this.props
         onCriteriaChange({
             key:key,
-            expression:lt_eq(name,value)
+            expression:lt_eq(name,evt.target.value)
         })
     }
     render(){
@@ -657,17 +673,17 @@ export class CriteriaDateRangeInput extends React.Component{
         const {value}=this.props
         this.state={value:value}
     }
-    onChange(value){
-        this.setState({value:value})
+    onChange(evt){
+        this.setState({value:evt.target.value})
         const {onCriteriaChange,key,name}=this.props
         onCriteriaChange({
             key:key,
-            expression:lt_eq(name,value)
+            expression:lt_eq(name,evt.target.value)
         })
     }
     render(){
-        return <DateRangePicker value={this.state.value} onChange={this.onChange}>
-        </DateRangePicker>
+        return <RangePicker value={this.state.value} onChange={this.onChange}>
+        </RangePicker>
     }
 }
 
@@ -686,8 +702,8 @@ export class CriteriaDateTimeRangeInput extends React.Component{
         })
     }
     render(){
-        return <DateRangePicker value={this.state.value} onChange={this.onChange}>
-        </DateRangePicker>
+        return <RangePicker value={this.state.value} onChange={this.onChange}>
+        </RangePicker>
     }
 }
 

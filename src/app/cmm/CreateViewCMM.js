@@ -16,7 +16,7 @@ import { getRoutePath,goRoute } from '../routerHelper'
 import {
     viewDataFromCreateContext,
     buildServerCreateData} from '../reducers/appContext'
-import {Button,Form,Tabs,Table, MessageBox} from "../../ui"
+import {ModalSheetManager} from '../modelView/ModalSheetManager'
 import {createViewParam,createDetailParam} from '../modelView/ViewParam'
 import ViewType from '../modelView/ViewType'
 import {RECORD_TAG} from '../ReservedKeyword'
@@ -215,19 +215,22 @@ export class CreateViewCMM extends ViewCMM{
                 self.showDetail(view,newID)
             }
             else{
-                MessageBox.alert(res.description)
+              ModalSheetManager.openAlert({title:"提示",
+              msg:res.description
+              })
             }
-            
             },function(err){
-                MessageBox.alert("通讯失败！")
+              ModalSheetManager.openAlert({title:"提示",
+              msg:"通讯失败！"
+              })
             })
       }
   }
-
+  
   doAction(view,trigger){
      this[trigger.name].call(this,view)
   }
- 
+
   doCancel(view){
     const {viewParam} = view.props
     const {ownerField,external}=(viewParam||{})

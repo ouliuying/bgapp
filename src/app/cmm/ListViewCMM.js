@@ -14,7 +14,8 @@ import { ModelAction } from '../mq/ModelAction'
 import {CREATE_VIEW_DATA, RECORD_TAG,ARGS} from '../ReservedKeyword'
 import { getRoutePath,goRoute } from '../routerHelper'
 import {viewDataFromListContext} from '../reducers/appContext'
-import {Button,Form,Tabs,Table, MessageBox} from 'element-react'
+import {ModalSheetManager} from '../modelView/ModalSheetManager'
+import {Button} from '../../ui'
 import {createDetailParam,createViewParam} from '../modelView/ViewParam'
 import { and } from '../../criteria'
 import ViewType from "../modelView/ViewType"
@@ -67,15 +68,17 @@ export class ListViewCMM extends  ViewCMM{
             if(!f.relationData){
                 columns.push({
                     label:f.title,
-                    prop:f.name
+                    dataIndex:f.name,
+                    key:f.name
                     })
             }
             else{
                 columns.push({
                     label:f.title,
-                    prop:f.name,
-                    render:(row, column, index)=>{
-                        let d =row[column.prop]
+                    key:f.name,
+                    dataIndex:f.name,
+                    render:(text,reocrd)=>{
+                        let d =text
                         if(d instanceof Object && d.record){
                             if(d.record instanceof Array){
                                 return (d.record[0]||{})[f.relationData.toName]
@@ -96,7 +99,7 @@ export class ListViewCMM extends  ViewCMM{
         columns.push({
             label: "操作",
             width: 120,
-            render: (row, column, index)=>{
+            render: (text,record)=>{
                 let tg= triggerGroups.find(x=>x.name=="opAction")
                 let selSingleItemActionTg = triggerGroups.find(x=>x.name=="selSingleItemAction")
                 return <span>
@@ -110,7 +113,7 @@ export class ListViewCMM extends  ViewCMM{
                                     if(!draft.model || draft.model=="*"){
                                         draft.model = self.model
                                     }
-                                    draft[ARGS]={id:row["id"],tag:row[RECORD_TAG]}
+                                    draft[ARGS]={id:record["id"],tag:record[RECORD_TAG]}
                                     self.doAction(view,draft)
                                 })
                                
@@ -127,7 +130,7 @@ export class ListViewCMM extends  ViewCMM{
                                     if(!draft.model || draft.model=="*"){
                                         draft.model = self.model
                                     }
-                                    draft[ARGS]={id:row["id"],tag:row[RECORD_TAG],data:row}
+                                    draft[ARGS]={id:record["id"],tag:record[RECORD_TAG],data:record}
                                     self.doAction(view,draft)
                                     const {external} = view.props
                                     external && external.close && external.close()
@@ -289,10 +292,15 @@ export class ListViewCMM extends  ViewCMM{
                 removeListContextViewDataRecord(self.app,self.model,self.viewType,[tag],ownerField)
             }
             else{
-                MessageBox.alert(res.description)
+                ModalSheetManager.alert({
+                    msg:res.description
+                })
+              
             }
             },function(err){
-                MessageBox.alert("通讯失败！")
+                ModalSheetManager.alert({
+                    msg:"通讯失败！"
+                })
             })
         }
         else{

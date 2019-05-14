@@ -4,9 +4,8 @@
     "private": true,
     "proxy": "http://localhost:8090/",
     "dependencies": {
+        "antd": "^3.18.1",
         "connected-react-router": "^6.4.0",
-        "element-react": "^1.4.26",
-        "element-theme-default": "^1.4.13",
         "history": "^4.9.0",
         "hoist-non-react-statics": "^3.2.1",
         "immer": "^1.10.5",

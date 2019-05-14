@@ -65,18 +65,21 @@ body {
     display: flex;
     align-items: stretch;
     flex-direction: row;
+    border-bottom: 1px solid $nav-bottom-border-color;
 }
 
 .bg-app-frame-header-icon {
-    background: $primary-background-color;
+    background: $logo-background-color;
     flex-basis: 143px;
     align-items: center;
     display: flex;
     color: white;
     justify-content: center;
-    border-right: 1px solid #77b5f5;
+    border-right: 1px solid $nav-bottom-border-color;
 }
-
+.bg-app-frame-header-icon img{
+    height:48px;
+}
 .bg-app-frame-header-icon span {
     font-size: 18px;
 }
@@ -85,6 +88,7 @@ body {
     background: $primary-background-color;
     display: flex;
     flex-direction: column-reverse;
+  
 }
 
 .bg-app-frame-body {
@@ -121,8 +125,10 @@ body {
 
 .bg-app-nav-button-bar {
     display: flex;
-    background: rgba(200, 200, 200, 0.4);
     align-items: bottom;
+    align-items: stretch;
+    height: 100%;
+    vertical-align: middle;
 }
 
 .bg-app-shortcut-add {
@@ -131,10 +137,23 @@ body {
 }
 
 .bg-app-shortcut-action-btn {
-    padding: 5px 20px;
-    display: inline-block;
+ 
+    display: flex;
+    color:#bfcbd9;
+    cursor: pointer;
+    align-items: center;
+    padding: 0px 10px;
+}
+.bg-app-shortcut-action-btn:hover,
+.bg-app-shortcut-action-btn.active
+{
+    color:#d3dfee;
+    background: $logo-bottom-color;
 }
 
+.bg-app-shortcut-action-btn span{
+    margin-left: 4px;
+}
 .bg-app-frame-body-area {
     display: flex;
 }
@@ -164,14 +183,13 @@ body {
 .bg-app-container-body-menu {
     display: block;
     min-width: 280px;
-    background: $nav-background-color;
+    background: $menu-background-color;
 }
 
 .bg-app-container-body-menu-header {
     background: $primary-background-color;
     padding: 12px;
     margin: 0;
-    border: 1px solid $border-color;
     font-size: 14px;
     color: $primary-color;
 }
@@ -180,12 +198,7 @@ body {
     display: flex;
 }
 
-.bg-app-container-body-menu .el-menu-item {
-    height: 40px;
-    line-height: 40px;
-    padding-top: 5px;
-    padding-bottom: 5px;
-}
+
 
 .bg-model-op-view {
     display: flex;
@@ -301,10 +314,7 @@ button:focus {
     display: block;
 }
 
-.bg-model-op-view-body-common .el-form-item {
-    margin-bottom: 0px;
-    padding-bottom: 0px;
-}
+
 
 .bg-model-op-view-body-common-two-col {
     display: flex;
@@ -317,10 +327,7 @@ button:focus {
     margin-bottom: 22px;
 }
 
-.bg-model-op-view-body-common-one-col .el-form-item {
-    flex-grow: 1;
-    flex-shrink: 1;
-}
+
 
 .bg-model-op-view-body-common-two-col-first {
     border-right: 1px solid $border-color;
@@ -357,9 +364,7 @@ button:focus {
     flex-direction: column;
 }
 
-.bg-model-op-view-body-relation .el-tabs__header {
-    margin-bottom: 0px;
-}
+
 
 .bg-model-op-view-body-relation-work-area .sub-toolbar {
     padding: 10px 10px;
@@ -384,14 +389,6 @@ button:focus {
     padding: 20px;
 }
 
-.el-tag {
-    user-select: none;
-}
-
-.bg-model-list-view-search-box .sub-search-tags .el-tag {
-    cursor: pointer;
-}
-
 .bg-model-list-view-body {
     display: flex;
     flex-direction: column;
@@ -405,6 +402,8 @@ button:focus {
 
 .bg-model-list-view-body-control {
     display: flex;
+    background:$primary-color;
+    padding:5px;
 }
 
 .bg-avatar {
@@ -615,4 +614,64 @@ button:focus {
 
   .bg-many2one-select-more-btn-container{
       text-align: center;
+  }
+  .bg-open-sheet-container{
+      width:80%;
+  }
+  .bg-sheet-queue-container-lay{
+      position: fixed;
+      top:0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      background:rgba(0,0,0,0.2);
+      overflow: auto;
+      z-index: 10;
+  }
+  .bg-sheet-dialog{
+    position: absolute;
+    top:15%;
+    width:80%;
+    min-height:60%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: $primary-color;
+    border-radius: 2px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.3);
+    box-sizing: border-box;
+    margin-bottom: 50px;
+  }
+  .bg-sheet-dialog-header{
+    padding: 20px 20px 10px;
+  }
+  .bg-sheet-dialog-header span{
+        padding:0;
+        margin:0;
+        line-height: 1;
+        font-size: 16px;
+        font-weight: 700;
+        color: #1f2d3d;
+  }
+  .bg-sheet-dialog-header button{
+        padding:0;
+        float: right;
+        background: 0 0;
+        border: none;
+        outline: 0;
+        padding: 0;
+        cursor: pointer;
+        font-size: 16px;
+        margin-top: -6px;
+  }
+
+  .bg-sheet-dialog-header button::after{
+      clear: both;
+  }
+  .bg-sheet-dialog-body{
+    position: relative;
+    overflow: auto;
+    padding: 30px 20px;
+    color: #48576a;
+    font-size: 14px;
+    background:$body-background-color;
   }

@@ -24,7 +24,7 @@ class AppFrame extends React.Component{
         return <div className="bg-app-frame bg-flex-full">
                     <div className="bg-app-frame-header">
                         <div className="bg-app-frame-header-icon">
-                          <Icon.Logo/> &nbsp;<span>bg.work</span>
+                         <img src="/images/logo.png"></img> &nbsp;<span>bg.work</span>
                         </div>
                         <div className="bg-app-frame-header-nav bg-flex-full">
                            <Route path="/app/dynamic" component={AppNav}>

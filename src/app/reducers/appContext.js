@@ -226,6 +226,12 @@ function getInitListViewData(data, view, ownerField){
             x[RECORD_TAG] = nextRecordTag()
         })
     }
+    data=data||{
+        app:view.app,
+        model:view.model,
+        record:[]
+    }
+    data.record=data.record||[]
     return data
 }
 function setModelViewCriteria(draft,app,model,viewType,ownerField,name,criteria){
@@ -550,13 +556,13 @@ function buildServerViewTypeData(app,model,viewType,viewDataConextkey,ownerField
     let modelData = (state[ViewContext.APP_CONTEXT][viewDataConextkey]||{})[rootKey]
     if(modelData){
 
-        if(modelData.viewData.data.record instanceof Array){
+        if(((modelData.viewData||{}).data||{}).record && (modelData.viewData.data.record instanceof Array)){
             serverData.record=buildServerModelDataArray(app,model,viewType,
                 modelData.viewData.data,ownerField,state)
         }
         else{
             serverData.record=buildServerModelDataObject(modelData.viewData.view,
-                modelData.viewData.data.record||{},state,modelData.viewData.subViews)
+                (modelData.viewData.data||{}).record||{},state,modelData.viewData.subViews)
         }
     }
     return serverData

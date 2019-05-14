@@ -7,11 +7,15 @@ class ModalSheetQueueContainer extends React.Component{
         const {modalSheetQueue} = this.props
         return <>
             {
-                Object.keys(modalSheetQueue||{}).map(function(key){
-                    let sheet = modalSheetQueue[key]
-                    let props = {sheetIndex:key,view:sheet.view,...sheet.props}
-                    return <ModalSheet {...props} key={key}></ModalSheet>
-                })
+                Object.keys(modalSheetQueue||{}).length>0?<div className="bg-sheet-queue-container-lay">
+                {
+                    Object.keys(modalSheetQueue||{}).map(function(key){
+                        let sheet = modalSheetQueue[key]
+                        let props = {sheetIndex:key,view:sheet.view,...sheet.props}
+                        return <ModalSheet {...props} key={key}></ModalSheet>
+                    })
+                }
+                </div>:null
             }
         </>
     }

@@ -9,7 +9,7 @@ import {
 import appRouteLoader from './appRouteLoader'
 import {getModelView} from './modelView/ModelViewRegistry'
 import {push} from 'connected-react-router'
-import {Menu} from 'element-react'
+import {Menu} from '../ui'
 import {createIconFromSvg} from '../icon/createIconFromSvg'
 import {getCurrentApp} from '../reducers/config'
 //import {getUIAppCache} from '../reducers/sys'
@@ -70,31 +70,31 @@ class AppInContainer extends React.Component{
             svgStyle:{width:18,height:18,fill:'#0ab73d'}
         })
         return <div className="bg-app-container bg-flex-full">
-            <div className="bg-app-container-header">
+            {/* <div className="bg-app-container-header">
                 <h3>
                    <AppIcon></AppIcon>
                     &nbsp;{this.app.title}
                 </h3>
-            </div>
+            </div> */}
             <div className="bg-app-container-body bg-flex-full">
                 <div className="bg-app-container-body-menu">
                
                 <h3 className="bg-app-container-body-menu-header">
                 {dyMenu.title}
                 </h3>
-                <Menu mode="vertical" defaultActive="1" onSelect={(index)=>this.showModelView(index)}>
+                <Menu theme="dark"   mode="inline" defaultActive="1" onSelect={(arg)=>this.showModelView(arg.key)}>
                     {
                         dyMenu.subMenu.map((sm,index)=>{
                             return this.isSubMenu(sm)?(
-                                <Menu.ItemGroup title={sm.title} key={index}>
+                                <Menu.SubMenu title={sm.title} key={index}>
                                     {
                                         sm.subMenu.map((sm2)=>{
                                             let key=`${sm2.app},${sm2.model},${sm2.viewType}`
-                                        return this.isSubMenu(sm2)?(null):(<Menu.Item index={`${sm2.app},${sm2.model},${sm2.viewType}`} key={key}>
+                                        return this.isSubMenu(sm2)?(null):(<Menu.Item key={key}>
                                         {sm2.title}</Menu.Item>)})
                                     }
-                                </Menu.ItemGroup>
-                            ):(<Menu.Item index={`${sm.app},${sm.model},${sm.viewType}`} key={`${sm.app},${sm.model},${sm.viewType}`}>
+                                </Menu.SubMenu>
+                            ):(<Menu.Item  key={`${sm.app},${sm.model},${sm.viewType}`}>
                             {sm.title}</Menu.Item>)
                         })
                     }

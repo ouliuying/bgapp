@@ -1,5 +1,5 @@
 import {createIconFromSvg} from './createIconFromSvg'
-const IconColor='#0ab73d'
+const IconColor='#e3efe6'
 const Logo = createIconFromSvg({
     src:"/icon/res/logo.svg",
     svgStyle:{width:32,height:32}

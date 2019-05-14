@@ -18,7 +18,7 @@ import {setSys} from './actions/sys'
 
 import {userNamePasswordSelector, statusSelector} from './reducers/partner'
 import {req,APPLICATION_X_WWW_FORM_URLENCODED} from './lib/http-helper'
-import MessageBox from './MessabeBox'
+import {ModalSheetManager} from './app/modelView/ModalSheetManager'
 class Login extends Component {
     static propTypes = {
         store: PropTypes.object,
@@ -48,8 +48,10 @@ class Login extends Component {
             setPartner(jData)
             setSys(jData)
             if(jData.errorCode!=0){
-                MessageBox.alert(jData.description)
+                ModalSheetManager.openAlert({title:"提示",msg:jData.description})
             }
+        },function(){
+            ModalSheetManager.openAlert({title:"提示",msg:"请求失败！"})
         })
     }
     isLogin(){

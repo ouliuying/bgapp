@@ -307,7 +307,7 @@ class EditView extends React.Component{
 
                             </hookView.Hook>
 
-                            {/**  create model dont support add target model same time  */}
+                            {/**  create model dont support //add target model same time  */}
                             {
                                 (relationViews && relationViews.length>0)?<div className="bg-big-line"></div>:null
                             }
