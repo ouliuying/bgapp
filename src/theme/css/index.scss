@@ -675,3 +675,9 @@ button:focus {
     font-size: 14px;
     background:$body-background-color;
   }
+  .ant-table-thead > tr {
+      background:$table-header-background-color;
+  }
+  .ant-table-thead > tr > th{
+      color:$table-header-color;
+  }

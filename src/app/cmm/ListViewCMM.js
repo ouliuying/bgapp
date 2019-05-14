@@ -67,14 +67,14 @@ export class ListViewCMM extends  ViewCMM{
         for(let f of ((viewMeta||{}).fields||[])){
             if(!f.relationData){
                 columns.push({
-                    label:f.title,
+                    title:f.title,
                     dataIndex:f.name,
                     key:f.name
                     })
             }
             else{
                 columns.push({
-                    label:f.title,
+                    title:f.title,
                     key:f.name,
                     dataIndex:f.name,
                     render:(text,reocrd)=>{
@@ -97,7 +97,7 @@ export class ListViewCMM extends  ViewCMM{
         }
      
         columns.push({
-            label: "操作",
+            title: "操作",
             width: 120,
             render: (text,record)=>{
                 let tg= triggerGroups.find(x=>x.name=="opAction")
