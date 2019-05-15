@@ -1,5 +1,5 @@
 import React from 'react'
-import {Input,DatePicker,Select,notification ,Button,Upload,Checkbox} from "../../ui"
+import {Input,DatePicker,Select,notification ,Button,Upload,Checkbox,Icon as FontIcon} from "../../ui"
 
 import {createIconFromSvg} from "../../icon/createIconFromSvg"
 import Icon from '../../icon'
@@ -310,7 +310,7 @@ export class Many2OneDataSetSelectField extends React.Component{
             }
         }
         let idValue =value?parseInt(value.record["id"]):undefined
-        return <><Select onChange={(idValue)=>{
+        return <div className="bg-many2one-select-co"><Select onChange={(idValue)=>{
            self.onChange(idValue)
         }} value={idValue}>
         {
@@ -323,12 +323,14 @@ export class Many2OneDataSetSelectField extends React.Component{
           })
         }
       </Select>
-      <span className="bg-many2one-select-more-btn-container">
+  
             <Button type="text" onClick={()=>{
                     self.selMore()
-            }}>选择更多。。。</Button>
-            </span> 
-      </>
+            }} className="bg-many2one-select-more-btn">
+                <FontIcon type="search" />
+            </Button>
+          
+      </div>
     }
 }
 
@@ -339,13 +341,9 @@ export class CriteriaEnumSelect  extends React.Component{
         super(props)
     }
     render(){
-        const {onCriteriaChange,meta,name,value}=this.props
-        return <Select value={value} placeholder="请选择" onChange={(value)=>{onCriteriaChange && onCriteriaChange({
-                expression: eq(name,value),
-                name,
-                value
-            }
-        )}}>
+        const {onChange,fd,value}=this.props
+        let meta = fd.meta
+        return <Select value={value} placeholder="请选择" onChange={(value)=>{onChange && onChange(value)}}>
         {
           meta.options.map(vt => {
             return <Select.Option key={vt.value} label={vt.label} value={vt.value} />
@@ -358,28 +356,24 @@ export class CriteriaEnumSelect  extends React.Component{
 export class CriteriaNumberRangeInput extends React.Component{
     constructor(props){
         super(props)
-        const{maxValue,minValue}=this.props.meta
-        this.state={
-            maxValue,
-            minValue,
-        }
     }
     onValueChange(value){
-        const {onCriteriaChange,name,key}=this.props
-        var state=Object.assign({},this.state,value)
-        this.setState(state)
-        onCriteriaChange({
-            key,
-            expression:and(gt_eq(name,this.state.minValue),lt(name,this.state.maxValue))
-        })
+        const {onChange}=this.props
+        onChange&&onChange(value)
     }
     render(){
+        let {value} = this.props
+        let [minValue,maxValue] =[undefined,undefined]
+        if(value instanceof Array){
+            minValue=value[0]
+            maxValue=value[1]
+        }
         return <div>
-            <Input placeholder="最小值" value={this.state.minValue} onChange={(evt)=>{
-                    this.onValueChange({minValue:evt.target.value})
-            }}></Input> - <Input placeholder="最大值" value={this.state.maxValue} onChange={
+            <Input placeholder="最小值" value={minValue} onChange={(evt)=>{
+                    this.onValueChange([evt.target.value,maxValue])
+            }}></Input> - <Input placeholder="最大值" value={maxValue} onChange={
                 (evt)=>{
-                    this.onValueChange({maxValue:evt.target.value})
+                    this.onValueChange([minValue,evt.target.value])
                 }
             }></Input>
         </div>
@@ -388,20 +382,14 @@ export class CriteriaNumberRangeInput extends React.Component{
 export class CriteriaNumberLessEqualInput extends React.Component{
     constructor(props){
         super(props)
-        const {value}=this.props
-        this.state={value:value}
     }
     onChange(value){
-        this.setState({value:value})
-        const {onCriteriaChange,key,name}=this.props
-        onCriteriaChange({
-            key:key,
-            expression:lt_eq(name,value)
-        })
+        const {onChange}=this.props
+        onChange&&onChange(value)
     }
     render(){
-        
-        return <Input value={this.state.value} onChange={this.onChange}>
+        let {value}=this.props
+        return <Input value={value} onChange={(evt)=>{this.onChange(evt.target.value)}}>
         </Input>
     }
 }
@@ -409,63 +397,49 @@ export class CriteriaNumberLessEqualInput extends React.Component{
 export class CriteriaNumberGreaterEqualInput extends React.Component{
     constructor(props){
         super(props)
-        const {value}=this.props
-        this.state={value:value}
     }
-    onChange(evt){
-        this.setState({value:evt.target.value})
-        const {onCriteriaChange,key,name}=this.props
-        onCriteriaChange({
-            key:key,
-            expression:gt_eq(name,evt.target.value)
-        })
+    onChange(value){
+        const {onChange}=this.props
+        onChange && onChange(value)
     }
     render(){
-        
-        return <Input value={this.state.value} onChange={this.onChange}>
+        const {value}=this.props
+        return <Input value={value} onChange={(evt)=>{
+            this.onChange(evt.target.value)
+        }}>
         </Input>
     }
 }
+
 export class CriteriaNumberEqualInput extends React.Component{
     constructor(props){
         super(props)
-        const {value}=this.props
-        this.state={value:value}
     }
-    onChange(evt){
-        this.setState({value:evt.target.value})
-        const {onCriteriaChange,key,name}=this.props
-        onCriteriaChange({
-            key:key,
-            expression:eq(name,evt.target.value)
-        })
+    onChange(value){
+        const {onChange}=this.props
+        onChange&&onChange(value)
     }
     render(){
-        
-        return <Input value={this.state.value} onChange={this.onChange}>
+        const {value}=this.props
+        return <Input value={value} onChange={(evt)=>{
+            this.onChange(evt.target.value)
+        }}>
         </Input>
     }
 }
 export class CriteriaStringILikeEqualInput extends React.Component{
     constructor(props){
         super(props)
-        const {value}=this.props
-        this.state={value:value}
     }
-    onChange(evt){
-        this.setState({value:evt.target.value})
-        const {onCriteriaChange,ckey,name}=this.props
-        onCriteriaChange(
-            iLike(name,evt.target.value),
-            ckey
-        )
+    onChange(value){
+        const {onChange}=this.props
+        onChange&&onChange(value)
     }
     render(){
-        let {title}=this.props
-        if(title===undefined){
-            title="..."
-        }
-        return <Input value={this.state.value} onChange={this.onChange} placeholder={"输入 " + title}>
+        let {value,title}=this.props
+        return <Input value={value} onChange={(evt)=>{
+            this.onChange(evt.target.value)
+        }} placeholder={title}>
         </Input>
     }
 }
@@ -473,20 +447,16 @@ export class CriteriaStringILikeEqualInput extends React.Component{
 export class CriteriaStringLikeEqualInput extends React.Component{
     constructor(props){
         super(props)
-        const {value}=this.props
-        this.state={value:value}
     }
-    onChange(evt){
-        this.setState({value:evt.target.value})
-        const {onCriteriaChange,ckey,name}=this.props
-        onCriteriaChange(
-            like(name,evt.target.value),
-            ckey
-        )
+    onChange(value){
+        const {onChange}=this.props
+        onChange&&onChange(value)
     }
     render(){
-        
-        return <Input value={this.state.value} onChange={this.onChange}>
+        const {value,title}=this.props
+        return <Input value={value} onChange={()=>{
+            this.onChange(value)
+        }} placeholder={title}>
         </Input>
     }
 }
@@ -494,23 +464,14 @@ export class CriteriaStringLikeEqualInput extends React.Component{
 export class CriteriaStringEqualInput extends React.Component{
     constructor(props){
         super(props)
-        const {value}=this.props
-        this.state={value}
     }
-    onChange(evt){
-        this.setState({value:evt.target.value})
-        const {onCriteriaChange,ckey,name}=this.props
-        onCriteriaChange(
-            eq(name,evt.target.value),
-            ckey
-        )
+    onChange(value){
+        const {onChange}=this.props
+        onChange&&onChange(value)
     }
     render(){
-        let {title}=this.props
-        if(title===undefined){
-            title="..."
-        }
-        return <Input value={this.state.value} onChange={(value)=>this.onChange(value)} placeholder={"输入 " + title}>
+        const {value,title}=this.props
+        return <Input value={value} onChange={(evt)=>this.onChange(evt.target.value)} placeholder={title}>
         </Input>
     }
 }
@@ -518,151 +479,51 @@ export class CriteriaStringEqualInput extends React.Component{
 export class CriteriaMobileEqualInput extends React.Component{
     constructor(props){
         super(props)
-        const {value}=this.props
-        this.state={value:value}
     }
-    onChange(evt){
-        if(!/^[0-9]{1,11}$/g.test(evt.target.value) && evt.target.value!=""){
-            Notification.error({
-                title: '手机号',
-                message: '必须输入数字。。。'
-              });
-              return;
-        }
-        this.setState({value:evt.target.value})
-        const {onCriteriaChange,ckey,name}=this.props
-        onCriteriaChange(
-            eq(name,evt.target.value),
-            ckey
-        )
+    onChange(value){
+       const {onChange}=this.props
+       onChange && onChange(value)
     }
     render(){
-        let {title}=this.props
-        if(title===undefined){
-            title="..."
-        }
-        return <Input value={this.state.value} onChange={(value)=>this.onChange(value)} placeholder={"输入 " + title}>
+        const {value,title}=this.props
+        return <Input value={value} onChange={(evt)=>this.onChange(evt.target.value)} placeholder={title}>
         </Input>
     }
 }
 export class CriteriaDateEqualInput extends React.Component{
     constructor(props){
         super(props)
-        const {value}=this.props
-        this.state={value:value}
     }
-    onChange(evt){
-        this.setState({value:evt.target.value})
-        const {onCriteriaChange,key,name}=this.props
-        onCriteriaChange({
-            key:key,
-            expression:eq(name,evt.target.value)
-        })
+    onChange(value){
+        const {onChange}=this.props
+        let strValue = value.format("YYYY-MM-DD")
+        onchange && onChange(strValue)
     }
     render(){
-        
-        return <DatePicker value={this.state.value} onChange={this.onChange}>
+        const {value}=this.props
+        let mValue=moment(value,["YYYY-MM-DD HH:mm:ss","YYYY-MM-DD"])
+        return <DatePicker value={mValue} onChange={evt=>{
+            this.onChange(evt.target.value)
+        }}>
         </DatePicker>
     }
 }
+
 export class CriteriaDateTimeEqualInput extends React.Component{
     constructor(props){
         super(props)
-        const {value}=this.props
-        this.state={value:value}
     }
-    onChange(evt){
-        this.setState({value:evt.target.value})
-        const {onCriteriaChange,key,name}=this.props
-        onCriteriaChange({
-            key:key,
-            expression:eq(name,evt.target.value)
-        })
+    onChange(value){
+        const {onChange}=this.props
+        let strValue = value.format("YYYY-MM-DD")
+        onchange && onChange(strValue)
     }
     render(){
-        
-        return <DatePicker value={this.state.value} onChange={this.onChange}>
-        </DatePicker>
-    }
-}
-
-export class CriteriaDateStartInput extends React.Component{
-    constructor(props){
-        super(props)
         const {value}=this.props
-        this.state={value:value}
-    }
-    onChange(evt){
-        this.setState({value:evt.target.value})
-        const {onCriteriaChange,key,name}=this.props
-        onCriteriaChange({
-            key:key,
-            expression:gt_eq(name,evt.target.value)
-        })
-    }
-    render(){
-        
-        return <DatePicker value={this.state.value} onChange={this.onChange}>
-        </DatePicker>
-    }
-}
-
-export class CriteriaDateEndInput extends React.Component{
-    constructor(props){
-        super(props)
-        const {value}=this.props
-        this.state={value:value}
-    }
-    onChange(evt){
-        this.setState({value:evt.target.value})
-        const {onCriteriaChange,key,name}=this.props
-        onCriteriaChange({
-            key:key,
-            expression:lt_eq(name,evt.target.value)
-        })
-    }
-    render(){
-        return <DatePicker value={this.state.value} onChange={this.onChange}>
-        </DatePicker>
-    }
-}
-
-export class CriteriaDateTimeStartInput extends React.Component{
-    constructor(props){
-        super(props)
-        const {value}=this.props
-        this.state={value:value}
-    }
-    onChange(evt){
-        this.setState({value:evt.target.value})
-        const {onCriteriaChange,key,name}=this.props
-        onCriteriaChange({
-            key:key,
-            expression:gt_eq(name,evt.target.value)
-        })
-    }
-    render(){
-        return <DatePicker value={this.state.value} onChange={this.onChange}>
-        </DatePicker>
-    }
-}
-
-export class CriteriaDateTimeEndInput extends React.Component{
-    constructor(props){
-        super(props)
-        const {value}=this.props
-        this.state={value:value}
-    }
-    onChange(evt){
-        this.setState({value:evt.target.value})
-        const {onCriteriaChange,key,name}=this.props
-        onCriteriaChange({
-            key:key,
-            expression:lt_eq(name,evt.target.value)
-        })
-    }
-    render(){
-        return <DatePicker value={this.state.value} onChange={this.onChange}>
+        let mValue=moment(value,["YYYY-MM-DD HH:mm:ss","YYYY-MM-DD"])
+        return <DatePicker value={mValue} onChange={evt=>{
+            this.onChange(evt.target.value)
+        }}>
         </DatePicker>
     }
 }
@@ -670,19 +531,14 @@ export class CriteriaDateTimeEndInput extends React.Component{
 export class CriteriaDateRangeInput extends React.Component{
     constructor(props){
         super(props)
-        const {value}=this.props
-        this.state={value:value}
     }
-    onChange(evt){
-        this.setState({value:evt.target.value})
-        const {onCriteriaChange,key,name}=this.props
-        onCriteriaChange({
-            key:key,
-            expression:lt_eq(name,evt.target.value)
-        })
+    onChange(value){
+       
     }
     render(){
-        return <RangePicker value={this.state.value} onChange={this.onChange}>
+        return <RangePicker value={this.state.value} onChange={evt=>{
+            this.onChange(evt.target.value)
+        }}>
         </RangePicker>
     }
 }
@@ -690,19 +546,21 @@ export class CriteriaDateRangeInput extends React.Component{
 export class CriteriaDateTimeRangeInput extends React.Component{
     constructor(props){
         super(props)
-        const {value}=this.props
-        this.state={value:value}
+    
     }
     onChange(value){
-        this.setState({value:value})
-        const {onCriteriaChange,key,name}=this.props
-        onCriteriaChange({
-            key:key,
-            expression:lt_eq(name,value)
-        })
+        const {onChange}=this.props
+        let strValue = value[0].format("YYYY-MM-DD HH:mm:ss")
+        let strValue2 = value[1].format("YYYY-MM-DD HH:mm:ss")
+        onchange && onChange([strValue,strValue2])
     }
     render(){
-        return <RangePicker value={this.state.value} onChange={this.onChange}>
+        const {value}=this.props
+        let mValue=moment(value[0],["YYYY-MM-DD HH:mm:ss","YYYY-MM-DD"])
+        let mValue2=moment(value[1],["YYYY-MM-DD HH:mm:ss","YYYY-MM-DD"])
+        return <RangePicker value={[mValue,mValue2]} onChange={evt=>{
+            this.onChange(evt.target.value)
+        }}>
         </RangePicker>
     }
 }

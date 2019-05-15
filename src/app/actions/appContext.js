@@ -15,6 +15,8 @@ export const SET_DETAIL_CONTEXT_VIEW_DATA = 'setDetailContextViewData'
 export const SET_EDIT_CONTEXT_VIEW_DATA = 'setEditContextViewData'
 export const SET_EDIT_CONTEXT_FIELD_VALUE = 'setEditContextFieldValue'
 
+export const SET_LIST_OP_SEARCH_BOX_VISIBLE= "setListOpSearchBoxVisible"
+export const SET_LIST_OP_SEARCH_BOX_CRITERIA_VALUE='setListOpSearchBoxCriteriaValue'
 
 
 
@@ -92,6 +94,12 @@ export function setEditContextFieldValue(fieldValues){
         type:SET_EDIT_CONTEXT_FIELD_VALUE,
         payload:fieldValues
     })
+}
+export function setListOpSearchBoxCriteriaValue(app,model,viewType,ownerField,fieldName,value){
+    setContextDataAction(SET_LIST_OP_SEARCH_BOX_CRITERIA_VALUE, {app,model,viewType,ownerField,fieldName,value})
+}
+export function setListOpSearchBoxVisible(app,model,viewType,ownerField,visible){
+    setContextDataAction(SET_LIST_OP_SEARCH_BOX_VISIBLE, {app,model,viewType,ownerField,visible})
 }
 
 

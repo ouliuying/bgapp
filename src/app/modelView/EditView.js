@@ -66,16 +66,16 @@ class EditView extends React.Component{
         return <hookView.HookProvider value={{cmmHost:self.cmmHost,parent:self}}>
                 <div className="bg-model-op-view bg-flex-full ">
                 {
-                    ownerField?null:<hookView.Hook hookTag="toolbar"  render={()=>{
-                        return <div className="bg-model-op-view-toolbar">
-                            <button className="bg-model-op-view-toolbar-back"  onClick={()=>{
-                                self.props.dispatch(goBack())
-                            }}>
-                            <Icon.LocationGoBack></Icon.LocationGoBack>
-                            </button>
-                    </div>
-                    }
-                    }/>
+                    // ownerField?null:<hookView.Hook hookTag="toolbar"  render={()=>{
+                    //     return <div className="bg-model-op-view-toolbar">
+                    //         <button className="bg-model-op-view-toolbar-back"  onClick={()=>{
+                    //             self.props.dispatch(goBack())
+                    //         }}>
+                    //         <Icon.LocationGoBack></Icon.LocationGoBack>
+                    //         </button>
+                    // </div>
+                    // }
+                    // }/>
                 }
                 <hookView.Hook hookTag="actions"  render={()=>{
                         return <div className="bg-model-op-view-actions">

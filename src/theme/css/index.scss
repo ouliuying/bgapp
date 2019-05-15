@@ -225,7 +225,7 @@ button:focus {
 }
 
 .bg-model-op-view-actions {
-    background: white;
+    background: $View-actions-background-color;
     margin: 5px;
     padding: 10px;
     border: 1px solid $border-color;
@@ -432,7 +432,7 @@ button:focus {
 .bg-waiting-g{
     width:20px;
     height:0px;
-    background: $primary-background-color;
+    background: $Waiting-color;
     margin:2px;
 }
 
@@ -440,7 +440,7 @@ button:focus {
  @keyframes bg-waiting-g1 {
     0% {
         height: 0px;
-        background:$primary-background-color;
+        background:$Waiting-color;
       }
       100% {
         height:80px;
@@ -461,7 +461,7 @@ button:focus {
   @keyframes bg-waiting-g2 {
     0% {
         height: 0px;
-        background:$primary-background-color;
+        background:$Waiting-color;
       }
       100% {
         height:80px;
@@ -483,7 +483,7 @@ button:focus {
   @keyframes bg-waiting-g3 {
     0% {
         height: 0px;
-        background:$primary-background-color;
+        background:$Waiting-color;
       }
       100% {
         height:80px;
@@ -505,7 +505,7 @@ button:focus {
   @keyframes bg-waiting-g4 {
     0% {
         height: 0px;
-        background:$primary-background-color;
+        background:$Waiting-color;
       }
       100% {
         height:80px;
@@ -527,7 +527,7 @@ button:focus {
   @keyframes bg-waiting-g5 {
     0% {
         height: 0px;
-        background:$primary-background-color;
+        background:$Waiting-color;
       }
       100% {
         height:80px;
@@ -549,7 +549,7 @@ button:focus {
   @keyframes bg-waiting-g6 {
     0% {
         height: 0px;
-        background:$primary-background-color;
+        background:$Waiting-color;
       }
       100% {
         height:80px;
@@ -571,7 +571,7 @@ button:focus {
   @keyframes bg-waiting-g7 {
     0% {
         height: 0px;
-        background:$primary-background-color;
+        background:$Waiting-color;
       }
       100% {
         height:80px;
@@ -593,7 +593,7 @@ button:focus {
   @keyframes bg-waiting-g8 {
     0% {
         height: 0px;
-        background:$primary-background-color;
+        background:$Waiting-color;
       }
       100% {
         height:80px;
@@ -612,8 +612,19 @@ button:focus {
     animation-play-state: running; 
   }
 
-  .bg-many2one-select-more-btn-container{
+  .bg-many2one-select-more-btn{
       text-align: center;
+      color:$Font-icon-color;
+      border: none;
+        outline: 0;
+        padding: 0;
+        cursor: pointer;
+        font-size: 16px;
+        width: 32px;
+  }
+  .bg-many2one-select-more-btn:hover{
+      background:$Font-icon-background-active-color;
+      color:$Font-icon-active-color;
   }
   .bg-open-sheet-container{
       width:80%;
@@ -680,4 +691,42 @@ button:focus {
   }
   .ant-table-thead > tr > th{
       color:$table-header-color;
+  }
+  .bg-many2one-select-co{
+      display: flex;
+      flex-direction: row;
+  }
+  .bg-list-view-action-search-section{
+    background: $View-actions-background-color;
+    margin: 5px;
+    padding: 10px;
+    border: 1px solid $border-color;
+  }
+  .bg-list-view-action-search-section  .bg-divider-line{
+    margin:10px -10px;
+  }
+  .bg-list-view-search-box-show-op{
+      text-align: center;
+      position: relative;
+  }
+  .bg-list-view-search-box-show-op span{
+    position: absolute;
+    top: 5px;
+    padding: 0 20px;
+    height: 18px;
+    background:$View-actions-background-color;
+    cursor: pointer;
+  }
+  .bg-list-view-search-box-show-op span.open i {
+     transform: rotate(180deg);
+  }
+  .bg-list-view-search-box{
+      margin-bottom: 5px;
+  }
+  .bg-list-view-search-box-item{
+      padding:5px;
+  }
+  .bg-list-view-search-box-btn{
+    margin-top: 26px;
+    margin-left: 20px;
   }

@@ -6,7 +6,7 @@ import {
     Route
 } from 'react-router-dom'
 import {push} from 'connected-react-router'
-import {Button,Table,Pagination, Form,Tag,Row, Col} from "../../ui"
+import {Button,Table,Pagination,Tag,Row, Col,Icon as FontIcon,Divider} from "../../ui"
 import hookView from '../../app/HookView'
 import { goBack } from 'connected-react-router';
 import Icon from '../../icon'
@@ -61,135 +61,142 @@ class ListView extends React.Component{
     render(){
         const self=this
         const {viewParam,viewData} = self.props
+        let {localData} = self.props
         const {ownerField} = (viewParam||{})
-        let {criterias, triggerGroups} = viewData
+        let {criterias, triggerGroups,subViews} = viewData
         criterias=criterias||[]
         triggerGroups=triggerGroups||[]
-        const {view} = viewData
-        const subViews = (view && view.subViews)||[]
+        localData=localData||{}
+        subViews=subViews||[]
         const {columns,rows,currentPage,totalCount,pageSize} = self.cmmHost.getViewDatas(self,viewData)
+        const {searchBox} = localData
+        const {visible:showSearchBox} = (searchBox||{})
         return <div className="bg-model-op-view bg-flex-full">
-                {/* toolbar begin */}
-                {
 
-                        ownerField?null:<hookView.Hook hookTag="toolbar" render={()=>{
-                            return <div className="bg-model-op-view-toolbar">
-                                <button className="bg-model-op-view-toolbar-back"  onClick={()=>{
-                                    self.props.dispatch(goBack())
-                                }}>
-                                <Icon.LocationGoBack></Icon.LocationGoBack>
-                                </button>
+                {/* list action items*/}
+                <hookView.Hook hookTag="list-view-action-items" render={()=>{
+                    const searchBox = subViews.find(x=>{
+                        return x.refView.viewType == "searchBox"
+                    })
+                    let searchFieldRows =[]
+                    if(searchBox && searchBox.view && (searchBox.view.fields||[]).length>0){
+                        let startIndex=0
+                        let lastGFields=[]
+                        let gfields=[]
+                        do{
+                            gfields = searchBox.view.fields.slice(startIndex,startIndex+3)
+                            if(gfields.length>0 ){
+                                lastGFields=gfields
+                                searchFieldRows.push(gfields)
+                            }
+                            startIndex = startIndex+3
+                        }while(gfields.length>0)
+                        lastGFields.push(null)
+                    }
+                    const groups=["main"]
+                    let tGroups = triggerGroups.filter(x=>{
+                        return groups.indexOf(x.name)>-1
+                    })
+                    return <div className="bg-list-view-action-search-section">
+                            <div className="bg-list-view-action">
+                            {
+                                tGroups.map((g)=>{
+                                    return <>
+                                        {
+                                             g.triggers.map(t=>{
+                                                return <Button type="danger" onClick={()=>{
+                                                    self.cmmHost.doAction(self,t)
+                                                }} key={t.name}>{t.title}</Button>
+                                            })
+                                        }
+                                    </>
+                                })
+                            }
                             </div>
-                            }
-                        }/>
-                }
-                    
-                {/* toolbar end */}
-
-                    
-                {/* searchBox begin */}
-                    <hookView.Hook hookTag="searchBox" render={()=>{
-                       const {viewData} = this.props
-                       const searchCriterias = criterias
-                       const searchBox = subViews.find(x=>{
-                           return x.refView.viewType == "searchBox"
-                       })
-                       const mainGroup = triggerGroups.find(x=>{
-                           return x.name == "main"
-                       })
-                        var criteriaControlGroups=[]
-                        if(this.searchBox){
-                            var lineCnt=3
-                            var lines=parseInt(searchBox.fields.length/lineCnt)
-                            for(var i=0;i<lines;i++){
-                                criteriaControlGroups.push(searchBox.fields.slice(lineCnt*i,lineCnt*(i+1)))
-                            }
-                            if(lines*4<searchBox.fields.length){
-                                var rest=searchBox.fields.slice(lines*lineCnt)
-                                rest.push(null)
-                                criteriaControlGroups.push(rest)
-                            }
-                            else{
-                                var btn=[]
-                                btn.push(null)
-                                criteriaControlGroups.push(btn)
-                            }
-                        }
-
-                        return <div className="bg-model-list-view-search-box">
-                                <div className="sub-body">
-                                <Form labelAlign={"left"}>
+                            <Divider className="bg-divider-line"></Divider>
+                            <div className="bg-list-view-search-container">
+                                {
+                                    searchBox?<div className="bg-list-view-search-box">
                                     {
-                                        criteriaControlGroups.length>0?criteriaControlGroups.map((fds,index)=>{
-                                            return <Row key={index}>
-                                                {
-                                                    fds.map((fd,index)=>{
-                                                            var Com=fd?ViewFieldTypeRegistry.getComponent(fd.type):null
-                                                            var title=fd?fd.title:""
-                                                            let cValue=criterias[fd.name]&&criterias[fd.name].value
-                                                            return <Col span="8" key={index}>
-                                                                    <Form.Item label={title}>
-                                                                        {
-                                                                            Com?<Com meta={fd.meta} name={fd.name} value={cValue} key={fd.name}  title={title} onCriteriaChange={(data)=>{
-                                                                              self.cmmHost.onCriteriaValueChange(data)
-                                                                            }}></Com>:<div><Button type="primary" onClick={
-                                                                                ()=>{
-                                                                                    self.cmmHost.doAction(self,{
-                                                                                        name:"search"
-                                                                                    })
-                                                                                }
-                                                                            }>确定</Button>&nbsp;
-                                                                            {
-                                                                                            mainGroup?mainGroup.triggers.map(t=>{
-                                                                                                return <Button type="danger" onClick={()=>{
-                                                                                                    self.cmmHost.doAction(self,t)
-                                                                                                }}>{t.title}</Button>
-                                                                                            }):null
-
-                                                                            }
-                                                                            </div>
-                                                                        }    
-                                                                    </Form.Item>
-                                                            </Col>
-                                                    })
-                                                }
-                                                </Row>
-                                            
-                                        }):<Row>
+                                       searchFieldRows.map(row=>{
+                                            return <>
                                             {
-                                                mainGroup?<Form.Item>
-                                                {
-                                                    mainGroup.triggers.map(t=>{
-                                                             return <Button type="danger" onClick={()=>{
-                                                                 self.cmmHost.doAction(self,t)
-                                                             }} key={t.name}>{t.title}</Button>
-                                                    })
-                                                }      
-                                                </Form.Item>:null
+                                                showSearchBox?<Row>
+                                                    {
+                                                        row.map(fd=>{
+                                                            let CCom = ViewFieldTypeRegistry.getComponent(fd&&fd.type)
+                                                            let cValue = self.cmmHost.getSearchBoxFieldValue(self,fd,localData)
+                                                            return fd?<Col span={6}>
+                                                                <div className="bg-list-view-search-box-item">
+                                                                    <label>{fd.title}</label>
+                                                                    <CCom field={fd} onChange={(value)=>self.cmmHost.onSearchBoxCriteriaChange(self,fd,value)} value={cValue}></CCom>
+                                                                </div>
+                                                            </Col>:<Col span={6}>
+                                                            <Button  className="bg-list-view-search-box-btn" type="primary" icon="search">确定</Button>
+                                                            </Col>
+                                                        })
+                                                    }
+                                                </Row>:<>
+                                                    {
+                                                        row.map(fd=>{
+                                                            return fd?<span><Tag color="#108ee9" onClick={()=>{
+                                                                self.cmmHost.toggleShowSearchBox(self)
+                                                          }}>{fd.title}</Tag></span>:null
+                                                        })
+                                                    }
+                                                </>
                                             }
-                                        </Row>
+                                            </>
+                                       })
                                     }
-                                </Form>
+                                    </div>:null
+                                }
+                                {
+                                    showSearchBox && searchFieldRows.length>0?<Divider className="bg-divider-line"></Divider>:null
+                                }
+                                <div className="bg-list-view-search-tag">
+                                    {
+                                        (showSearchBox || !searchBox || searchFieldRows.length<1)?criterias.map((c)=>{
+                                            return <Tag closable onClose={(e)=>{
+                                                self.cmmHost.removeCriteriaTag(c)
+                                            }}>
+                                                <span>{c.name}</span>
+                                            </Tag>
+                                        }):null 
+                                    }
+                                    <>
+                                    {
+                                        (showSearchBox || !searchBox || searchFieldRows.length<1)?<Tag color="#108ee9" onClick={()=>{
+                                            self.cmmHost.addCriteriaTag()
+                                        }}><FontIcon type="plus"/>添加快捷条件</Tag>:null
+                                    }
+                                    </>
+                                </div>
                             </div>
-                            <div className="sub-search-tags">
-                                        <Tag type="danger" closable={true} onClose={()=>{
-
-                                        }}>搜索标签</Tag>
+                            <div className="bg-list-view-search-box-show-op">
+                            {
+                                showSearchBox?<span className="open" onClick={()=>{
+                                    self.cmmHost.toggleShowSearchBox(self)
+                                }}>
+                                    <FontIcon type="down"></FontIcon>
+                                </span>:<span onClick={()=>{
+                                      self.cmmHost.toggleShowSearchBox(self)
+                                }}>
+                                    <FontIcon type="down"></FontIcon>
+                                </span>
+                            }
                             </div>
-                        </div>
-                    }}></hookView.Hook>
-                {/* searchBox end */}
-
-
+                    </div>
+                }}>
+                </hookView.Hook>
+                {/* list action items end*/}
+ 
+                    
                 {/* list view body begin*/}
                    <hookView.Hook hookTag="listViewBody" render={()=>{
                        //  style={{width:self.state.width-360}}
                         return <div className="bg-model-list-view-body bg-flex-full">
-                                <div className="bg-model-list-view-body-control-header">
-                                    <Button.Group>
-                                        <Button type="primary" icon="search"></Button>
-                                    </Button.Group>
-                                </div>
+                           
 
                                 <div className="bg-model-list-view-body-control">
 

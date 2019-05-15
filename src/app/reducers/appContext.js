@@ -8,7 +8,9 @@ import {
     SET_EDIT_CONTEXT_VIEW_DATA,
     SET_EDIT_CONTEXT_FIELD_VALUE,
     REMOVE_LIST_CONTEXT_VIEW_DATA_RECORD,
-    UPDATE_LIST_CONTEXT_VIEW_DATA_RECORD
+    UPDATE_LIST_CONTEXT_VIEW_DATA_RECORD,
+    SET_LIST_OP_SEARCH_BOX_VISIBLE,
+    SET_LIST_OP_SEARCH_BOX_CRITERIA_VALUE
 } from '../actions/appContext'
 import ViewContext from '../modelView/ViewContext'
 import produce from "immer"
@@ -166,6 +168,20 @@ export function appContext(state,action){
                 }
             })
         }
+        case SET_LIST_OP_SEARCH_BOX_VISIBLE:
+        {
+            const {app,model,viewType,ownerField,visible} = action.payload
+            return produce(state,draft=>{
+                setModelViewListOpSearchBoxVisible(draft,app,model,viewType,ownerField,visible)
+            })
+        }
+        case SET_LIST_OP_SEARCH_BOX_CRITERIA_VALUE:
+        {
+            const {app,model,viewType,ownerField,fieldName,value} = action.payload
+            return produce(state,draft=>{
+                setListOpSearchBoxCriteriaValue(draft,app,model,viewType,ownerField,fieldName,value)
+            })
+        }
         case SET_DETAIL_CONTEXT_VIEW_DATA:
         {
             const {app,model,viewType,viewData,ownerField} = action.payload
@@ -202,9 +218,14 @@ function setCreateViewData(draft,viewData,ownerField){
 function setListViewData(draft,viewData,ownerField){
     let {view,data,triggerGroups}=viewData
     let key = getAppModelViewKey(view.app,view.model,view.viewType,ownerField)
+    let localData =(draft[LIST_VIEW_DATA][key] && draft[LIST_VIEW_DATA][key]["localData"])||{
+        visible:false,
+        criteria:{}
+    }
     draft[LIST_VIEW_DATA][key]={
         app:view.app,
         model:view.model,
+        localData:localData,
         viewData:{
          ...viewData
         }
@@ -219,6 +240,21 @@ function setListViewData(draft,viewData,ownerField){
         }
     }
     draft[LIST_VIEW_DATA][key]["viewData"]["data"]=getInitListViewData(data, view, ownerField)
+}
+
+function setModelViewListOpSearchBoxVisible(draft,app,model,viewType,ownerField,visible){
+    let key = getAppModelViewKey(app,model,viewType,ownerField)
+    draft[LIST_VIEW_DATA][key]["localData"]=draft[LIST_VIEW_DATA][key]["localData"]||{}
+    draft[LIST_VIEW_DATA][key]["localData"]["searchBox"]=draft[LIST_VIEW_DATA][key]["localData"]["searchBox"]||{}
+    draft[LIST_VIEW_DATA][key]["localData"]["searchBox"]["visible"]=visible
+}
+
+function setListOpSearchBoxCriteriaValue(draft,app,model,viewType,ownerField,fieldName,value){
+    let key = getAppModelViewKey(app,model,viewType,ownerField)
+    draft[LIST_VIEW_DATA][key]["localData"]=draft[LIST_VIEW_DATA][key]["localData"]||{}
+    draft[LIST_VIEW_DATA][key]["localData"]["searchBox"]=draft[LIST_VIEW_DATA][key]["localData"]["searchBox"]||{}
+    draft[LIST_VIEW_DATA][key]["localData"]["searchBox"]["criteria"]=draft[LIST_VIEW_DATA][key]["localData"]["searchBox"]["criteria"]||{}
+    draft[LIST_VIEW_DATA][key]["localData"]["searchBox"]["criteria"][fieldName]=value
 }
 function getInitListViewData(data, view, ownerField){
     if(data && data.record){
@@ -349,7 +385,11 @@ export const viewDataFromListContext = createSelector(state=>state[ViewContext.A
     if(!appContext||!appContext[LIST_VIEW_DATA]||!(appContext[LIST_VIEW_DATA][key])||!(appContext[LIST_VIEW_DATA][key]["viewData"])) return {}
     return appContext[LIST_VIEW_DATA][key]["viewData"]
 }))
-
+export const localDataFromListContext = createSelector(state=>state[ViewContext.APP_CONTEXT],appContext=>memoize(({app,model,viewType,ownerField})=>{
+    let key=getAppModelViewKey(app,model,viewType, ownerField)
+    if(!appContext||!appContext[LIST_VIEW_DATA]||!(appContext[LIST_VIEW_DATA][key])||!(appContext[LIST_VIEW_DATA][key]["localData"])) return {}
+    return appContext[LIST_VIEW_DATA][key]["localData"]
+}))
 export const viewDataFromDetailContext = createSelector(state=>state[ViewContext.APP_CONTEXT],appContext=>memoize(({app,model,viewType,ownerField})=>{
     let key=getAppModelViewKey(app,model,viewType, ownerField)
     if(!appContext||!appContext[DETAIL_VIEW_DATA]||!(appContext[DETAIL_VIEW_DATA][key])||!(appContext[DETAIL_VIEW_DATA][key]["viewData"])) return {}

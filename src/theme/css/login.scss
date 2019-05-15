@@ -60,8 +60,8 @@
 }
 
 .bg-login-icon svg {
-    color: $primary-foreground-color;
-    fill: $primary-foreground-color;
+    color: $Font-icon-background-active-color;
+    fill: $Font-icon-background-active-color;
     width: 100px;
     height: 100px;
 }
@@ -123,4 +123,7 @@
     position: absolute;
     bottom: 12px;
     right: 15px;
+}
+.ant-form-item{
+    margin-bottom: 0;
 }

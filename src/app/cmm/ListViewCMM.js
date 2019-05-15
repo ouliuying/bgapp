@@ -6,14 +6,16 @@ import {
     setListContextCriteria,
     setListContextData,
     removeListContextViewDataRecord,
-    updateListContextViewDataRecord
+    updateListContextViewDataRecord,
+    setListOpSearchBoxVisible,
+    setListOpSearchBoxCriteriaValue
 } from '../actions/appContext'
 import { goBack,push } from 'connected-react-router';
 import {ViewFieldType} from '../modelView/ViewFieldType'
 import { ModelAction } from '../mq/ModelAction'
 import {CREATE_VIEW_DATA, RECORD_TAG,ARGS} from '../ReservedKeyword'
 import { getRoutePath,goRoute } from '../routerHelper'
-import {viewDataFromListContext} from '../reducers/appContext'
+import {viewDataFromListContext, localDataFromListContext} from '../reducers/appContext'
 import {ModalSheetManager} from '../modelView/ModalSheetManager'
 import {Button} from '../../ui'
 import {createDetailParam,createViewParam} from '../modelView/ViewParam'
@@ -38,7 +40,8 @@ export class ListViewCMM extends  ViewCMM{
         let installApps=getAppsSelector(state)
         const {app,model,viewType}=appModelViewType
         let viewData=viewDataFromListContext(state)({app,model,viewType,ownerField})
-        let newProps= Object.assign({},installApps,{viewData})
+        let localData=localDataFromListContext(state)({app,model,viewType,ownerField})
+        let newProps= Object.assign({},installApps,{viewData},{localData})
         return Object.assign({},baseProps,newProps,ownProps)
     }
 
@@ -188,10 +191,10 @@ export class ListViewCMM extends  ViewCMM{
     }
 
     didMount(view){
-        let {viewParam,viewData,viewRefType}= view.props
+        let {viewParam,viewData,viewRefType,localData}= view.props
         const {ownerField,ownerFieldValue}=viewParam||{}
         const {pageData} = viewData
-        let criteria = this.getCriteria(viewData)
+        let criteria = this.getCriteria(localData)
         let rawOwnerFieldValue = this.getOwnerFieldRawFieldValue(this.app,this.model,ownerField,ownerFieldValue)
         var reqParam={
             viewType:this.viewType,
@@ -248,7 +251,55 @@ export class ListViewCMM extends  ViewCMM{
     onCurrentChange(view,currentPage){
       
     }
+    getSerachBoxDefaultFieldValue(fd){
+        let meta = (fd||{}).meta
+        return (meta||{}).value
+    }
+    getSearchBoxFieldValue(view,fd,localData){
+        if(!fd){
+            return undefined
+        }
+        const {searchBox} = localData||{}
+        const {criteria} = searchBox||{}
+        let value = (criteria||{})[fd.name]
+        if(value==undefined){
+            value=this.getSerachBoxDefaultFieldValue(fd)
+        }
+        return value
+    }
 
+    onSearchBoxCriteriaChange(view,fd,value){
+        let self = this
+        let {viewParam}= view.props
+        const {ownerField}=viewParam||{}
+        setListOpSearchBoxCriteriaValue(self.app,
+            self.model,
+            self.viewType,
+            ownerField,
+            fd.name,value)
+    }
+
+    toggleShowSearchBox(view){
+        let {viewParam,localData}= view.props
+        const {ownerField}=viewParam||{}
+        localData=localData||{}
+        const {searchBox} = localData
+        console.log(searchBox)
+        if(searchBox && searchBox.visible){
+            setListOpSearchBoxVisible(this.app,this.model,this.viewType,ownerField,false)
+            console.log("set false")
+        }
+        else{
+            setListOpSearchBoxVisible(this.app,this.model,this.viewType,ownerField,true)
+            console.log("set true")
+        }
+    }
+    addCriteriaTag(){
+        ModalSheetManager.openAlert({
+            title:"提示",
+            msg:"赶工中..."
+        })
+    }
     toDetail(view,trigger){
         let self =this
         const {viewParam,viewRefType} = view.props
@@ -292,13 +343,13 @@ export class ListViewCMM extends  ViewCMM{
                 removeListContextViewDataRecord(self.app,self.model,self.viewType,[tag],ownerField)
             }
             else{
-                ModalSheetManager.alert({
+                ModalSheetManager.openAlert({
                     msg:res.description
                 })
               
             }
             },function(err){
-                ModalSheetManager.alert({
+                ModalSheetManager.openAlert({
                     msg:"通讯失败！"
                 })
             })

@@ -30,10 +30,6 @@ import {TextField,
     CriteriaStringEqualInput,
     CriteriaDateEqualInput,
     CriteriaDateTimeEqualInput,
-    CriteriaDateStartInput,
-    CriteriaDateEndInput,
-    CriteriaDateTimeStartInput,
-    CriteriaDateTimeEndInput,
     CriteriaDateRangeInput,
     CriteriaDateTimeRangeInput,
     CriteriaMobileEqualInput
@@ -92,10 +88,6 @@ registry.add("criteriaStringLike",CriteriaStringLikeEqualInput)
 registry.add("criteriaStringEqual",CriteriaStringEqualInput)
 registry.add("criteriaDateEqual",CriteriaDateEqualInput)
 registry.add("CriteriaDateTimeEqual",CriteriaDateTimeEqualInput)
-registry.add("CriteriaDateStart",CriteriaDateStartInput)
-registry.add("criteriaDateEnd",CriteriaDateEndInput)
-registry.add("criteriaDateTimeStart",CriteriaDateTimeStartInput)
-registry.add("criteriaDateTimEnd",CriteriaDateTimeEndInput)
 registry.add("criteriaDateRange",CriteriaDateRangeInput)
 registry.add("criteriaDateTimeRange",CriteriaDateTimeRangeInput)
 registry.add("criteriaMobileEqual",CriteriaMobileEqualInput)
