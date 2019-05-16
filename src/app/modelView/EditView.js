@@ -123,7 +123,7 @@ class EditView extends React.Component{
                                         <hookView.Hook hookTag="body-main-h"  render={()=>{
                                             return <div className="bg-model-op-view-body-main-h">
                                                         <div className="bg-model-op-view-body-main-h1">
-                                                        <Form labelPosition="top" >
+                                                        <Form>
                                                         {
                                                             
                                                             viewMeta&&viewMeta.fields.map((field,index)=>{
@@ -146,7 +146,7 @@ class EditView extends React.Component{
                                                         </div>
 
                                                         <div className="bg-model-op-view-body-main-h2">
-                                                        <Form labelPosition="top" >
+                                                        <Form>
                                                         {
                                                                 
                                                                 viewMeta&&viewMeta.fields.map((field,index)=>{
@@ -230,7 +230,7 @@ class EditView extends React.Component{
                                     }
                                 }
                                 return <div className="bg-model-op-view-body-common">
-                                        <Form labelPosition="top">
+                                        <Form>
                                         {
                                             commonGroupFields.map((gfs,index)=>
                                             {

@@ -151,8 +151,8 @@ body {
     background: $logo-bottom-color;
 }
 
-.bg-app-shortcut-action-btn span{
-    margin-left: 4px;
+.bg-app-shortcut-action-btn-title{
+   margin-left: 4px;
 }
 .bg-app-frame-body-area {
     display: flex;
@@ -327,7 +327,9 @@ button:focus {
     margin-bottom: 22px;
 }
 
-
+.bg-model-op-view-body-common-one-col  .ant-row {
+   width:100%;
+}
 
 .bg-model-op-view-body-common-two-col-first {
     border-right: 1px solid $border-color;

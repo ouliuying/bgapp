@@ -9,6 +9,7 @@ import {getShortcutAppsSelector} from './reducers/sys'
 import Icon from './icon'
 import {createIconFromSvg} from './icon/createIconFromSvg'
 import {setCurrApp} from './actions/config'
+import {getCurrentApp} from './reducers/config'
 export class AppNav extends Component {
     static propTypes = {
         store: PropTypes.object,
@@ -27,12 +28,12 @@ export class AppNav extends Component {
                         src:sApp.icon,
                         svgStyle:{width:22,height:22,fill:'#bfcbd9'}
                     })
-
-                    return (<a className="bg-app-shortcut-action-btn" onClick={()=>{
+                    let active=(this.props.currApp.name == sApp.name)?" active":""
+                    return (<a className={"bg-app-shortcut-action-btn"+active} onClick={()=>{
                         setCurrApp({currApp:sApp})
                         this.props.dispatch(push(`/app/dynamic/${sApp.name}`))}
                         } key={sApp.name}>
-                            <AppIcon></AppIcon><span> {sApp.title}</span>
+                            <AppIcon></AppIcon><span className="bg-app-shortcut-action-btn-title"> {sApp.title}</span>
                     </a>)
                 })
             }
@@ -47,6 +48,7 @@ export class AppNav extends Component {
     }
 }
 function mapState(state){
-    return {shortcutApps:getShortcutAppsSelector(state)}
+    let currApp = getCurrentApp(state)
+    return {shortcutApps:getShortcutAppsSelector(state),...currApp}
 }
 export default withRouter(connect(mapState)(AppNav))

@@ -1,8 +1,9 @@
-import {SET_CURR_APP} from '../actions/config'
+import {SET_CURR_APP,SET_OPEN_MENU_KEYS} from '../actions/config'
 import { createSelector } from 'reselect'
 import memoize from 'lodash.memoize'
 const initConfig={
     currApp:{},
+    openMenukeys:[],
 }
 
 export function config(state,action){
@@ -15,7 +16,9 @@ export function config(state,action){
             let newState=action.payload
             return Object.assign({},state,newState)
         }
-
+        case SET_OPEN_MENU_KEYS:
+            let newState=action.payload
+            return Object.assign({},state,newState)
         default:
             return state
     }
@@ -23,3 +26,8 @@ export function config(state,action){
 
 export const getCurrentApp = createSelector(state=>state.config.currApp,
     (currApp)=>({currApp}))
+
+export const getOpenMenuKeys = (state)=>{
+    let ret= {openMenuKeys:state.config.openMenuKeys}
+    return ret
+}

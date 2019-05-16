@@ -23,4 +23,7 @@ export {
     getRouterLocationState,
     getDynamicRouterAppModelViewType
 }
+export const getRoutePath=state=>{
+    return state.router.location.pathname
+}
 

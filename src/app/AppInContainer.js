@@ -11,13 +11,14 @@ import {getModelView} from './modelView/ModelViewRegistry'
 import {push} from 'connected-react-router'
 import {Menu} from '../ui'
 import {createIconFromSvg} from '../icon/createIconFromSvg'
-import {getCurrentApp} from '../reducers/config'
+import {getCurrentApp,getOpenMenuKeys} from '../reducers/config'
 //import {getUIAppCache} from '../reducers/sys'
 import {getAppViewsMenu} from './reducers/appInContainer'
 import {ModelAction} from './mq/ModelAction'
 import HookContext from './HookContext';
 import {setAppInContainerViewMenu} from './actions/appInContainer'
-import {getDynamicRouterApp} from '../reducers/router'
+import {getDynamicRouterApp,getDynamicRouterAppModelViewType} from '../reducers/router'
+import {setOpenMenuKeys} from '../actions/config'
 class AppInContainer extends React.Component{
     constructor(props){
         super(props)
@@ -59,7 +60,7 @@ class AppInContainer extends React.Component{
 
     render(){
         var self=this
-        const {views,menu,modelViews:appModelViews,routerApp} = this.props
+        const {views,menu,modelViews:appModelViews,routerApp,appModelViewType} = this.props
         let dyMenu=menu||{
             subMenu:[]
         }
@@ -69,6 +70,9 @@ class AppInContainer extends React.Component{
             src:this.app.icon,
             svgStyle:{width:18,height:18,fill:'#0ab73d'}
         })
+        let openKey = `${appModelViewType.app},${appModelViewType.model},${appModelViewType.viewType}`
+        let subOpenKey=this.props.openMenuKeys
+        console.log(subOpenKey)
         return <div className="bg-app-container bg-flex-full">
             {/* <div className="bg-app-container-header">
                 <h3>
@@ -82,9 +86,13 @@ class AppInContainer extends React.Component{
                 <h3 className="bg-app-container-body-menu-header">
                 {dyMenu.title}
                 </h3>
-                <Menu theme="dark"   mode="inline" defaultActive="1" onSelect={(arg)=>this.showModelView(arg.key)}>
+                <Menu theme="dark"  mode="inline" defaultOpenKeys={subOpenKey} onOpenChange={(openKeys)=>{
+                    console.log(openKeys)
+                    setOpenMenuKeys(openKeys)
+                }}  defaultSelectedKeys={[openKey]}  onClick={(arg)=>this.showModelView(arg.key)}>
                     {
                         dyMenu.subMenu.map((sm,index)=>{
+                            console.log("index = "+index)
                             return this.isSubMenu(sm)?(
                                 <Menu.SubMenu title={sm.title} key={index}>
                                     {
@@ -142,6 +150,8 @@ function inMapStateToProps(state){
     let app=getCurrentApp(state)
     let routerApp=getDynamicRouterApp(state)
     let vm = getAppViewsMenu(state)(app.currApp.name)
-    return Object.assign({},app,vm,routerApp)
+    let appModelViewType = getDynamicRouterAppModelViewType(state)
+    let openMenuKeys=getOpenMenuKeys(state)
+    return Object.assign({},app,vm,routerApp,appModelViewType,openMenuKeys)
 }
 export default withRouter(connect(inMapStateToProps)(AppInContainer))

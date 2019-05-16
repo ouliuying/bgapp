@@ -123,7 +123,7 @@ class CreateView extends React.Component{
                                         <hookView.Hook hookTag="body-main-h"  render={()=>{
                                             return <div className="bg-model-op-view-body-main-h">
                                                         <div className="bg-model-op-view-body-main-h1">
-                                                        <Form labelPosition="top" >
+                                                        <Form>
                                                         {
                                                             
                                                             view&&view.fields.map((field,index)=>{
@@ -146,7 +146,7 @@ class CreateView extends React.Component{
                                                         </div>
 
                                                         <div className="bg-model-op-view-body-main-h2">
-                                                        <Form labelPosition="top" >
+                                                        <Form >
                                                         {
                                                                 
                                                                 view&&view.fields.map((field,index)=>{
@@ -230,7 +230,7 @@ class CreateView extends React.Component{
                                     }
                                 }
                                 return <div className="bg-model-op-view-body-common">
-                                        <Form labelPosition="top">
+                                        <Form>
                                         {
                                             commonGroupFields.map((gfs,index)=>
                                             {
@@ -290,14 +290,17 @@ class CreateView extends React.Component{
                                                                     </div>
                                                                 </div>
                                                             </Form.Item>):(
+                                                               
                                                                 <div className="bg-model-op-view-body-common-one-col" key={`fi-${key1}`}>
-                                                                    <Form.Item label={gfs.fields[0].title}>
+                                                           
+                                                                <Form.Item label={gfs.fields[0].title}>
                                                                         <Com1 {...props1} onChange={(value)=>{
                                                                                     self.onFieldValueChange(gfs.fields[0],value)
                                                                                 }} key={key1} value={value1} meta={meta1} relationData={gfs.fields[0].relationData} field={gfs.fields[0]}></Com1>
                                                                     </Form.Item>  
                                                                 </div>
-                                                            
+                                                               
+                                                              
                                                         )         
                                             })
                                         }

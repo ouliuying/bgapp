@@ -24,6 +24,7 @@ import ViewType from "../modelView/ViewType"
 import {produce} from 'immer'
 import {bindRecordTag} from '../fieldHelper'
 import {nextRecordTag} from '../../lib/tag-helper'
+import {getExpression} from '../../lib/criteria-helper'
 export class ListViewCMM extends  ViewCMM{
     constructor(app,model,viewType){
         super(app,model,viewType)
@@ -47,7 +48,7 @@ export class ListViewCMM extends  ViewCMM{
 
 
     init(view){
-   
+        
     }
 
     update(view){
@@ -150,18 +151,42 @@ export class ListViewCMM extends  ViewCMM{
 
     }
 
-    getCriteria(viewData){
-        const {criterias} = viewData
-        if(criterias){
-            let expArr=[]
-            Object.keys(criterias).map(key=>{
-                let v = criterias[key]
-                expArr.push(v.expression)
+    getCriteria(view){
+        let expr=undefined
+        const {viewData,localData}=view.props
+        const {subViews}=viewData||{}
+        const searchBox = (subViews||[]).find(x=>{
+            return x.refView.viewType == "searchBox"
+        })
+        if(searchBox){
+            let fields = (searchBox.view||{}).fields||[]
+            let kvArr=[]
+            fields.map(fd=>{
+                let meta=fd.meta
+                let skipValue = meta.skipValue||[]
+                let v = this.getSearchBoxFieldValue(view,fd,localData)
+                if(v!=undefined && skipValue.indexOf(v)<0){
+                    kvArr.push({
+                        name:fd.name,
+                        value:v,
+                        viweFieldType:fd.type
+                    })
+                }
             })
-            if(expArr.length>0){
-                return and(...expArr)
+            let eArr=[]
+            if(kvArr.length>0){
+                for(let kv of kvArr){
+                    let e=getExpression(kv.name,kv.value,kv.viweFieldType)
+                    if(e){
+                        eArr.push(e)
+                    }
+                }
+            }
+            if(eArr.length>0){
+                expr=eArr.length==1?eArr[0]:and(...eArr)
             }
         }
+        return expr
     }
 
     getOwnerFieldRawFieldValue(app,model,ownerField,ownerFieldValue){
@@ -191,10 +216,10 @@ export class ListViewCMM extends  ViewCMM{
     }
 
     didMount(view){
-        let {viewParam,viewData,viewRefType,localData}= view.props
+        let {viewParam,viewData,viewRefType}= view.props
         const {ownerField,ownerFieldValue}=viewParam||{}
         const {pageData} = viewData
-        let criteria = this.getCriteria(localData)
+        let criteria = this.getCriteria(view)
         let rawOwnerFieldValue = this.getOwnerFieldRawFieldValue(this.app,this.model,ownerField,ownerFieldValue)
         var reqParam={
             viewType:this.viewType,
@@ -241,7 +266,7 @@ export class ListViewCMM extends  ViewCMM{
     }
 
     search(view){
-        
+        this.didMount(view)
     }
 
     onSizeChange(view,size){
@@ -251,10 +276,12 @@ export class ListViewCMM extends  ViewCMM{
     onCurrentChange(view,currentPage){
       
     }
+
     getSerachBoxDefaultFieldValue(fd){
         let meta = (fd||{}).meta
         return (meta||{}).value
     }
+
     getSearchBoxFieldValue(view,fd,localData){
         if(!fd){
             return undefined
@@ -287,11 +314,9 @@ export class ListViewCMM extends  ViewCMM{
         console.log(searchBox)
         if(searchBox && searchBox.visible){
             setListOpSearchBoxVisible(this.app,this.model,this.viewType,ownerField,false)
-            console.log("set false")
         }
         else{
             setListOpSearchBoxVisible(this.app,this.model,this.viewType,ownerField,true)
-            console.log("set true")
         }
     }
     addCriteriaTag(){

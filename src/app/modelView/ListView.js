@@ -55,7 +55,6 @@ class ListView extends React.Component{
         catch(err){
 
         }
-       
     }
 
     render(){
@@ -132,7 +131,11 @@ class ListView extends React.Component{
                                                                     <CCom field={fd} onChange={(value)=>self.cmmHost.onSearchBoxCriteriaChange(self,fd,value)} value={cValue}></CCom>
                                                                 </div>
                                                             </Col>:<Col span={6}>
-                                                            <Button  className="bg-list-view-search-box-btn" type="primary" icon="search">确定</Button>
+                                                            <Button  className="bg-list-view-search-box-btn" type="primary" icon="search" onClick={()=>{
+                                                                self.cmmHost.doAction(self,{
+                                                                    name:"search"
+                                                                })
+                                                            }}>确定</Button>
                                                             </Col>
                                                         })
                                                     }

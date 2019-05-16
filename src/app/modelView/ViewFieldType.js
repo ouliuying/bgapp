@@ -33,7 +33,23 @@ export const ViewFieldType={
     IconLabelField:'iconLabel',
     Many2OneDataSetSelectField:'many2OneDataSetSelect',
     SingleCheckBoxField:'singleCheckbox',
-    StaticField:'static'
+    StaticField:'static',
+
+
+    //criteria
+    CriteriaEnumSelect:"criteriaSelect",
+    CriteriaNumberRangeInput:"criteriaNumberRange",
+    CriteriaNumberLessEqualInput:"criteriaNumberLessEqual",
+    CriteriaNumberGreaterEqualInput:"criteriaNumberGreaterEqual",
+    CriteriaNumberEqualInput:"criteriaNumberEqual",
+    CriteriaStringILikeEqualInput:"criteriaStringILike",
+    CriteriaStringLikeEqualInput:"criteriaStringLike",
+    CriteriaStringEqualInput:"criteriaStringEqual",
+    CriteriaDateEqualInput:"criteriaDateEqual",
+    CriteriaDateTimeEqualInput:"CriteriaDateTimeEqual",
+    CriteriaDateRangeInput:"criteriaDateRange",
+    CriteriaDateTimeRangeInput:"criteriaDateTimeRange",
+    CriteriaMobileEqualInput:"criteriaMobileEqual"
 }
 
 export class StaticField extends React.Component{
