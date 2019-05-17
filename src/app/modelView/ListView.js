@@ -215,13 +215,13 @@ class ListView extends React.Component{
                                     </Table>
                                 </div>
                                 <div className="bg-model-list-view-body-control-footer">
-                                <Pagination layout="total, sizes, prev, pager, next, jumper" 
-                                total={totalCount} pageSizes={[10, 20, 30, 40]} 
-                                pageSize={pageSize} 
-                                currentPage={currentPage}
-                                onSizeChange={(size)=>{self.cmmHost.onSizeChange(size)}}
-                                onCurrentChange={(page)=>{self.cmmHost.onCurrentChange(page)}}
-                                />
+                                    <Pagination layout="total, sizes, prev, pager, next, jumper" 
+                                    total={totalCount} pageSizes={[10, 20, 30, 40]} 
+                                    pageSize={pageSize} 
+                                    currentPage={currentPage}
+                                    onSizeChange={(size)=>{self.cmmHost.onSizeChange(size)}}
+                                    onCurrentChange={(page)=>{self.cmmHost.onCurrentChange(page)}}
+                                    />
                                 </div>
                         </div>
                    }}></hookView.Hook>

@@ -309,11 +309,20 @@ class EditView extends React.Component{
 
                             {/**  create model dont support //add target model same time  */}
                             {
-                                (relationViews && relationViews.length>0)?<div className="bg-big-line"></div>:null
+                               // (relationViews && relationViews.length>0)?<div className="bg-big-line"></div>:null
                             }
 
 
-                            <hookView.Hook hookTag="body-relation" render={()=>{
+                        
+
+                    </div>
+
+                    }}></hookView.Hook>
+                    {/*  body end  */}
+
+
+                    {/*  relation start  */}
+                    <hookView.Hook hookTag="body-relation" render={()=>{
                                    let subViewStatus = produce(self.subViewStatus,draft=>{
                                     if(draft.length<1 && relationViews.length>0){
                                         if(!ownerField){
@@ -327,31 +336,35 @@ class EditView extends React.Component{
                                 })
                                 return relationViews.length>0?(<div className="bg-model-op-view-body-relation">
                                 <div className="bg-model-op-view-body-relation-nav">
-                                    {
-                                        relationViews.map(function(v){
-                                            return <Button onClick={()=>{
-                                                for(let svs of subViewStatus){
-                                                    svs.show=false
-                                                }
-                                                let rSelf = subViewStatus.find(x=>x.subView.refView.fieldName == v.refView.fieldName)
-                                                if(rSelf){
-                                                    rSelf.show=true
-                                                }
-                                                else{
-                                                    subViewStatus.push({
-                                                        subView:v,
-                                                        show:true
-                                                    })
-                                                }
-                                                self.subViewStatus=subViewStatus
-                                                self.forceUpdate()
-                                            }} key={v.refView.fieldName}>
-                                                {v.refView.title}
-                                            </Button>
-                                        })
-                                    }
+                                         <Tabs type="card">
+                                           {
+                                               relationViews.map(v=>{
+                                                   return <Tabs.TabPane tab={v.refView.title} key={v.refView.fieldName} onChange={
+                                                       activekey=>{
+                                                        for(let svs of subViewStatus){
+                                                            svs.show=false
+                                                        }
+                                                        let rSelf = subViewStatus.find(x=>x.subView.refView.fieldName == v.refView.fieldName)
+                                                        if(rSelf){
+                                                            rSelf.show=true
+                                                        }
+                                                        else{
+                                                            subViewStatus.push({
+                                                                subView:v,
+                                                                show:true
+                                                            })
+                                                        }
+                                                        self.subViewStatus=subViewStatus
+                                                        self.forceUpdate()
+                                                       }
+                                                   }>
+
+                                                   </Tabs.TabPane>
+                                               })
+                                           }
+                                       </Tabs>
                                 </div>
-                                <div>
+                                <div className="bg-model-op-view-body-relation-body">
                                     {
                                         subViewStatus.map(function(svs){
                                             let showStyle = svs.show?{display:"block"}:{display:"none"}
@@ -381,11 +394,8 @@ class EditView extends React.Component{
                                 }
                             }>
                             </hookView.Hook>
+                           {/*  relation end  */}
 
-                    </div>
-
-                    }}></hookView.Hook>
-                    {/*  body end  */}
             </div>
     </hookView.HookProvider>
     }

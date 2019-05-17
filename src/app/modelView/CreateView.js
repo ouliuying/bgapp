@@ -15,6 +15,7 @@ import ViewFieldTypeRegistry from './ViewFieldTypeRegistry'
 import {mapStateToProps} from './createViewMapStateToProps'
 import {getModelView} from './ModelViewRegistry'
 import {produce} from 'immer'
+import { Divider } from "../../ui"
 class CreateView extends React.Component{
     constructor(props){
         super(props)
@@ -65,18 +66,6 @@ class CreateView extends React.Component{
         })
         return <hookView.HookProvider value={{cmmHost:self.cmmHost,parent:self}}>
                 <div className="bg-model-op-view bg-flex-full ">
-                {
-                    // ownerField?null:<hookView.Hook hookTag="toolbar"  render={()=>{
-                    //     return <div className="bg-model-op-view-toolbar">
-                    //         <button className="bg-model-op-view-toolbar-back"  onClick={()=>{
-                    //             self.props.dispatch(goBack())
-                    //         }}>
-                    //         <Icon.LocationGoBack></Icon.LocationGoBack>
-                    //         </button>
-                    // </div>
-                    // }
-                    // }/>
-                }
                 <hookView.Hook hookTag="actions"  render={()=>{
                         return <div className="bg-model-op-view-actions">
                                     <hookView.Hook hookTag="actions-main-group"  render={()=>{
@@ -313,10 +302,20 @@ class CreateView extends React.Component{
                             {/**  create model dont support add target model same time  */}
 
                             {
-                                (relationViews && relationViews.length>0)?<div className="bg-big-line"></div>:null
+                                // (relationViews && relationViews.length>0)?<div className="bg-big-line"></div>:null
+                                //(relationViews && relationViews.length>0)?<Divider className="bg-big-line"></Divider>:null
                             }
 
-                            <hookView.Hook hookTag="body-relation" render={()=>{
+
+                    </div>
+
+                    }}></hookView.Hook>
+                    {/*  body end  */}
+
+
+
+                    {/*  relation start  */}
+                    <hookView.Hook hookTag="body-relation" render={()=>{
                                     let subViewStatus = produce(self.subViewStatus,draft=>{
                                         if(draft.length<1 && relationViews.length>0){
                                             if(!ownerField){
@@ -330,31 +329,36 @@ class CreateView extends React.Component{
                                     })
                                     return relationViews.length>0?(<div className="bg-model-op-view-body-relation">
                                     <div className="bg-model-op-view-body-relation-nav">
-                                        {
-                                            relationViews.map(function(v){
-                                                return <Button onClick={()=>{
-                                                    for(let svs of subViewStatus){
-                                                        svs.show=false
-                                                    }
-                                                    let rSelf = subViewStatus.find(x=>x.subView.refView.fieldName == v.refView.fieldName)
-                                                    if(rSelf){
-                                                        rSelf.show=true
-                                                    }
-                                                    else{
-                                                        subViewStatus.push({
-                                                            subView:v,
-                                                            show:true
-                                                        })
-                                                    }
-                                                    self.subViewStatus=subViewStatus
-                                                    self.forceUpdate()
-                                                }} key={v.refView.fieldName}>
-                                                    {v.refView.title}
-                                                </Button>
-                                            })
-                                        }
-                                    </div>
-                                    <div>
+                                       <Tabs type="card">
+                                           {
+                                               relationViews.map(v=>{
+                                                   return <Tabs.TabPane tab={v.refView.title} key={v.refView.fieldName} onChange={
+                                                       activekey=>{
+                                                        for(let svs of subViewStatus){
+                                                            svs.show=false
+                                                        }
+                                                        let rSelf = subViewStatus.find(x=>x.subView.refView.fieldName == v.refView.fieldName)
+                                                        if(rSelf){
+                                                            rSelf.show=true
+                                                        }
+                                                        else{
+                                                            subViewStatus.push({
+                                                                subView:v,
+                                                                show:true
+                                                            })
+                                                        }
+                                                        self.subViewStatus=subViewStatus
+                                                        self.forceUpdate()
+                                                       }
+                                                   }>
+
+                                                   </Tabs.TabPane>
+                                               })
+                                           }
+                                       </Tabs>
+
+
+                                       <div className="bg-model-op-view-body-relation-body">
                                         {
                                             subViewStatus.map(function(svs){
                                                 let showStyle = svs.show?{display:"block"}:{display:"none"}
@@ -379,49 +383,17 @@ class CreateView extends React.Component{
                                             })
                                         }
                                     </div>
-                                  
+
+                                    </div>
                                     </div>):null
                                 }
                             }>
                             </hookView.Hook>
+                             {/*  relation end  */}
 
-                    </div>
-
-                    }}></hookView.Hook>
-                    {/*  body end  */}
             </div>
     </hookView.HookProvider>
     }
 }
 export default hookView.withHook(withRouter(connect(mapStateToProps)(CreateView)))
-
-
-
-{/* <Tabs activeName={currRelView.title} onTabClick={ (tab) => {
-    let currRelView=relationViews.find(x=>x.refView.fieldName == tab.props.name)
-    self.setState({
-        currRelView
-    })
-}}>
-{
-relationViews.map(v=>{
-  let  VComponent  = v.refView && getModelView(v.refView.app,v.refView.model,v.refView.viewType)
-  return <Tabs.Pane label={v.refView.title} name={v.refView.fieldName}>
-  {
-      (currRelView.refView.fieldName==v.refView.fieldName) && VComponent?(
-          <hookView.HookProvider value={{cmmHost:undefined,parent:undefined}}>
-            <VComponent app={v.refView.app} 
-                model={v.refView.model} 
-                viewType={v.refView.viewType}
-                viewParam={self.getViewParam(v, v.refView.fieldName)}
-                >
-            </VComponent>
-          </hookView.HookProvider>
-        
-      ):null
-  }
-  </Tabs.Pane>
-})
-}
-</Tabs> */}
 
