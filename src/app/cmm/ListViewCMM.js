@@ -8,7 +8,9 @@ import {
     removeListContextViewDataRecord,
     updateListContextViewDataRecord,
     setListOpSearchBoxVisible,
-    setListOpSearchBoxCriteriaValue
+    setListOpSearchBoxCriteriaValue,
+    setListCurrentPage,
+    setListPageSize
 } from '../actions/appContext'
 import { goBack,push } from 'connected-react-router';
 import {ViewFieldType} from '../modelView/ViewFieldType'
@@ -58,10 +60,12 @@ export class ListViewCMM extends  ViewCMM{
     // const {columns,rows,currentPage,totalCount,pageSize} = self.cmmHost.getViewDatas(self,viewData)
     getViewDatas(view,viewData){
         let self =this
-        let {pageData,data,totalCount,view:viewMeta,triggerGroups} = viewData
+        let {data,totalCount,view:viewMeta,triggerGroups} = viewData
+        let {localData} = view.props
+        let {pageData} = localData||{}
         const {app,model}=view
-        let pageSize = pageData && pageData.pageSize||10
-        let currentPage =  pageData && pageData.pageIndex||1
+        let pageSize = (pageData && pageData.pageSize)||10
+        let currentPage = (pageData && pageData.pageIndex)||1
         totalCount = totalCount||0
         let columns = []
         let rows = []
@@ -214,11 +218,19 @@ export class ListViewCMM extends  ViewCMM{
           }
         }
     }
-
-    didMount(view){
-        let {viewParam,viewData,viewRefType}= view.props
+    fetchData(opts){
+        const {view}=opts
+        let {viewParam,viewData,viewRefType,localData}= view.props
         const {ownerField,ownerFieldValue}=viewParam||{}
-        const {pageData} = viewData
+        const {pageData} = localData
+        let pageIndex = (pageData&&pageData.pageIndex)||1
+        let pageSize = (pageData&&pageData.pageSize)||10
+        if(opts.pageIndex!=undefined){
+            pageIndex = opts.pageIndex
+        }
+        if(opts.pageSize!=undefined){
+            pageSize = opts.pageSize
+        }
         let criteria = this.getCriteria(view)
         let rawOwnerFieldValue = this.getOwnerFieldRawFieldValue(this.app,this.model,ownerField,ownerFieldValue)
         var reqParam={
@@ -234,8 +246,8 @@ export class ListViewCMM extends  ViewCMM{
                 app:this.app,
                 model:this.model,
                 criteria,
-                pageIndex:(pageData&&pageData.pageIndex)||1,
-                pageSize:(pageData&&pageData.pageSize)||10,
+                pageIndex:pageIndex,
+                pageSize:pageSize,
             }
         }
         var self=this
@@ -251,13 +263,14 @@ export class ListViewCMM extends  ViewCMM{
             console.log(err)
         })
     }
+    didMount(view){
+        this.fetchData({view})
+    }
 
     onCriteriaValueChange(data){
         let self=this
         setListContextCriteria(self.app,self.model,self.viewType,data.name,data)
     }
-
- 
 
     doAction(view,trigger){
         if(this[trigger.name]){
@@ -270,11 +283,27 @@ export class ListViewCMM extends  ViewCMM{
     }
 
     onSizeChange(view,size){
-        
+        let self = this
+        let {viewParam} = view.props
+        const {ownerField}=viewParam||{}
+        setListPageSize(self.app,
+            self.model,
+            self.viewType,
+            ownerField,
+            size)
+        self.fetchData({view,pageSize:size})
     }
 
     onCurrentChange(view,currentPage){
-      
+        let self = this
+        let {viewParam} = view.props
+        const {ownerField}=viewParam||{}
+        setListCurrentPage(self.app,
+            self.model,
+            self.viewType,
+            ownerField,
+            currentPage)
+        self.fetchData({view,pageIndex:currentPage})
     }
 
     getSerachBoxDefaultFieldValue(fd){

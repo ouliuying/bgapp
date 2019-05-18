@@ -17,7 +17,8 @@ export const SET_EDIT_CONTEXT_FIELD_VALUE = 'setEditContextFieldValue'
 
 export const SET_LIST_OP_SEARCH_BOX_VISIBLE= "setListOpSearchBoxVisible"
 export const SET_LIST_OP_SEARCH_BOX_CRITERIA_VALUE='setListOpSearchBoxCriteriaValue'
-
+export const SET_LIST_CURRENT_PAGE="setListCurrentPage"
+export const SET_LIST_PAGE_SIZE="setListPageSize"
 
 
 
@@ -100,6 +101,12 @@ export function setListOpSearchBoxCriteriaValue(app,model,viewType,ownerField,fi
 }
 export function setListOpSearchBoxVisible(app,model,viewType,ownerField,visible){
     setContextDataAction(SET_LIST_OP_SEARCH_BOX_VISIBLE, {app,model,viewType,ownerField,visible})
+}
+export function setListCurrentPage(app,model,viewType,ownerField,currentPage){
+    setContextDataAction(SET_LIST_CURRENT_PAGE, {app,model,viewType,ownerField,currentPage})
+}
+export function setListPageSize(app,model,viewType,ownerField,pageSize){
+    setContextDataAction(SET_LIST_PAGE_SIZE, {app,model,viewType,ownerField,pageSize})
 }
 
 

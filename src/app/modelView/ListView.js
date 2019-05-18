@@ -70,6 +70,7 @@ class ListView extends React.Component{
         const {columns,rows,currentPage,totalCount,pageSize} = self.cmmHost.getViewDatas(self,viewData)
         const {searchBox} = localData
         const {visible:showSearchBox} = (searchBox||{})
+
         return <div className="bg-model-op-view bg-flex-full">
 
                 {/* list action items*/}
@@ -215,12 +216,15 @@ class ListView extends React.Component{
                                     </Table>
                                 </div>
                                 <div className="bg-model-list-view-body-control-footer">
-                                    <Pagination layout="total, sizes, prev, pager, next, jumper" 
-                                    total={totalCount} pageSizes={[10, 20, 30, 40]} 
-                                    pageSize={pageSize} 
-                                    currentPage={currentPage}
-                                    onSizeChange={(size)=>{self.cmmHost.onSizeChange(size)}}
-                                    onCurrentChange={(page)=>{self.cmmHost.onCurrentChange(page)}}
+                                    <Pagination
+                                        total={totalCount} 
+                                        pageSizeOptions={['10', '20', '30', '40']}
+                                        showSizeChanger={true}
+                                        showQuickJumper={true}
+                                        pageSize={pageSize} 
+                                        current={currentPage}
+                                        onShowSizeChange={(size)=>{self.cmmHost.onSizeChange(size)}}
+                                        onChange={(page)=>{self.cmmHost.onCurrentChange(self,page)}}
                                     />
                                 </div>
                         </div>

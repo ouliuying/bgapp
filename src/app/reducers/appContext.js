@@ -10,7 +10,9 @@ import {
     REMOVE_LIST_CONTEXT_VIEW_DATA_RECORD,
     UPDATE_LIST_CONTEXT_VIEW_DATA_RECORD,
     SET_LIST_OP_SEARCH_BOX_VISIBLE,
-    SET_LIST_OP_SEARCH_BOX_CRITERIA_VALUE
+    SET_LIST_OP_SEARCH_BOX_CRITERIA_VALUE,
+    SET_LIST_CURRENT_PAGE,
+    SET_LIST_PAGE_SIZE
 } from '../actions/appContext'
 import ViewContext from '../modelView/ViewContext'
 import produce from "immer"
@@ -182,6 +184,20 @@ export function appContext(state,action){
                 setListOpSearchBoxCriteriaValue(draft,app,model,viewType,ownerField,fieldName,value)
             })
         }
+        case SET_LIST_CURRENT_PAGE:
+        {
+            const {app,model,viewType,ownerField,currentPage} = action.payload
+            return produce(state,draft=>{
+                setModelViewListCurrentPage(draft,app,model,viewType,ownerField,currentPage)
+            })
+        }
+        case SET_LIST_PAGE_SIZE:
+        {
+            const {app,model,viewType,ownerField,pageSize} = action.payload
+            return produce(state,draft=>{
+                setModelViewListPageSize(draft,app,model,viewType,ownerField,pageSize)
+            })
+        }
         case SET_DETAIL_CONTEXT_VIEW_DATA:
         {
             const {app,model,viewType,viewData,ownerField} = action.payload
@@ -255,6 +271,18 @@ function setListOpSearchBoxCriteriaValue(draft,app,model,viewType,ownerField,fie
     draft[LIST_VIEW_DATA][key]["localData"]["searchBox"]=draft[LIST_VIEW_DATA][key]["localData"]["searchBox"]||{}
     draft[LIST_VIEW_DATA][key]["localData"]["searchBox"]["criteria"]=draft[LIST_VIEW_DATA][key]["localData"]["searchBox"]["criteria"]||{}
     draft[LIST_VIEW_DATA][key]["localData"]["searchBox"]["criteria"][fieldName]=value
+}
+function setModelViewListCurrentPage(draft,app,model,viewType,ownerField,currentPage){
+    let key = getAppModelViewKey(app,model,viewType,ownerField)
+    draft[LIST_VIEW_DATA][key]["localData"]=draft[LIST_VIEW_DATA][key]["localData"]||{}
+    draft[LIST_VIEW_DATA][key]["localData"]["pageData"]=draft[LIST_VIEW_DATA][key]["localData"]["pageData"]||{}
+    draft[LIST_VIEW_DATA][key]["localData"]["pageData"]["pageIndex"]=currentPage
+}
+function setModelViewListPageSize(draft,app,model,viewType,ownerField,pageSize){
+    let key = getAppModelViewKey(app,model,viewType,ownerField)
+    draft[LIST_VIEW_DATA][key]["localData"]=draft[LIST_VIEW_DATA][key]["localData"]||{}
+    draft[LIST_VIEW_DATA][key]["localData"]["pageData"]=draft[LIST_VIEW_DATA][key]["localData"]["pageData"]||{}
+    draft[LIST_VIEW_DATA][key]["localData"]["pageData"]["pageSize"]=pageSize
 }
 function getInitListViewData(data, view, ownerField){
     if(data && data.record){
