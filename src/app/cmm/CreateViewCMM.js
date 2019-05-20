@@ -25,8 +25,11 @@ export class CreateViewCMM extends ViewCMM{
 
     constructor(app,model,viewType){
       super(app,model,viewType)
+      this._dataReady = false
     }
-
+    get isDataReady(){
+      return this._dataReady
+    }
     static get s_viewType(){
         return ViewType.CREATE
     }
@@ -79,7 +82,7 @@ export class CreateViewCMM extends ViewCMM{
     didMount(view){
         let self= this
         let {viewParam, viewData}= view.props
-        let {ownerField,ownerFieldValue,external} = (viewParam||{})
+        let {ownerField,ownerFieldValue,external,ownerModelID} = (viewParam||{})
         let {getDatasource,setDatasource} = (external||{})
         let rawOwnerFieldValue = self.getOwnerFieldRawFieldValue(this.app,this.model,ownerField,ownerFieldValue)
         let recordTag = ownerField?ownerField[RECORD_TAG]:undefined
@@ -92,6 +95,7 @@ export class CreateViewCMM extends ViewCMM{
                 name:ownerField.name,
                 value:rawOwnerFieldValue
             }:undefined,
+            ownerModelID:ownerModelID?ownerModelID:undefined,
             reqData:{
                 app:this.app,
                 model:this.model
@@ -99,6 +103,7 @@ export class CreateViewCMM extends ViewCMM{
         }
         
         new ModelAction(this.app,this.model).call("loadModelViewType",reqParam,function(data){
+          this._dataReady=true
         data.bag && setCreateContextViewData(
             self.app,
             self.model,
@@ -107,6 +112,7 @@ export class CreateViewCMM extends ViewCMM{
             ownerField
         )
         },function(err){
+          this._dataReady=true
             console.log(err)
         })
     }
@@ -180,7 +186,8 @@ export class CreateViewCMM extends ViewCMM{
     const {viewData} = view.props
     const {data}=(viewData||{})
     let ownerFieldValue = (data.record||{})[ownerField.name]
-    return createViewParam(ownerField,ownerFieldValue,null,null)
+    let ownerModelID = (data.record||{})["id"]
+    return createViewParam(ownerField,ownerFieldValue,ownerModelID,undefined,undefined)
   }
 
   showDetail(view,id){

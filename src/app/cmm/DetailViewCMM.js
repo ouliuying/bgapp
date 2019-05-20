@@ -43,8 +43,7 @@ export class DetailViewCMM extends ViewCMM{
     }
 
     update(view){
-       
-            
+        
     }
 
     getModelID(view){

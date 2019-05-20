@@ -22,8 +22,11 @@ export class EditViewCMM extends ViewCMM{
 
     constructor(app,model,viewType){
       super(app,model,viewType)
+      this._dataReady = false
     }
-
+    get isDataReady(){
+      return this._dataReady
+    }
     static get s_viewType(){
         return ViewType.EDIT
     }
@@ -49,7 +52,8 @@ export class EditViewCMM extends ViewCMM{
         const {viewData} = view.props
         const {data}=(viewData||{})
         let ownerFieldValue = (data.record||{})[ownerField.name]
-        return createViewParam(ownerField,ownerFieldValue,null,null)
+        let ownerModelID = (data.record||{})["id"]
+        return createViewParam(ownerField,ownerFieldValue,ownerModelID,undefined,undefined)
     }
     getModelID(view){
 
@@ -75,7 +79,7 @@ export class EditViewCMM extends ViewCMM{
 
     reloadEditContextData(view){
         let {viewParam,viewData}= view.props
-        let {ownerField,ownerFieldValue} = (viewParam||{})
+        let {ownerField,ownerFieldValue,ownerModelID} = (viewParam||{})
         let modelID = this.getModelID(view)
         let rawFieldValue = this.getOwnerFieldRawFieldValue(this.app,this.model,ownerField,ownerFieldValue)
         var reqParam={
@@ -86,6 +90,7 @@ export class EditViewCMM extends ViewCMM{
                 name:ownerField.name,
                 value:rawFieldValue
             }:undefined,
+            ownerModelID:ownerModelID?ownerModelID:undefined,
             reqData:{
                 app:this.app,
                 model:this.model,
@@ -94,14 +99,16 @@ export class EditViewCMM extends ViewCMM{
         }
         var self=this
         new ModelAction(this.app,this.model).call("loadModelViewType",reqParam,function(data){
-        data.bag && setEditContextViewData(
-            self.app,
-            self.model,
-            self.viewType,
-            data.bag,
-            ownerField,
-        )
+          this._dataReady=true
+          data.bag && setEditContextViewData(
+              self.app,
+              self.model,
+              self.viewType,
+              data.bag,
+              ownerField,
+          )
         },function(err){
+          this._dataReady=true
             console.log(err)
         })
     }

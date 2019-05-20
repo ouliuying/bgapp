@@ -323,7 +323,7 @@ class CreateView extends React.Component{
                                         }
                                     }
                                     
-                                    return relationViews.length>0?(<div className="bg-model-op-view-body-relation">
+                                    return (relationViews.length>0 && self.cmmHost.isDataReady)?(<div className="bg-model-op-view-body-relation">
                                     <div className="bg-model-op-view-body-relation-nav">
                                        <Tabs type="card"  onTabClick={
                                                        (fieldName)=>{
@@ -362,6 +362,7 @@ class CreateView extends React.Component{
                                                 let v = svs.subView
                                                 let  VComponent  = v.refView && getModelView(v.refView.app,v.refView.model,v.refView.viewType)
                                                 let ownerField = view.fields.find(x=>x.name==v.refView.fieldName)
+                                                let viewParam=self.cmmHost.getSubRefViewParam(self, v, ownerField)
                                                 return <div style={showStyle} key={v.refView.fieldName}>
                                                     {
                                                         VComponent?(
@@ -369,7 +370,7 @@ class CreateView extends React.Component{
                                                               <VComponent app={v.refView.app} 
                                                                   model={v.refView.model} 
                                                                   viewType={v.refView.viewType}
-                                                                  viewParam={self.cmmHost.getSubRefViewParam(self, v, ownerField)}
+                                                                  viewParam={viewParam}
                                                                   >
                                                               </VComponent>
                                                             </hookView.HookProvider>
