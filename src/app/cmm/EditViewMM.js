@@ -99,7 +99,7 @@ export class EditViewCMM extends ViewCMM{
         }
         var self=this
         new ModelAction(this.app,this.model).call("loadModelViewType",reqParam,function(data){
-          this._dataReady=true
+          self._dataReady=true
           data.bag && setEditContextViewData(
               self.app,
               self.model,
@@ -108,7 +108,7 @@ export class EditViewCMM extends ViewCMM{
               ownerField,
           )
         },function(err){
-          this._dataReady=true
+          self._dataReady=true
             console.log(err)
         })
     }

@@ -221,7 +221,7 @@ export class ListViewCMM extends  ViewCMM{
     fetchData(opts){
         const {view}=opts
         let {viewParam,viewData,viewRefType,localData}= view.props
-        const {ownerField,ownerFieldValue}=viewParam||{}
+        const {ownerField,ownerFieldValue,ownerModelID}=viewParam||{}
         const {pageData} = localData
         let pageIndex = (pageData&&pageData.pageIndex)||1
         let pageSize = (pageData&&pageData.pageSize)||10
@@ -242,6 +242,7 @@ export class ListViewCMM extends  ViewCMM{
                 name:ownerField.name,
                 value:rawOwnerFieldValue,
             }:undefined,
+            ownerModelID:ownerModelID?ownerModelID:undefined,
             reqData:{
                 app:this.app,
                 model:this.model,
@@ -450,7 +451,7 @@ export class ListViewCMM extends  ViewCMM{
             }
             let tag = nextRecordTag()
             let bindOwnerField = bindRecordTag(ownerField,tag)
-            let dViewParam = createViewParam(bindOwnerField,ownerFieldValue,external,orgState)
+            let dViewParam = createViewParam(bindOwnerField,ownerFieldValue,undefined,external,orgState)
             this.showAppModelViewInModalQueue(this.app,this.model,ViewType.CREATE,viewRefType,dViewParam)
         }
         else{

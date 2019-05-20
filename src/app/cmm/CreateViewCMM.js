@@ -103,7 +103,7 @@ export class CreateViewCMM extends ViewCMM{
         }
         
         new ModelAction(this.app,this.model).call("loadModelViewType",reqParam,function(data){
-          this._dataReady=true
+          self._dataReady=true
         data.bag && setCreateContextViewData(
             self.app,
             self.model,
@@ -112,7 +112,7 @@ export class CreateViewCMM extends ViewCMM{
             ownerField
         )
         },function(err){
-          this._dataReady=true
+          self._dataReady=true
             console.log(err)
         })
     }

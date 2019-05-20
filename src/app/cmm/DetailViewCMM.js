@@ -43,7 +43,7 @@ export class DetailViewCMM extends ViewCMM{
     }
 
     update(view){
-        
+
     }
 
     getModelID(view){
@@ -147,7 +147,7 @@ export class DetailViewCMM extends ViewCMM{
         const {viewParam,viewRefType} = view.props
         if((viewParam||{}).ownerField){
             const {ownerField,ownerFieldValue,orgState} = viewParam
-            let eViewParam = createEditParam(ownerField,ownerFieldValue,undefined,orgState,id)
+            let eViewParam = createEditParam(ownerField,ownerFieldValue,undefined,id,undefined,orgState)
             this.showAppModelViewInModalQueue(this.app,this.model,ViewType.EDIT,viewRefType,eViewParam)
         }
         else{
