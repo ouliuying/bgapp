@@ -53,10 +53,16 @@ export const ViewFieldType={
 }
 
 export class StaticField extends React.Component{
+    getText(value){
+        if(typeof value ==="string"){
+            return value
+        }
+        return JSON.stringify(value)
+    }
     render(){
         const {value} = this.props
         return <span>
-                {value}
+                {this.getText(value)}
         </span>
     }
 }
@@ -291,8 +297,14 @@ export class Many2OneDataSetSelectField extends React.Component{
                 }
               
             }
-            let view = getModelView(relationData.targetApp,relationData.targetModel,ViewType.LIST)
-            let viewParam = createViewParam(undefined,undefined,external,undefined)
+            let view = getModelView(relationData.targetApp,
+                relationData.targetModel,
+                ViewType.LIST)
+            let viewParam = createViewParam(undefined,
+                undefined,
+                undefined,
+                external,
+                undefined)
             view && (
                 ModalSheetManager.openModal(view,{
                     app:relationData.targetApp,

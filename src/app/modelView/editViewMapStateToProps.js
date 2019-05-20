@@ -1,7 +1,7 @@
 
 import {getDynamicRouterAppModelViewType} from '../../reducers/router'
 import {EditViewCMM} from '../cmm/EditViewMM'
-import {createViewParam} from './ViewParam'
+import {createEditParam} from './ViewParam'
 export const mapStateToProps=(state,ownProps)=>{
     if(!ownProps){
         ownProps={}
@@ -11,7 +11,7 @@ export const mapStateToProps=(state,ownProps)=>{
         viewParam.orgState=state
     }
     else{
-        viewParam = createViewParam(null,null,null,state)
+        viewParam = createEditParam(undefined,undefined,undefined,undefined,undefined,state)
     }
     let routerLocationState=getDynamicRouterAppModelViewType(state)
     let appModelViewType=routerLocationState.appModelViewType

@@ -33,7 +33,6 @@ class DetailView extends React.Component{
     componentDidMount(){
         let {cmmHost} = this.props
         cmmHost.didMount(this)
-      
     }
     
     componentWillMount(){
@@ -47,13 +46,6 @@ class DetailView extends React.Component{
         const self=this
         self.cmmHost.update(this)
         const host= self.cmmHost
-        if(host){
-            console.log("host 不为空")
-            console.log(JSON.stringify(host))
-        }
-        else{
-            console.log("host 为空")
-        }
         const {viewData,viewParam}=self.props
         const {ownerField} = (viewParam||{})
         const  {view:viewMeta,data,triggerGroups,subViews}=viewData
@@ -323,56 +315,57 @@ class DetailView extends React.Component{
 
                     {/*  relation start  */}
                     <hookView.Hook hookTag="body-relation" render={()=>{
-                                    let subViewStatus = produce(self.subViewStatus,draft=>{
-                                        if(draft.length<1 && relationViews.length>0){
-                                            if(!ownerField){
-                                                let subView = relationViews[0]
-                                                draft.push({
-                                                    subView,
-                                                    show:true
-                                                })
-                                            }
+                                   
+                                    if(self.subViewStatus.length<1 && relationViews.length>0){
+                                        if(!ownerField){
+                                            let subView = relationViews[0]
+                                            self.subViewStatus.push({
+                                                subView,
+                                                show:true,
+                                                fieldName:subView.refView.fieldName
+                                            })
                                         }
-                                    })
-                                    return relationViews.length>0?(<div className="bg-model-op-view-body-relation">
+                                    }
+                            
+                                    return (relationViews.length>0 && self.cmmHost.isDataReady)?(<div className="bg-model-op-view-body-relation">
                                     <div className="bg-model-op-view-body-relation-nav">
-                                        <Tabs type="card">
-                                           {
-                                               relationViews.map(v=>{
-                                                   return <Tabs.TabPane tab={v.refView.title} key={v.refView.fieldName} onChange={
-                                                       activekey=>{
-                                                        for(let svs of subViewStatus){
+                                        <Tabs type="card" onTabClick={
+                                                       (fieldName)=>{
+                                                        for(let svs of self.subViewStatus){
                                                             svs.show=false
                                                         }
-                                                        let rSelf = subViewStatus.find(x=>x.subView.refView.fieldName == v.refView.fieldName)
+                                                        let rSelf = self.subViewStatus.find(x=>x.subView.refView.fieldName == fieldName)
                                                         if(rSelf){
                                                             rSelf.show=true
                                                         }
                                                         else{
-                                                            subViewStatus.push({
+                                                            let v = relationViews.find(x=>x.refView.fieldName == fieldName)
+                                                            self.subViewStatus.push({
                                                                 subView:v,
-                                                                show:true
+                                                                show:true,
+                                                                fieldName:fieldName
                                                             })
                                                         }
-                                                        self.subViewStatus=subViewStatus
                                                         self.forceUpdate()
                                                        }
                                                    }>
-
-                                                   </Tabs.TabPane>
-                                               })
-                                           }
+                                                    {
+                                                        relationViews.map(v=>{
+                                                            return <Tabs.TabPane tab={v.refView.title} key={v.refView.fieldName}></Tabs.TabPane>
+                                                        })
+                                                    }
                                        </Tabs>
 
                                     </div>
 
                                     <div className="bg-model-op-view-body-relation-body">
                                         {
-                                            subViewStatus.map(function(svs){
+                                             self.subViewStatus.map(function(svs){
                                                 let showStyle = svs.show?{display:"block"}:{display:"none"}
                                                 let v = svs.subView
                                                 let  VComponent  = v.refView && getModelView(v.refView.app,v.refView.model,v.refView.viewType)
-                                         
+                                                let ownerField = viewMeta.fields.find(x=>x.name==v.refView.fieldName)
+                                                let viewParam= host.getSubRefViewParam(self, v,ownerField)
                                                 return <div style={showStyle} key={v.refView.fieldName}>
                                                     {
                                                         VComponent?(
@@ -380,7 +373,7 @@ class DetailView extends React.Component{
                                                               <VComponent app={v.refView.app} 
                                                                   model={v.refView.model} 
                                                                   viewType={v.refView.viewType}
-                                                                  viewParam={host.getSubRefViewParam(self, v, v.refView.fieldName)}
+                                                                  viewParam={viewParam}
                                                                   >
                                                               </VComponent>
                                                             </hookView.HookProvider>
@@ -391,7 +384,6 @@ class DetailView extends React.Component{
                                             })
                                         }
                                     </div>
-                                  
                                     </div>):null
                                 }
                             }>

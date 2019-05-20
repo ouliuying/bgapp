@@ -16,6 +16,11 @@ export class DetailViewCMM extends ViewCMM{
 
     constructor(app,model,viewType){
       super(app,model,viewType)
+      this._dataReady = false
+    }
+
+    get isDataReady(){
+        return this._dataReady
     }
 
     static get s_viewType(){
@@ -44,11 +49,11 @@ export class DetailViewCMM extends ViewCMM{
 
     getModelID(view){
         let {modelID,viewParam} = view.props
-        const {modelID:vModelID} = viewParam||{}
+        const {modelID:vModelID,ownerField} = viewParam||{}
         if(vModelID){
             return vModelID
         }
-        if(!modelID){
+        if(!modelID && !ownerField){
             modelID = this.getModelIDFromPath(view)
         }
         return modelID
@@ -58,7 +63,10 @@ export class DetailViewCMM extends ViewCMM{
         const {viewData} = view.props
         const {data}=(viewData||{})
         let ownerFieldValue = (data.record||{})[ownerField.name]
-        return createViewParam(ownerField,ownerFieldValue,null,null)
+        let ownerModelID = (data.record||{})["id"]
+        console.log("modelid = "+ownerModelID + subRefView.refView.fieldName)
+        let p= createViewParam(ownerField,ownerFieldValue,ownerModelID,undefined,undefined,undefined)
+        return p
     }
 
     getModelIDFromPath(view){
@@ -97,7 +105,7 @@ export class DetailViewCMM extends ViewCMM{
 
     didMount(view){
         let {viewParam,viewData}= view.props
-        const {ownerField,ownerFieldValue} = viewParam
+        const {ownerField,ownerFieldValue,ownerModelID} = viewParam
         let modelID = this.getModelID(view)
         let rawOwnerFieldValue = this.getOwnerFieldRawFieldValue(this.app,this.model,ownerField,ownerFieldValue)
         var reqParam={
@@ -108,6 +116,7 @@ export class DetailViewCMM extends ViewCMM{
                 name:ownerField.name,
                 value:rawOwnerFieldValue
             }:undefined,
+            ownerModelID:ownerModelID?ownerModelID:undefined,
             reqData:{
                 app:this.app,
                 model:this.model,
@@ -116,15 +125,18 @@ export class DetailViewCMM extends ViewCMM{
         }
         var self=this
         new ModelAction(this.app,this.model).call("loadModelViewType",reqParam,function(data){
-        data.bag && setDetailContextViewData(
-            self.app,
-            self.model,
-            self.viewType,
-            data.bag,
-            ownerField,
-        )
+            self._dataReady=true
+            data.bag && setDetailContextViewData(
+                self.app,
+                self.model,
+                self.viewType,
+                data.bag,
+                ownerField,
+            )
+          
         },function(err){
             console.log(err)
+            self._dataReady=true
         })
     }
 

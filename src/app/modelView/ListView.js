@@ -223,7 +223,7 @@ class ListView extends React.Component{
                                         showQuickJumper={true}
                                         pageSize={pageSize} 
                                         current={currentPage}
-                                        onShowSizeChange={(size)=>{self.cmmHost.onSizeChange(size)}}
+                                        onShowSizeChange={(size)=>{self.cmmHost.onSizeChange(self,size)}}
                                         onChange={(page)=>{self.cmmHost.onCurrentChange(self,page)}}
                                     />
                                 </div>

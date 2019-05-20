@@ -10,7 +10,7 @@ export const mapStateToProps=(state,ownProps)=>{
         viewParam.orgState=state
     }
     else{
-        viewParam = createViewParam(null,null,null,state)
+        viewParam = createViewParam(undefined,undefined,undefined,undefined,state)
     }
     let routerLocationState=getDynamicRouterAppModelViewType(state)
     let appModelViewType=routerLocationState.appModelViewType

@@ -72,7 +72,6 @@ class AppInContainer extends React.Component{
         })
         let openKey = `${appModelViewType.app},${appModelViewType.model},${appModelViewType.viewType}`
         let subOpenKey=this.props.openMenuKeys
-        console.log(subOpenKey)
         return <div className="bg-app-container bg-flex-full">
             {/* <div className="bg-app-container-header">
                 <h3>
@@ -92,7 +91,6 @@ class AppInContainer extends React.Component{
                 }}  defaultSelectedKeys={[openKey]}  onClick={(arg)=>this.showModelView(arg.key)}>
                     {
                         dyMenu.subMenu.map((sm,index)=>{
-                            console.log("index = "+index)
                             return this.isSubMenu(sm)?(
                                 <Menu.SubMenu title={sm.title} key={index}>
                                     {
