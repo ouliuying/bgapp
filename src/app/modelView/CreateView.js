@@ -158,23 +158,21 @@ class CreateView extends React.Component{
 
                                         {/*  body-main-label begin  */}
                                         <hookView.Hook hookTag="body-main-label"  render={()=>{
+                                            let fields=(view&&view.fields.filter(x=>{
+                                                return x.style==ViewFieldStyle.LABEL
+                                            })||[])
                                             return <div className="bg-model-op-view-body-main-label">
                                                 {
-                                                    view&&view.fields.map((field,index)=>{
+                                                    fields.map(field=>{
                                                                     let type=field.type
                                                                     let key=`${field.app}_${field.model}_${field.name}`
                                                                     const FieldComponent=ViewFieldTypeRegistry.getComponent(type)
-                                                                    return field.style===ViewFieldStyle.LABEL?(
-                                                                        
-                                                                            <FieldComponent 
+                                                                    return <FieldComponent 
                                                                             title={field.title} 
                                                                             icon={field.icon} 
                                                                             className="bg-op-label" 
                                                                             iconClassName="bg-op-label-icon"
-                                                                            key={key}></FieldComponent>
-                                                                        
-                                                                        
-                                                                    ):null
+                                                                            key={key}></FieldComponent>   
                                                         })
                                                 }
                                             </div>
@@ -183,17 +181,6 @@ class CreateView extends React.Component{
                                 </div>
                             }}>
                             </hookView.Hook>
-
-                            
-
-                            {/**  create model dont support add target model same time  */}
-
-                            {
-                                // (relationViews && relationViews.length>0)?<div className="bg-big-line"></div>:null
-                                //(relationViews && relationViews.length>0)?<Divider className="bg-big-line"></Divider>:null
-                            }
-
-
                     </div>
 
                     }}></hookView.Hook>

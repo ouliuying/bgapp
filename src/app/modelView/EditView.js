@@ -174,23 +174,21 @@ class EditView extends React.Component{
 
                                         {/*  body-main-label begin  */}
                                         <hookView.Hook hookTag="body-main-label"  render={()=>{
+                                            let fields =  viewMeta&&viewMeta.fields.filter(x=>{
+                                                return x.style==ViewFieldStyle.LABEL
+                                            })||[]
                                             return <div className="bg-model-op-view-body-main-label">
                                                 {
-                                                    viewMeta&&viewMeta.fields.map((field,index)=>{
+                                                    fields.map((field,index)=>{
                                                                     let type=field.type
                                                                     let key=`${field.app}_${field.model}_${field.name}`
                                                                     const FieldComponent=ViewFieldTypeRegistry.getComponent(type)
-                                                                    return field.style===ViewFieldStyle.LABEL?(
-                                                                        
-                                                                            <FieldComponent 
+                                                                    return <FieldComponent 
                                                                             title={field.title} 
                                                                             icon={field.icon} 
                                                                             className="bg-op-label" 
                                                                             iconClassName="bg-op-label-icon"
                                                                             key={key}></FieldComponent>
-                                                                        
-                                                                        
-                                                                    ):null
                                                         })
                                                 }
                                             </div>
@@ -217,19 +215,7 @@ class EditView extends React.Component{
 
 
                     {/*  relation start  */}
-                    <hookView.Hook hookTag="body-relation" render={()=>{
-                                  
-                                // if(self.subViewStatus.length<1 && relationViews.length>0){
-                                //     if(!ownerField){
-                                //         let subView = relationViews[0]
-                                //         self.subViewStatus.push({
-                                //             subView,
-                                //             show:true,
-                                //             fieldName:relationViews[0].refView.fieldName
-                                //         })
-                                //     }
-                                // }
-                               
+                    <hookView.Hook hookTag="body-relation" render={()=>{ 
                                 return <div className="bg-model-op-view-body-relation">
                                             <div className="bg-model-op-view-body-relation-nav">
                                                 <Tabs type="card"  onTabClick={
