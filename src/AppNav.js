@@ -19,19 +19,18 @@ export class AppNav extends Component {
         store: PropTypes.object,
     }
     render() {
-        return (
-        
-        <div className="bg-app-nav-button-bar">
+        let self =this
+        return <div className="bg-app-nav-button-bar">
             {
-                this.props.shortcutApps.map(sApp=>{
+                self.props.shortcutApps.map(sApp=>{
                     const AppIcon=createIconFromSvg({
                         src:sApp.icon,
                         svgStyle:{width:22,height:22,fill:'#bfcbd9'}
                     })
-                    let active=(this.props.currApp.name == sApp.name)?" active":""
+                    let active=(self.props.currApp.name == sApp.name)?" active":""
                     return (<a className={"bg-app-shortcut-action-btn"+active} onClick={()=>{
                         setCurrApp({currApp:sApp})
-                        this.props.dispatch(push(`/app/dynamic/${sApp.name}`))}
+                        self.props.dispatch(push(`/app/dynamic/${sApp.name}`))}
                         } key={sApp.name}>
                             <AppIcon></AppIcon><span className="bg-app-shortcut-action-btn-title"> {sApp.title}</span>
                     </a>)
@@ -44,7 +43,7 @@ export class AppNav extends Component {
 
          
         </div>
-        )
+        
     }
 }
 function mapState(state){

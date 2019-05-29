@@ -10,6 +10,20 @@ const appInContainers={
     "corp":Loadable({
         loader: () => import('../bgcorp/CorpInContainer'),
         loading: () => <div/>,
+    }),
+    "product":Loadable({
+        loader: () => import('../bgproduct/ProductInContainer'),
+        loading: () => <div/>,
+    })
+    ,
+    "crm":Loadable({
+        loader: () => import('../bgcrm/CrmInContainer'),
+        loading: () => <div/>,
+    })
+    ,
+    "account":Loadable({
+        loader: () => import('../bgaccount/AccountInContainer'),
+        loading: () => <div/>,
     })
 }
 function TestApp(){
