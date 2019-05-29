@@ -15,6 +15,7 @@ import ViewFieldTypeRegistry from './ViewFieldTypeRegistry'
 import {mapStateToProps} from './editViewMapStateToProps'
 import {getModelView} from './ModelViewRegistry'
 import {produce} from 'immer'
+import { VIEW_COMMON_FIELDS_TAB_TITLE, VIEW_COMMON_FIELDS_TAB_KEY } from '../ReservedKeyword';
 class EditView extends React.Component{
     constructor(props){
         super(props)
@@ -199,113 +200,7 @@ class EditView extends React.Component{
                             }}>
                             </hookView.Hook>
 
-                            <hookView.Hook  hookTag="body-common"  render={()=>{
-                                let commonGroupFields=[]
-                                for(var fd of (viewMeta||{}).fields||[]){
-                                    if(fd.style===ViewFieldStyle.NORMAL){
-                                        let currGF=null
-                                        if(fd.colSpan>1){
-                                            currGF={fields:[],components:[],colCount:0,rowSpan:0,colSpan:0}
-                                            commonGroupFields.push(currGF)
-                                        }
-                                        else{
-                                            if(commonGroupFields.length>0){
-                                                currGF=commonGroupFields[commonGroupFields.length-1]
-                                                if(currGF.colCount>1){
-                                                    currGF={fields:[],components:[],colCount:0,rowSpan:0,colSpan:0}
-                                                    commonGroupFields.push(currGF)
-                                                }
-                                            }
-                                            else{
-                                                currGF={fields:[],components:[],colCount:0,rowSpan:0,colSpan:0}
-                                                commonGroupFields.push(currGF)
-                                            }
-                                        }
-                                        currGF.fields.push(fd)
-                                        currGF.components.push(ViewFieldTypeRegistry.getComponent(fd.type))
-                                        currGF.colCount=currGF.colCount+fd.colSpan
-                                        if(currGF.rowSpan<fd.rowSpan){
-                                            currGF.rowSpan=fd.rowSpan
-                                        }
-                                    }
-                                }
-                                return <div className="bg-model-op-view-body-common">
-                                        <Form>
-                                        {
-                                            commonGroupFields.map((gfs,index)=>
-                                            {
-                                                    const Com1=gfs.components[0]
-                                                    let props1=null
-                                                    let props2=null
-                                                    let key1=null
-                                                    let key2=null
-                                                    let value1=null
-                                                    let value2=null
-                                                    let meta1=null
-                                                    let meta2=null
-                                                    const  Com2=gfs.components.length>1?gfs.components[1]:null
-                                                    if(Com1){
-                                                        let fd=gfs.fields[0]
-                                                        meta1=fd.meta
-                                                        key1=`${fd.app}_${fd.model}_${fd.name}`
-                                                        value1=editData&&editData[fd.name]!==undefined?editData[fd.name]:""
-                                                        props1={
-                                                            name:fd.name
-                                                        }
-                                                        if(fd.relationData){
-                                                            props1.relationData=fd.relationData
-                                                            props1.orgSelData={}
-                                                        }
-                                                    }
-                                                    if(Com2){
-                                                        let fd=gfs.fields[1]
-                                                        meta2=fd.meta
-                                                        value2=editData&&editData[fd.name]!==null?editData[fd.name]:""
-                                                        key2=`${fd.app}_${fd.model}_${fd.name}`
-                                                        props2={
-                                                            name:fd.name
-                                                        }
-                                                        if(fd.relationData){
-                                                            props2.relationData=fd.relationData
-                                                            props2.orgSelData={}
-                                                        }
-                                                    }
-                                                    return (gfs.fields.length>1||gfs.colCount===1)?(
-                                                            <Form.Item key={`fi-${key1}`}>
-                                                                <div className="bg-model-op-view-body-common-two-col">
-                                                                    <div className="bg-model-op-view-body-common-two-col-first">
-                                                                    <Form.Item label={gfs.fields[0].title}>
-                                                                        <Com1 {...props1} onChange={(value)=>{
-                                                                                    self.onFieldValueChange(gfs.fields[0],value)
-                                                                                }} key={key1} value={value1} meta={meta1} relationData={gfs.fields[0].relationData} field={gfs.fields[0]}></Com1>
-                                                                    </Form.Item>
-                                                                    </div>
-                                                                    <div className="bg-model-op-view-body-common-two-col-second">
-                                                                    {Com2!=null && (<Form.Item label={gfs.fields[1].title}>
-                                                                        <Com2 {...props2} onChange={(value)=>{
-                                                                                    self.onFieldValueChange(gfs.fields[1],value)
-                                                                                }} key={key2} value={value2} meta={meta2} relationData={gfs.fields[1].relationData} field={gfs.fields[1]}></Com2>
-                                                                    </Form.Item>)
-                                                                }
-                                                                    </div>
-                                                                </div>
-                                                            </Form.Item>):(
-                                                                <div className="bg-model-op-view-body-common-one-col" key={`fi-${key1}`}>
-                                                                    <Form.Item label={gfs.fields[0].title}>
-                                                                        <Com1 {...props1} onChange={(value)=>{
-                                                                                    self.onFieldValueChange(gfs.fields[0],value)
-                                                                                }} key={key1} value={value1} meta={meta1} relationData={gfs.fields[0].relationData}  field={gfs.fields[0]}></Com1>
-                                                                    </Form.Item>  
-                                                                </div>
-                                                            
-                                                        )         
-                                            })
-                                        }
-                                        </Form>
-                                </div>
-                            }}>
-
-                            </hookView.Hook>
+                           
 
                             {/**  create model dont support //add target model same time  */}
                             {
@@ -324,75 +219,193 @@ class EditView extends React.Component{
                     {/*  relation start  */}
                     <hookView.Hook hookTag="body-relation" render={()=>{
                                   
-                                if(self.subViewStatus.length<1 && relationViews.length>0){
-                                    if(!ownerField){
-                                        let subView = relationViews[0]
-                                        self.subViewStatus.push({
-                                            subView,
-                                            show:true,
-                                            fieldName:relationViews[0].refView.fieldName
-                                        })
-                                    }
-                                }
+                                // if(self.subViewStatus.length<1 && relationViews.length>0){
+                                //     if(!ownerField){
+                                //         let subView = relationViews[0]
+                                //         self.subViewStatus.push({
+                                //             subView,
+                                //             show:true,
+                                //             fieldName:relationViews[0].refView.fieldName
+                                //         })
+                                //     }
+                                // }
                                
-                                return relationViews.length>0?(<div className="bg-model-op-view-body-relation">
-                                <div className="bg-model-op-view-body-relation-nav">
-                                         <Tabs type="card"  onTabClick={
-                                                       fieldName=>{
-                                                        for(let svs of self.subViewStatus){
-                                                            svs.show=false
-                                                        }
-                                                        let rSelf = self.subViewStatus.find(x=>x.subView.refView.fieldName == fieldName)
-                                                        if(rSelf){
-                                                            rSelf.show=true
-                                                        }
-                                                        else{
-                                                            let v = relationViews.find(x=>x.refView.fieldName == fieldName)
-                                                            self.subViewStatus.push({
-                                                                subView:v,
-                                                                show:true,
-                                                                fieldName:fieldName
-                                                            })
-                                                        }
-                                                        self.forceUpdate()
-                                                       }
-                                                   }>
-                                           {
-                                               relationViews.map(v=>{
-                                                   return <Tabs.TabPane tab={v.refView.title} key={v.refView.fieldName}>
+                                return <div className="bg-model-op-view-body-relation">
+                                            <div className="bg-model-op-view-body-relation-nav">
+                                                <Tabs type="card"  onTabClick={
+                                                            fieldName=>{
+                                                                for(let svs of self.subViewStatus){
+                                                                    svs.show=false
+                                                                }
+                                                                let rSelf = self.subViewStatus.find(x=>x.subView.refView.fieldName == fieldName)
+                                                                if(rSelf){
+                                                                    rSelf.show=true
+                                                                }
+                                                                else{
+                                                                    let v = relationViews.find(x=>x.refView.fieldName == fieldName)
+                                                                    if(v){
+                                                                        self.subViewStatus.push({
+                                                                            subView:v,
+                                                                            show:true,
+                                                                            fieldName:fieldName
+                                                                        })
+                                                                    }
+                                                                }
+                                                                self.forceUpdate()
+                                                            }
+                                                        }>
+                                                            <Tabs.TabPane tab={VIEW_COMMON_FIELDS_TAB_TITLE} key={VIEW_COMMON_FIELDS_TAB_KEY}>
 
-                                                   </Tabs.TabPane>
-                                               })
-                                           }
-                                       </Tabs>
-                                </div>
-                                <div className="bg-model-op-view-body-relation-body">
-                                    {
-                                        self.subViewStatus.map(function(svs){
-                                            let showStyle = svs.show?{display:"block"}:{display:"none"}
-                                            let v = svs.subView
-                                            let  VComponent  = v.refView && getModelView(v.refView.app,v.refView.model,v.refView.viewType)
-                                            let ownerField = viewMeta.fields.find(x=>x.name==v.refView.fieldName)
-                                            return <div style={showStyle} key={v.refView.fieldName}>
+                                                            </Tabs.TabPane>
                                                 {
-                                                    VComponent?(
-                                                        <hookView.HookProvider value={{cmmHost:undefined,parent:undefined}}>
-                                                          <VComponent app={v.refView.app} 
-                                                              model={v.refView.model} 
-                                                              viewType={v.refView.viewType}
-                                                              viewParam={host.getSubRefViewParam(self, v,ownerField)}
-                                                              >
-                                                          </VComponent>
-                                                        </hookView.HookProvider>
-                                                      
-                                                    ):null
+                                                    relationViews.map(v=>{
+                                                        return <Tabs.TabPane tab={v.refView.title} key={v.refView.fieldName}>
+
+                                                        </Tabs.TabPane>
+                                                    })
                                                 }
-                                            </div>
-                                        })
-                                    }
-                                </div>
+                                            </Tabs>
+                                    </div>
+                                    <div className="bg-model-op-view-body-relation-body">
+                                        {
+                                            self.subViewStatus.map(function(svs){
+                                                let showStyle = svs.show?{display:"block"}:{display:"none"}
+                                                let v = svs.subView
+                                                let  VComponent  = v.refView && getModelView(v.refView.app,v.refView.model,v.refView.viewType)
+                                                let ownerField = viewMeta.fields.find(x=>x.name==v.refView.fieldName)
+                                                return <div style={showStyle} key={v.refView.fieldName}>
+                                                    {
+                                                        VComponent?(
+                                                            <hookView.HookProvider value={{cmmHost:undefined,parent:undefined}}>
+                                                            <VComponent app={v.refView.app} 
+                                                                model={v.refView.model} 
+                                                                viewType={v.refView.viewType}
+                                                                viewParam={host.getSubRefViewParam(self, v,ownerField)}
+                                                                >
+                                                            </VComponent>
+                                                            </hookView.HookProvider>
+                                                        
+                                                        ):null
+                                                    }
+                                                </div>
+                                            })
+                                        }
+                                        {
+                                            self.subViewStatus.findIndex(x=>x.show==true)<0?<>
+                                              {/* common start */}
+                                               <hookView.Hook  hookTag="body-common"  render={()=>{
+                                                    let commonGroupFields=[]
+                                                    for(var fd of (viewMeta||{}).fields||[]){
+                                                        if(fd.style===ViewFieldStyle.NORMAL){
+                                                            let currGF=null
+                                                            if(fd.colSpan>1){
+                                                                currGF={fields:[],components:[],colCount:0,rowSpan:0,colSpan:0}
+                                                                commonGroupFields.push(currGF)
+                                                            }
+                                                            else{
+                                                                if(commonGroupFields.length>0){
+                                                                    currGF=commonGroupFields[commonGroupFields.length-1]
+                                                                    if(currGF.colCount>1){
+                                                                        currGF={fields:[],components:[],colCount:0,rowSpan:0,colSpan:0}
+                                                                        commonGroupFields.push(currGF)
+                                                                    }
+                                                                }
+                                                                else{
+                                                                    currGF={fields:[],components:[],colCount:0,rowSpan:0,colSpan:0}
+                                                                    commonGroupFields.push(currGF)
+                                                                }
+                                                            }
+                                                            currGF.fields.push(fd)
+                                                            currGF.components.push(ViewFieldTypeRegistry.getComponent(fd.type))
+                                                            currGF.colCount=currGF.colCount+fd.colSpan
+                                                            if(currGF.rowSpan<fd.rowSpan){
+                                                                currGF.rowSpan=fd.rowSpan
+                                                            }
+                                                        }
+                                                    }
+                                                    return <div className="bg-model-op-view-body-common">
+                                                            <Form>
+                                                            {
+                                                                commonGroupFields.map((gfs,index)=>
+                                                                {
+                                                                        const Com1=gfs.components[0]
+                                                                        let props1=null
+                                                                        let props2=null
+                                                                        let key1=null
+                                                                        let key2=null
+                                                                        let value1=null
+                                                                        let value2=null
+                                                                        let meta1=null
+                                                                        let meta2=null
+                                                                        const  Com2=gfs.components.length>1?gfs.components[1]:null
+                                                                        if(Com1){
+                                                                            let fd=gfs.fields[0]
+                                                                            meta1=fd.meta
+                                                                            key1=`${fd.app}_${fd.model}_${fd.name}`
+                                                                            value1=editData&&editData[fd.name]!==undefined?editData[fd.name]:""
+                                                                            props1={
+                                                                                name:fd.name
+                                                                            }
+                                                                            if(fd.relationData){
+                                                                                props1.relationData=fd.relationData
+                                                                                props1.orgSelData={}
+                                                                            }
+                                                                        }
+                                                                        if(Com2){
+                                                                            let fd=gfs.fields[1]
+                                                                            meta2=fd.meta
+                                                                            value2=editData&&editData[fd.name]!==null?editData[fd.name]:""
+                                                                            key2=`${fd.app}_${fd.model}_${fd.name}`
+                                                                            props2={
+                                                                                name:fd.name
+                                                                            }
+                                                                            if(fd.relationData){
+                                                                                props2.relationData=fd.relationData
+                                                                                props2.orgSelData={}
+                                                                            }
+                                                                        }
+                                                                        return (gfs.fields.length>1||gfs.colCount===1)?(
+                                                                                <Form.Item key={`fi-${key1}`}>
+                                                                                    <div className="bg-model-op-view-body-common-two-col">
+                                                                                        <div className="bg-model-op-view-body-common-two-col-first">
+                                                                                        <Form.Item label={gfs.fields[0].title}>
+                                                                                            <Com1 {...props1} onChange={(value)=>{
+                                                                                                        self.onFieldValueChange(gfs.fields[0],value)
+                                                                                                    }} key={key1} value={value1} meta={meta1} relationData={gfs.fields[0].relationData} field={gfs.fields[0]}></Com1>
+                                                                                        </Form.Item>
+                                                                                        </div>
+                                                                                        <div className="bg-model-op-view-body-common-two-col-second">
+                                                                                        {Com2!=null && (<Form.Item label={gfs.fields[1].title}>
+                                                                                            <Com2 {...props2} onChange={(value)=>{
+                                                                                                        self.onFieldValueChange(gfs.fields[1],value)
+                                                                                                    }} key={key2} value={value2} meta={meta2} relationData={gfs.fields[1].relationData} field={gfs.fields[1]}></Com2>
+                                                                                        </Form.Item>)
+                                                                                    }
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </Form.Item>):(
+                                                                                    <div className="bg-model-op-view-body-common-one-col" key={`fi-${key1}`}>
+                                                                                        <Form.Item label={gfs.fields[0].title}>
+                                                                                            <Com1 {...props1} onChange={(value)=>{
+                                                                                                        self.onFieldValueChange(gfs.fields[0],value)
+                                                                                                    }} key={key1} value={value1} meta={meta1} relationData={gfs.fields[0].relationData}  field={gfs.fields[0]}></Com1>
+                                                                                        </Form.Item>  
+                                                                                    </div>
+                                                                                
+                                                                            )         
+                                                                })
+                                                            }
+                                                            </Form>
+                                                    </div>
+                                                }}>
+
+                                                </hookView.Hook>
+                                                {/* common end */}
+                                            </>:null
+                                        }
+                                    </div>
                               
-                                </div>):null
+                                </div>
                                 }
                             }>
                             </hookView.Hook>
