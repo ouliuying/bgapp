@@ -106,50 +106,47 @@ class CreateView extends React.Component{
                                 return <div className="bg-model-op-view-body-main">
                                         {/*  body-main-h begin  */}
                                         <hookView.Hook hookTag="body-main-h"  render={()=>{
+                                            let mainFields = view&&view.fields.filter(x=>x.style==ViewFieldStyle.HEAD)||[]
+                                            let subMainFields = view&&view.fields.filter(x=>x.style==ViewFieldStyle.SUB_HEAD)||[]
                                             return <div className="bg-model-op-view-body-main-h">
                                                         <div className="bg-model-op-view-body-main-h1">
-                                                        <Form>
-                                                        {
-                                                            
-                                                            view&&view.fields.map((field,index)=>{
-                                                                    let type=field.type
-                                                                    let meta=field.meta
-                                                                    let nValue=createData&&createData[field.name]!==undefined?createData[field.name]:""
-                                                                    const FieldComponent=ViewFieldTypeRegistry.getComponent(type)
-                                                                    let key=`${field.app}_${field.model}_${field.name}`
-                                                                    return field.style===ViewFieldStyle.HEAD?(
-                                                                        <Form.Item label={field.title} key={`form-item${key}`}>
-                                                                                <FieldComponent onChange={(value)=>{
-                                                                                    self.onFieldValueChange(field,value)
-                                                                                }} value={nValue } key={key} meta={meta} title={field.title} relationData={field.relationData} field={field}></FieldComponent>    
-                                                                        </Form.Item>
-                                                                    ):null
-                                                                })
-                                                        }
-                                                        </Form>
-                                                    
+                                                            <Form>
+                                                            {
+                                                                
+                                                                mainFields.map((field,index)=>{
+                                                                        let type=field.type
+                                                                        let meta=field.meta
+                                                                        let nValue=createData&&createData[field.name]!==undefined?createData[field.name]:""
+                                                                        const FieldComponent=ViewFieldTypeRegistry.getComponent(type)
+                                                                        let key=`${field.app}_${field.model}_${field.name}`
+                                                                        return <Form.Item label={field.title} key={`form-item${key}`}>
+                                                                                    <FieldComponent onChange={(value)=>{
+                                                                                        self.onFieldValueChange(field,value)
+                                                                                    }} value={nValue } key={key} meta={meta} title={field.title} relationData={field.relationData} field={field}></FieldComponent>    
+                                                                            </Form.Item>
+                                                                    })
+                                                            }
+                                                            </Form>
                                                         </div>
 
                                                         <div className="bg-model-op-view-body-main-h2">
-                                                        <Form >
-                                                        {
-                                                                
-                                                                view&&view.fields.map((field,index)=>{
-                                                                    let type=field.type
-                                                                    let meta=field.meta
-                                                                    const FieldComponent=ViewFieldTypeRegistry.getComponent(type)
-                                                                    let nValue=createData&&createData[field.name]!==undefined?createData[field.name]:""
-                                                                    let key=`${field.app}_${field.model}_${field.name}`
-                                                                    return field.style===ViewFieldStyle.SUB_HEAD?(
-                                                                        <Form.Item label={field.title} key={`form-item${key}`}>
-                                                                            <FieldComponent onChange={(value)=>{
-                                                                                    self.onFieldValueChange(field,value)
-                                                                                }} value={nValue} key={key} meta={meta} title={field.title} relationData={field.relationData} field={field}></FieldComponent>    
-                                                                        </Form.Item>
-                                                                    ):null
-                                                                })
-                                                        } 
-                                                        </Form>
+                                                            <Form >
+                                                            {
+                                                                    
+                                                                    subMainFields.map((field,index)=>{
+                                                                        let type=field.type
+                                                                        let meta=field.meta
+                                                                        const FieldComponent=ViewFieldTypeRegistry.getComponent(type)
+                                                                        let nValue=createData&&createData[field.name]!==undefined?createData[field.name]:""
+                                                                        let key=`${field.app}_${field.model}_${field.name}`
+                                                                        return <Form.Item label={field.title} key={`form-item${key}`}>
+                                                                                <FieldComponent onChange={(value)=>{
+                                                                                        self.onFieldValueChange(field,value)
+                                                                                    }} value={nValue} key={key} meta={meta} title={field.title} relationData={field.relationData} field={field}></FieldComponent>    
+                                                                            </Form.Item>
+                                                                    })
+                                                            } 
+                                                            </Form>
                                                         </div>
                                                 </div>
                                         }}></hookView.Hook>
@@ -248,6 +245,7 @@ class CreateView extends React.Component{
                                                 let  VComponent  = v.refView && getModelView(v.refView.app,v.refView.model,v.refView.viewType)
                                                 let ownerField = view.fields.find(x=>x.name==v.refView.fieldName)
                                                 let viewParam=self.cmmHost.getSubRefViewParam(self, v, ownerField)
+                                                let viewRefType = v.refView.refTypes.join(",")
                                                 return <div style={showStyle} key={v.refView.fieldName}>
                                                     {
                                                         VComponent?(
@@ -255,6 +253,7 @@ class CreateView extends React.Component{
                                                               <VComponent app={v.refView.app} 
                                                                   model={v.refView.model} 
                                                                   viewType={v.refView.viewType}
+                                                                  viewRefType={viewRefType}
                                                                   viewParam={viewParam}
                                                                   >
                                                               </VComponent>

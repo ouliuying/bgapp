@@ -8,6 +8,7 @@ import {
 } from 'react-router-dom'
 import CreateView from '../app/modelView/CreateView'
 import hookView from '../app/HookView'
+import {mapStateToProps} from '../app/modelView/createViewMapStateToProps'
 class PartnerCreateView extends React.Component{
     render(){
         const {overrideRender:parentOverrideRender,...rest}=this.props
@@ -22,8 +23,5 @@ class PartnerCreateView extends React.Component{
         
     }
 }
-function mapStateToProps(state){
-    return state
-}
-export default withRouter(connect(mapStateToProps)(PartnerCreateView))
+export default hookView.withHook(withRouter(connect(mapStateToProps)(PartnerCreateView)))
 

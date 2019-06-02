@@ -58,7 +58,13 @@ class  HookView extends React.Component{
                             }
                         }
                     }
-                    return render(rest)
+                    try{
+                        return render(rest)
+                    }
+                    catch{
+                        return <></>
+                    }
+                   
                 }
             }
         </HookContext.Consumer>

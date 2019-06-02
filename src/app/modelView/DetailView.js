@@ -112,24 +112,28 @@ class DetailView extends React.Component{
                                 return <div className="bg-model-op-view-body-main">
                                         {/*  body-main-h begin  */}
                                         <hookView.Hook hookTag="body-main-h"  render={()=>{
+                                            let mainFields = viewMeta&&viewMeta.fields.filter(x=>{
+                                                return x.style==ViewFieldStyle.HEAD
+                                            })||[]
+                                            let subMainFields = viewMeta&&viewMeta.fields.filter(x=>{
+                                                return x.style==ViewFieldStyle.SUB_HEAD
+                                            })||[]
                                             return <div className="bg-model-op-view-body-main-h">
                                                         <div className="bg-model-op-view-body-main-h1">
                                                         <Form  >
                                                         {
                                                             
-                                                            viewMeta&&viewMeta.fields.map((field,index)=>{
+                                                            mainFields.map((field,index)=>{
                                                                     let type=field.type
                                                                     let meta=field.meta
                                                                     let nValue=detailData&&detailData[field.name]!==undefined?detailData[field.name]:""
                                                                     const FieldComponent=ViewFieldTypeRegistry.getComponent(type)
                                                                     let key=`${field.app}_${field.model}_${field.name}`
-                                                                    return field.style===ViewFieldStyle.HEAD?(
-                                                                        <Form.Item label={field.title} key={`form-item${key}`}>
+                                                                    return<Form.Item label={field.title} key={`form-item${key}`}>
                                                                                 <FieldComponent onChange={(value)=>{
                                                                                     host.onFieldValueChange(field,value)
                                                                                 }} value={nValue } key={key} meta={meta} title={field.title} relationData={field.relationData}></FieldComponent>    
                                                                         </Form.Item>
-                                                                    ):null
                                                                 })
                                                         }
                                                         </Form>
@@ -140,19 +144,17 @@ class DetailView extends React.Component{
                                                         <Form  >
                                                         {
                                                                 
-                                                                viewMeta&&viewMeta.fields.map((field,index)=>{
+                                                                subMainFields.map((field,index)=>{
                                                                     let type=field.type
                                                                     let meta=field.meta
                                                                     const FieldComponent=ViewFieldTypeRegistry.getComponent(type)
                                                                     let nValue=detailData&&detailData[field.name]!==undefined?detailData[field.name]:""
                                                                     let key=`${field.app}_${field.model}_${field.name}`
-                                                                    return field.style===ViewFieldStyle.SUB_HEAD?(
-                                                                        <Form.Item label={field.title} key={`form-item${key}`}>
+                                                                    return <Form.Item label={field.title} key={`form-item${key}`}>
                                                                             <FieldComponent onChange={(value)=>{
                                                                                     host.onFieldValueChange(field,value)
                                                                                 }} value={nValue} key={key} meta={meta} title={field.title} relationData={field.relationData}></FieldComponent>    
                                                                         </Form.Item>
-                                                                    ):null
                                                                 })
                                                         } 
                                                         </Form>
@@ -253,6 +255,7 @@ class DetailView extends React.Component{
                                                 let  VComponent  = v.refView && getModelView(v.refView.app,v.refView.model,v.refView.viewType)
                                                 let ownerField = viewMeta.fields.find(x=>x.name==v.refView.fieldName)
                                                 let viewParam= host.getSubRefViewParam(self, v,ownerField)
+                                                let viewRefType = v.refView.refTypes.join(",")
                                                 return <div style={showStyle} key={v.refView.fieldName}>
                                                     {
                                                         VComponent?(
@@ -260,6 +263,7 @@ class DetailView extends React.Component{
                                                               <VComponent app={v.refView.app} 
                                                                   model={v.refView.model} 
                                                                   viewType={v.refView.viewType}
+                                                                  viewRefType={viewRefType}
                                                                   viewParam={viewParam}
                                                                   >
                                                               </VComponent>

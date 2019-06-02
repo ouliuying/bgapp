@@ -212,7 +212,7 @@ export class CreateViewCMM extends ViewCMM{
         let datasource = _.cloneDeep(viewData.data||{})
         datasource[RECORD_TAG]=tag
         setDatasource(datasource)
-        close()
+        close && close()
       }
       else{
         let createData= buildServerCreateData(self.app,self.model,self.viewType,ownerField,orgState)
