@@ -12,7 +12,8 @@ import {
     SET_LIST_OP_SEARCH_BOX_VISIBLE,
     SET_LIST_OP_SEARCH_BOX_CRITERIA_VALUE,
     SET_LIST_CURRENT_PAGE,
-    SET_LIST_PAGE_SIZE
+    SET_LIST_PAGE_SIZE,
+    UPDATE_CREATE_CONTEXT_FIELD_META
 } from '../actions/appContext'
 import ViewContext from '../modelView/ViewContext'
 import produce from "immer"
@@ -114,6 +115,13 @@ export function appContext(state,action){
             return produce(state,draft=>{
                setCreateViewData(draft,viewData,ownerField)
             })
+        }
+        case UPDATE_CREATE_CONTEXT_FIELD_META:
+        {
+            const {app,model,viewType,ownerField,field,meta}=action.payload
+            return produce(state,draft=>{
+                updateCreateContextFieldMeta(draft,app,model,viewType,ownerField,field,meta)
+             })
         }
         case SET_LIST_CONTEXT_CRITERIA:
         {
@@ -228,6 +236,17 @@ function setCreateViewData(draft,viewData,ownerField){
         viewData:Object.assign({
          ...viewData
         },{data:getInitCreateViewData(data,view, ownerField)})
+    }
+}
+
+function  updateCreateContextFieldMeta(draft,app,model,viewType,ownerField,field,meta){
+    let key = getAppModelViewKey(app,model,viewType,ownerField)
+    let viewData = (draft[CREATE_VIEW_DATA][key]||{})["viewData"]
+    if(viewData){
+        let targetField = (viewData.view||{}).fields.find(x=>x.name==field.name)
+        if(targetField){
+            targetField.meta=meta
+        }
     }
 }
 

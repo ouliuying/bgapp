@@ -2,6 +2,7 @@ import {ReducerRegistry} from '../../ReducerRegistry'
 export const SET_CREATE_CONTEXT_FIELD_VALUE='setCreateContextFieldValue'
 export const CLEAR_CREATE_CONTEXT_FIELD_VALUE='clearCreateContextFieldValue'
 export const SET_CREATE_CONTEXT_VIEW_DATA='setCreateContextViewData'
+export const UPDATE_CREATE_CONTEXT_FIELD_META = 'updateCreateContextViewData'
 export const SET_LIST_CONTEXT_CRITERIA='setListContextCtriteria'
 export const SET_LIST_CONTEXT_VIEW_DATA='setListContextData'
 export const UPDATE_LIST_CONTEXT_VIEW_DATA_RECORD='updateListContextViewDataRecord'
@@ -107,6 +108,9 @@ export function setListCurrentPage(app,model,viewType,ownerField,currentPage){
 }
 export function setListPageSize(app,model,viewType,ownerField,pageSize){
     setContextDataAction(SET_LIST_PAGE_SIZE, {app,model,viewType,ownerField,pageSize})
+}
+export function updateCreateContextViewData(app,model,viewType,ownerField,field,meta){
+    setContextDataAction(UPDATE_CREATE_CONTEXT_FIELD_META, {app,model,viewType,ownerField,field,meta})
 }
 
 

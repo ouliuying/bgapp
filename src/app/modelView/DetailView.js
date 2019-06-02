@@ -126,13 +126,14 @@ class DetailView extends React.Component{
                                                             mainFields.map((field,index)=>{
                                                                     let type=field.type
                                                                     let meta=field.meta
+                                                                    let ctrlProps = field.ctrlProps
                                                                     let nValue=detailData&&detailData[field.name]!==undefined?detailData[field.name]:""
                                                                     const FieldComponent=ViewFieldTypeRegistry.getComponent(type)
                                                                     let key=`${field.app}_${field.model}_${field.name}`
                                                                     return<Form.Item label={field.title} key={`form-item${key}`}>
                                                                                 <FieldComponent onChange={(value)=>{
                                                                                     host.onFieldValueChange(field,value)
-                                                                                }} value={nValue } key={key} meta={meta} title={field.title} relationData={field.relationData}></FieldComponent>    
+                                                                                }} value={nValue } key={key} meta={meta} ctrlProps={ctrlProps} title={field.title} relationData={field.relationData}></FieldComponent>    
                                                                         </Form.Item>
                                                                 })
                                                         }
@@ -147,13 +148,14 @@ class DetailView extends React.Component{
                                                                 subMainFields.map((field,index)=>{
                                                                     let type=field.type
                                                                     let meta=field.meta
+                                                                    let ctrlProps = field.ctrlProps
                                                                     const FieldComponent=ViewFieldTypeRegistry.getComponent(type)
                                                                     let nValue=detailData&&detailData[field.name]!==undefined?detailData[field.name]:""
                                                                     let key=`${field.app}_${field.model}_${field.name}`
                                                                     return <Form.Item label={field.title} key={`form-item${key}`}>
                                                                             <FieldComponent onChange={(value)=>{
                                                                                     host.onFieldValueChange(field,value)
-                                                                                }} value={nValue} key={key} meta={meta} title={field.title} relationData={field.relationData}></FieldComponent>    
+                                                                                }} value={nValue} key={key} meta={meta} ctrlProps={ctrlProps} title={field.title} relationData={field.relationData}></FieldComponent>    
                                                                         </Form.Item>
                                                                 })
                                                         } 
@@ -174,10 +176,14 @@ class DetailView extends React.Component{
                                                     fields.map(field=>{
                                                                     let type=field.type
                                                                     let key=`${field.app}_${field.model}_${field.name}`
+                                                                    let meta = field.meta
+                                                                    let ctrlProps = field.ctrlProps
                                                                     const FieldComponent=ViewFieldTypeRegistry.getComponent(type)
                                                                     return <FieldComponent 
                                                                             title={field.title} 
-                                                                            icon={field.icon} 
+                                                                            icon={field.icon}
+                                                                            meta={meta}
+                                                                            ctrlProps={ctrlProps}
                                                                             className="bg-op-label" 
                                                                             iconClassName="bg-op-label-icon"
                                                                             key={key}></FieldComponent>
@@ -322,10 +328,13 @@ class DetailView extends React.Component{
                                                                         let value2=null
                                                                         let meta1=null
                                                                         let meta2=null
+                                                                        let ctrlProps1=null
+                                                                        let ctrlProps2=null
                                                                         const  Com2=gfs.components.length>1?gfs.components[1]:null
                                                                         if(Com1){
                                                                             let fd=gfs.fields[0]
                                                                             meta1=fd.meta
+                                                                            ctrlProps1=fd.ctrlProps
                                                                             key1=`${fd.app}_${fd.model}_${fd.name}`
                                                                             value1=detailData&&detailData[fd.name]!==undefined?detailData[fd.name]:""
                                                                             props1={
@@ -339,6 +348,7 @@ class DetailView extends React.Component{
                                                                         if(Com2){
                                                                             let fd=gfs.fields[1]
                                                                             meta2=fd.meta
+                                                                            ctrlProps2=fd.ctrlProps
                                                                             value2=detailData&&detailData[fd.name]!==null?detailData[fd.name]:""
                                                                             key2=`${fd.app}_${fd.model}_${fd.name}`
                                                                             props2={
@@ -356,14 +366,14 @@ class DetailView extends React.Component{
                                                                                         <Form.Item label={gfs.fields[0].title}>
                                                                                             <Com1 {...props1} onChange={(value)=>{
                                                                                                         host.onFieldValueChange(gfs.fields[0],value)
-                                                                                                    }} key={key1} value={value1} meta={meta1} relationData={gfs.fields[0].relationData}></Com1>
+                                                                                                    }} key={key1} value={value1} meta={meta1} ctrlProps={ctrlProps1} relationData={gfs.fields[0].relationData}></Com1>
                                                                                         </Form.Item>
                                                                                         </div>
                                                                                         <div className="bg-model-op-view-body-common-two-col-second">
                                                                                         {Com2!=null && (<Form.Item label={gfs.fields[1].title}>
                                                                                             <Com2 {...props2} onChange={(value)=>{
                                                                                                         host.onFieldValueChange(gfs.fields[1],value)
-                                                                                                    }} key={key2} value={value2} meta={meta2} relationData={gfs.fields[1].relationData}></Com2>
+                                                                                                    }} key={key2} value={value2} meta={meta2} ctrlProps={ctrlProps2} relationData={gfs.fields[1].relationData}></Com2>
                                                                                         </Form.Item>)
                                                                                     }
                                                                                         </div>
@@ -373,7 +383,7 @@ class DetailView extends React.Component{
                                                                                         <Form.Item label={gfs.fields[0].title}>
                                                                                             <Com1 {...props1} onChange={(value)=>{
                                                                                                         host.onFieldValueChange(gfs.fields[0],value)
-                                                                                                    }} key={key1} value={value1} meta={meta1} relationData={gfs.fields[0].relationData}></Com1>
+                                                                                                    }} key={key1} value={value1} meta={meta1} ctrlProps={ctrlProps1} relationData={gfs.fields[0].relationData}></Com1>
                                                                                         </Form.Item>  
                                                                                     </div>
                                                                                 

@@ -136,13 +136,14 @@ class EditView extends React.Component{
                                                                 mainFields.map((field,index)=>{
                                                                         let type=field.type
                                                                         let meta=field.meta
+                                                                        let ctrlProps = field.ctrlProps
                                                                         let nValue=editData&&editData[field.name]!==undefined?editData[field.name]:""
                                                                         const FieldComponent=ViewFieldTypeRegistry.getComponent(type)
                                                                         let key=`${field.app}_${field.model}_${field.name}`
                                                                         return <Form.Item label={field.title} key={`form-item${key}`}>
                                                                                     <FieldComponent onChange={(value)=>{
                                                                                         self.onFieldValueChange(field,value)
-                                                                                    }} value={nValue } key={key} meta={meta} title={field.title} relationData={field.relationData}  field={field}>></FieldComponent>    
+                                                                                    }} value={nValue } key={key} meta={meta} ctrlProps={ctrlProps} title={field.title} relationData={field.relationData}  field={field}>></FieldComponent>    
                                                                             </Form.Item>
                                                                     })
                                                             }
@@ -155,13 +156,14 @@ class EditView extends React.Component{
                                                                     subMainFields.map((field,index)=>{
                                                                         let type=field.type
                                                                         let meta=field.meta
+                                                                        let ctrlProps = field.ctrlProps
                                                                         const FieldComponent=ViewFieldTypeRegistry.getComponent(type)
                                                                         let nValue=editData&&editData[field.name]!==undefined?editData[field.name]:""
                                                                         let key=`${field.app}_${field.model}_${field.name}`
                                                                         return <Form.Item label={field.title} key={`form-item${key}`}>
                                                                                 <FieldComponent onChange={(value)=>{
                                                                                         self.onFieldValueChange(field,value)
-                                                                                    }} value={nValue} key={key} meta={meta} title={field.title} relationData={field.relationData} field={field}></FieldComponent>    
+                                                                                    }} value={nValue} key={key} meta={meta} ctrlProps={ctrlProps} title={field.title} relationData={field.relationData} field={field}></FieldComponent>    
                                                                             </Form.Item>
                                                                     })
                                                             } 
@@ -182,10 +184,14 @@ class EditView extends React.Component{
                                                     fields.map((field,index)=>{
                                                                     let type=field.type
                                                                     let key=`${field.app}_${field.model}_${field.name}`
+                                                                    let meta = field.meta
+                                                                    let ctrlProps = field.ctrlProps
                                                                     const FieldComponent=ViewFieldTypeRegistry.getComponent(type)
                                                                     return <FieldComponent 
                                                                             title={field.title} 
                                                                             icon={field.icon} 
+                                                                            meta={meta}
+                                                                            ctrlProps={ctrlProps}
                                                                             className="bg-op-label" 
                                                                             iconClassName="bg-op-label-icon"
                                                                             key={key}></FieldComponent>
@@ -314,10 +320,13 @@ class EditView extends React.Component{
                                                                         let value2=null
                                                                         let meta1=null
                                                                         let meta2=null
+                                                                        let ctrlProps1=null
+                                                                        let ctrlProps2=null
                                                                         const  Com2=gfs.components.length>1?gfs.components[1]:null
                                                                         if(Com1){
                                                                             let fd=gfs.fields[0]
                                                                             meta1=fd.meta
+                                                                            ctrlProps1=fd.ctrlProps
                                                                             key1=`${fd.app}_${fd.model}_${fd.name}`
                                                                             value1=editData&&editData[fd.name]!==undefined?editData[fd.name]:""
                                                                             props1={
@@ -331,6 +340,7 @@ class EditView extends React.Component{
                                                                         if(Com2){
                                                                             let fd=gfs.fields[1]
                                                                             meta2=fd.meta
+                                                                            ctrlProps2=fd.ctrlProps
                                                                             value2=editData&&editData[fd.name]!==null?editData[fd.name]:""
                                                                             key2=`${fd.app}_${fd.model}_${fd.name}`
                                                                             props2={
@@ -348,14 +358,14 @@ class EditView extends React.Component{
                                                                                         <Form.Item label={gfs.fields[0].title}>
                                                                                             <Com1 {...props1} onChange={(value)=>{
                                                                                                         self.onFieldValueChange(gfs.fields[0],value)
-                                                                                                    }} key={key1} value={value1} meta={meta1} relationData={gfs.fields[0].relationData} field={gfs.fields[0]}></Com1>
+                                                                                                    }} key={key1} value={value1} meta={meta1} ctrlProps={ctrlProps1} relationData={gfs.fields[0].relationData} field={gfs.fields[0]}></Com1>
                                                                                         </Form.Item>
                                                                                         </div>
                                                                                         <div className="bg-model-op-view-body-common-two-col-second">
                                                                                         {Com2!=null && (<Form.Item label={gfs.fields[1].title}>
                                                                                             <Com2 {...props2} onChange={(value)=>{
                                                                                                         self.onFieldValueChange(gfs.fields[1],value)
-                                                                                                    }} key={key2} value={value2} meta={meta2} relationData={gfs.fields[1].relationData} field={gfs.fields[1]}></Com2>
+                                                                                                    }} key={key2} value={value2} meta={meta2} ctrlProps={ctrlProps2} relationData={gfs.fields[1].relationData} field={gfs.fields[1]}></Com2>
                                                                                         </Form.Item>)
                                                                                     }
                                                                                         </div>
@@ -365,7 +375,7 @@ class EditView extends React.Component{
                                                                                         <Form.Item label={gfs.fields[0].title}>
                                                                                             <Com1 {...props1} onChange={(value)=>{
                                                                                                         self.onFieldValueChange(gfs.fields[0],value)
-                                                                                                    }} key={key1} value={value1} meta={meta1} relationData={gfs.fields[0].relationData}  field={gfs.fields[0]}></Com1>
+                                                                                                    }} key={key1} value={value1} meta={meta1} ctrlProps={ctrlProps1} relationData={gfs.fields[0].relationData}  field={gfs.fields[0]}></Com1>
                                                                                         </Form.Item>  
                                                                                     </div>
                                                                                 

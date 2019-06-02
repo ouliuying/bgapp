@@ -318,7 +318,9 @@ export class Many2OneDataSetSelectField extends React.Component{
     }
     render(){
         var self=this
-        const {meta,value,relationData}=this.props
+        const {meta,value,relationData,ctrlProps}=this.props
+        const {moreBtn} = ctrlProps||{}
+        console.log("ctrlProps = "+ctrlProps)
         let options=[]
         if(meta && meta.options){
             meta.options.map(r=>{
@@ -351,12 +353,14 @@ export class Many2OneDataSetSelectField extends React.Component{
           })
         }
       </Select>
-  
-            <Button type="text" onClick={()=>{
-                    self.selMore()
-            }} className="bg-many2one-select-more-btn">
-                <FontIcon type="search" />
-            </Button>
+    {
+        moreBtn!==false?<Button type="text" onClick={()=>{
+            self.selMore()
+    }} className="bg-many2one-select-more-btn">
+        <FontIcon type="search" />
+        </Button>:null
+    }
+      
           
       </div>
     }
