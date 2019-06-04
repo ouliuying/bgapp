@@ -1,9 +1,12 @@
-import {CreateViewCMM as BaseViewCMM} from '../../../app/cmm/CreateViewCMM'
+
+
+
+import {EditViewCMM as BaseViewCMM} from '../../../app/cmm/EditViewCMM'
 import { RECORD_TAG } from '../../../app/ReservedKeyword';
 import { ModelAction } from '../../../app/mq/ModelAction';
 import { setCreateContextViewData, updateCreateContextViewData } from '../../../app/actions/appContext';
 
-export class CreateViewCMM extends BaseViewCMM{
+export class EditViewCMM extends BaseViewCMM{
     constructor(app,model,viewType){
         super(app,model,viewType)
     }

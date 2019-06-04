@@ -50,13 +50,6 @@ class EditView extends React.Component{
         const self=this
         self.cmmHost.update(this)
         const host= self.cmmHost
-        if(host){
-            console.log("host 不为空")
-            console.log(JSON.stringify(host))
-        }
-        else{
-            console.log("host 为空")
-        }
         const {viewData,viewParam}=self.props
         const {ownerField} = (viewParam||{})
         const  {view:viewMeta,data,triggerGroups,subViews}=viewData

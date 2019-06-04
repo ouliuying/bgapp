@@ -81,7 +81,7 @@ export class CreateViewCMM extends ViewCMM{
 
     didMount(view){
         let self= this
-        let {viewParam, viewData}= view.props
+        let {viewParam, viewData,viewRefType}= view.props
         let {ownerField,ownerFieldValue,external,ownerModelID} = (viewParam||{})
         let {getDatasource,setDatasource} = (external||{})
         let rawOwnerFieldValue = self.getOwnerFieldRawFieldValue(this.app,this.model,ownerField,ownerFieldValue)
@@ -89,6 +89,7 @@ export class CreateViewCMM extends ViewCMM{
         let datasource = getDatasource&&getDatasource(recordTag)
         var reqParam={
             viewType:this.viewType,
+            viewRefType:viewRefType,
             ownerField:ownerField?{
                 app:ownerField.app,
                 model:ownerField.model,

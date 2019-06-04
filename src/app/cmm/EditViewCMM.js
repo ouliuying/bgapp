@@ -78,12 +78,13 @@ export class EditViewCMM extends ViewCMM{
     }
 
     reloadEditContextData(view){
-        let {viewParam,viewData}= view.props
+        let {viewParam,viewData,viewRefType}= view.props
         let {ownerField,ownerFieldValue,ownerModelID} = (viewParam||{})
         let modelID = this.getModelID(view)
         let rawFieldValue = this.getOwnerFieldRawFieldValue(this.app,this.model,ownerField,ownerFieldValue)
         var reqParam={
             viewType:this.viewType,
+            viewRefType:viewRefType,
             ownerField:ownerField?{
                 app:ownerField.app,
                 model:ownerField.model,

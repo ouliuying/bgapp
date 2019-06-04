@@ -209,6 +209,7 @@ export function appContext(state,action){
         case SET_DETAIL_CONTEXT_VIEW_DATA:
         {
             const {app,model,viewType,viewData,ownerField} = action.payload
+            updateViewField(viewData,ownerField)
             return produce(state,draft=>{
                 setDetailContextViewData(draft,app,model,viewType,viewData,ownerField)
             })
@@ -216,6 +217,7 @@ export function appContext(state,action){
         case SET_EDIT_CONTEXT_VIEW_DATA:
         {
             const {app,model,viewType,viewData,ownerField} = action.payload
+            updateViewField(viewData,ownerField)
             return produce(state, draft=>{
                 setEditContextViewData(draft,app,model,viewType,viewData,ownerField)
             })

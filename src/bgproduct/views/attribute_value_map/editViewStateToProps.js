@@ -1,7 +1,7 @@
 
-import {getDynamicRouterAppModelViewType} from '../../reducers/router'
-import {EditViewCMM} from '../cmm/EditViewCMM'
-import {createEditParam} from './ViewParam'
+import {getDynamicRouterAppModelViewType} from '../../../reducers/router'
+import {EditViewCMM} from './EditViewCMM'
+import {createEditParam} from '../../../app/modelView/ViewParam'
 export const mapStateToProps=(state,ownProps)=>{
     if(!ownProps){
         ownProps={}
