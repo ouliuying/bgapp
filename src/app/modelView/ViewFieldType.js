@@ -1,5 +1,5 @@
 import React from 'react'
-import {Input,DatePicker,Select,notification ,Button,Upload,Checkbox,Icon as FontIcon} from "../../ui"
+import {Input,DatePicker,Select,notification ,Button,Upload,Checkbox,Icon as FontIcon,Row,Col,Cascader} from "../../ui"
 
 import {createIconFromSvg} from "../../icon/createIconFromSvg"
 import Icon from '../../icon'
@@ -14,6 +14,7 @@ import {ModalSheetManager} from './ModalSheetManager'
 import ViewRefType from './ViewRefType'
 import { createViewParam } from './ViewParam';
 import moment from 'moment';
+import chinaArea from '../../lib/china-area'
 const {RangePicker} = DatePicker
 const { TextArea } = Input
 export const ViewFieldType={
@@ -34,6 +35,7 @@ export const ViewFieldType={
     Many2OneDataSetSelectField:'many2OneDataSetSelect',
     SingleCheckBoxField:'singleCheckbox',
     StaticField:'static',
+    ChinaFullAddress:'chinaFullAddress',
 
 
     //criteria
@@ -314,7 +316,6 @@ export class Many2OneDataSetSelectField extends React.Component{
                     viewRefType:ViewRefType.SINGLE_SELECTION
                 })
             )
-        
     }
     render(){
         var self=this
@@ -594,6 +595,76 @@ export class CriteriaDateTimeRangeInput extends React.Component{
             this.onChange(evt.target.value)
         }}>
         </RangePicker>
+    }
+}
+
+export class ChinaFullAddress extends React.Component{
+    constructor(props){
+        super(props)
+        this.options = []
+        chinaArea.map(p=>{
+            let option = {
+                label:p.p,
+                value:p.p,
+                children:[]
+            }
+            p.cs.map(c=>{
+                let ci = {
+                    label:c.c,
+                    value:c.c,
+                    children:[]
+                }
+                c.s.map(s=>{
+                    let si={
+                        label:s,
+                        value:s
+                    }
+                    ci.children.push(si)
+                })
+                option.children.push(ci)
+            })
+            this.options.push(option)
+        })
+    }
+
+    render(){
+        const {onChange,value} = this.props
+        let jVal ={}
+        try
+        {
+            jVal=JSON.parse(value)
+        }
+        catch{
+            jVal={
+                province:"",
+                city:"",
+                district:"",
+                streetAddress:""
+            }
+        }
+        let rVal = [jVal.province,jVal.city,jVal.district]
+        if(rVal[0]=="" || rVal[0]==null || rVal[0]==undefined){
+            rVal=undefined
+        }
+        return <div>
+                <div>
+                    <Cascader placeholder="选择 省份/市/区/县" value={rVal} options={this.options} onChange={
+                        v=>{
+                            let nVal= Object.assign({},jVal,{province:v[0],city:v[1],district:v[2]})
+
+                            onChange(JSON.stringify(nVal))
+                        }
+                    }></Cascader>
+                </div>
+                <div>
+                   <Input placeholder="街道/乡/村信息" value={jVal.streetAddress} onChange={
+                       evt=>{
+                            let nVal= Object.assign({},jVal,{streetAddress:evt.target.value})
+                            onChange(JSON.stringify(nVal))
+                       }
+                   }></Input>
+                </div>
+        </div>
     }
 }
 
