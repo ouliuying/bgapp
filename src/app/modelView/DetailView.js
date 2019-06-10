@@ -55,7 +55,7 @@ class DetailView extends React.Component{
         let relationViews = (subViews||[]).filter((subView)=>{
             return subView.refView.style===ViewFieldStyle.RELATION
         })
-        let showFields = ((viewMeta&&viewMeta.fields)||[]).filter(x=>x.visibleCriteria.test(detailData))||[]
+        self.showFields = ((viewMeta&&viewMeta.fields)||[]).filter(x=>testCriteria(x.visibleCriteria,detailData))||[]
         return <hookView.HookProvider value={{cmmHost:self.cmmHost,parent:self}}>
                 <div className="bg-model-op-view bg-flex-full ">
                 {
@@ -114,10 +114,10 @@ class DetailView extends React.Component{
                                 return <div className="bg-model-op-view-body-main">
                                         {/*  body-main-h begin  */}
                                         <hookView.Hook hookTag="body-main-h"  render={()=>{
-                                            let mainFields = showFields.filter(x=>{
+                                            let mainFields = self.showFields.filter(x=>{
                                                 return x.style==ViewFieldStyle.HEAD
                                             })||[]
-                                            let subMainFields = showFields.filter(x=>{
+                                            let subMainFields = self.showFields.filter(x=>{
                                                 return x.style==ViewFieldStyle.SUB_HEAD
                                             })||[]
                                             return <div className="bg-model-op-view-body-main-h">
@@ -128,7 +128,7 @@ class DetailView extends React.Component{
                                                             mainFields.map((field,index)=>{
                                                                     let type=field.type
                                                                     let meta=field.meta
-                                                                    let enable = testCriteria(field.enableCriateria,detailData)
+                                                                    let enable = testCriteria(field.enableCriteria,detailData)
                                                                     let ctrlProps = field.ctrlProps
                                                                     let nValue=detailData&&detailData[field.name]!==undefined?detailData[field.name]:""
                                                                     const FieldComponent=ViewFieldTypeRegistry.getComponent(type)
@@ -181,7 +181,7 @@ class DetailView extends React.Component{
                                                                     let type=field.type
                                                                     let key=`${field.app}_${field.model}_${field.name}`
                                                                     let meta = field.meta
-                                                                    let enable = testCriteria(field.enableCriateria,detailData)
+                                                                    let enable = testCriteria(field.enableCriteria,detailData)
                                                                     let ctrlProps = field.ctrlProps
                                                                     const FieldComponent=ViewFieldTypeRegistry.getComponent(type)
                                                                     return <FieldComponent 
@@ -292,7 +292,7 @@ class DetailView extends React.Component{
                                                 {/* common begin */}
                                                 <hookView.Hook  hookTag="body-common"  render={()=>{
                                                     let commonGroupFields=[]
-                                                    for(var fd of showFields){
+                                                    for(var fd of self.showFields){
                                                         if(fd.style===ViewFieldStyle.NORMAL){
                                                             let currGF=null
                                                             if(fd.colSpan>1){
@@ -341,7 +341,7 @@ class DetailView extends React.Component{
                                                                         const  Com2=gfs.components.length>1?gfs.components[1]:null
                                                                         if(Com1){
                                                                             let fd=gfs.fields[0]
-                                                                            enable1=testCriteria(fd.enableCriateria,detailData)
+                                                                            enable1=testCriteria(fd.enableCriteria,detailData)
                                                                             meta1=fd.meta
                                                                             ctrlProps1=fd.ctrlProps
                                                                             key1=`${fd.app}_${fd.model}_${fd.name}`
@@ -356,7 +356,7 @@ class DetailView extends React.Component{
                                                                         }
                                                                         if(Com2){
                                                                             let fd=gfs.fields[1]
-                                                                            enable2=testCriteria(fd.enableCriateria,detailData)
+                                                                            enable2=testCriteria(fd.enableCriteria,detailData)
                                                                             meta2=fd.meta
                                                                             ctrlProps2=fd.ctrlProps
                                                                             value2=detailData&&detailData[fd.name]!==null?detailData[fd.name]:""

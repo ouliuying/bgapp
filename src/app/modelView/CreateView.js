@@ -58,11 +58,10 @@ class CreateView extends React.Component{
         const ownerField= (viewParam||{}).ownerField
         const  {view,data,triggerGroups,subViews}=(viewData||{})
         const createData = data && data.record
-        console.log(createData)
         let relationViews = (subViews||[]).filter((subView)=>{
             return subView.refView.style===ViewFieldStyle.RELATION
         })
-        let showFields = ((view&&view.fields)||[]).filter(x=>x.visibleCriteria.test(createData))||[]
+        let showFields = ((view&&view.fields)||[]).filter(x=>testCriteria(x.visibleCriteria,createData))||[]
         return <hookView.HookProvider value={{cmmHost:self.cmmHost,parent:self}}>
                 <div className="bg-model-op-view bg-flex-full ">
                 <hookView.Hook hookTag="actions"  render={()=>{

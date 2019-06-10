@@ -125,7 +125,6 @@ const ExprKeyword={
     LEFT_BRACKET:"("
 }
 export const createCriteria=(expr)=>{
-    console.log("expr="+expr)
   return createCriteriaImp({expr})
 }
 

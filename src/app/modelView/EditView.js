@@ -57,7 +57,7 @@ class EditView extends React.Component{
         let relationViews = (subViews||[]).filter((subView)=>{
             return subView.refView.style===ViewFieldStyle.RELATION
         })
-        let showFields = ((viewMeta&&viewMeta.fields)||[]).filter(x=>x.visibleCriteria.test(editData))||[]
+        let showFields = ((viewMeta&&viewMeta.fields)||[]).filter(x=>testCriteria(x.visibleCriteria,editData))||[]
         return <hookView.HookProvider value={{cmmHost:self.cmmHost,parent:self}}>
                 <div className="bg-model-op-view bg-flex-full ">
                 {
