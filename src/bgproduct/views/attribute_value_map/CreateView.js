@@ -26,6 +26,5 @@ class AttirbuteValueMapCreateView extends React.Component{
         
     }
 }
-
 export default hookView.withHook(withRouter(connect(mapStateToProps)(AttirbuteValueMapCreateView)))
 

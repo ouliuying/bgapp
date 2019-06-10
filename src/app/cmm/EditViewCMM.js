@@ -18,6 +18,7 @@ import {ModalSheetManager} from '../modelView/ModalSheetManager'
 import {createViewParam} from '../modelView/ViewParam'
 import _ from "lodash"
 import ViewType from '../modelView/ViewType';
+import { createCriteria } from '../modelView/ViewFieldCriteria';
 export class EditViewCMM extends ViewCMM{
 
     constructor(app,model,viewType){
@@ -105,7 +106,7 @@ export class EditViewCMM extends ViewCMM{
               self.app,
               self.model,
               self.viewType,
-              data.bag,
+              self.initDatasource(data.bag,ownerField,ownerFieldValue),
               ownerField,
           )
         },function(err){
@@ -114,6 +115,67 @@ export class EditViewCMM extends ViewCMM{
         })
     }
     
+
+
+
+    initDatasource(bag,ownerField,ownerFieldValue){
+      this.createFieldEnableAndVisibleCriteria(bag,ownerField,ownerFieldValue)
+      return bag
+  }
+    
+    createFieldEnableAndVisibleCriteria(bag,ownerField,ownerFieldValue){
+      let {view,subViews} = bag||{}
+      let self = this
+      try{
+        ((view||{}).fields||[]).map(fd=>{
+            fd.visibleCriteria= createCriteria(fd.visible)
+            fd.enableCriteria = createCriteria(fd.enable)
+            return fd
+        })
+        if(ownerField && ownerFieldValue!==undefined){
+          let relFd = self.getOwnerRelationField((view||{}).fields,(view||{}).app,(view||{}).model,ownerField,ownerFieldValue)
+          if(relFd){
+            let rFD = ((view||{}).fields||[]).find(x=>x.name === relFd.name)
+            if(rFD){
+                rFD.enableCriteria=createCriteria("false")
+            }
+          }
+        }
+       
+        (subViews||[]).map(rv=>{
+           if(rv.view){
+              (rv.view.fields||[]).map(rfd=>{
+                rfd.visibleCriteria= createCriteria(rfd.visible)
+                rfd.enableCriteria = createCriteria(rfd.enable)
+                return rfd
+              })
+              let relFd = self.getOwnerRelationField(rv.view.fields,rv.view.app,rv.view.model,ownerField,ownerFieldValue)
+              if(relFd){
+                let rFD = ((view||{}).fields||[]).find(x=>x.name === relFd.name)
+                if(rFD){
+                    rFD.enableCriteria=createCriteria("false")
+                }
+              }
+           }
+           return rv
+        })
+      }
+      catch
+      {
+
+      }
+    }
+    
+    getOwnerRelationField(fields,app,model,ownerField,ownerFieldValue){
+      if(ownerField.relationData.targetApp===app && ownerField.relationData.targetModel===model){
+          return fields.find(x=>x.name===ownerField.relationData.targetField)
+      }
+      else if(ownerField.relationData.relationApp===app && ownerField.relationData.relationModel === model){
+          return fields.find(x=>x.name===ownerField.relationData.relationField)
+      }
+    }
+
+
     didMount(view){
       this.reloadEditContextData(view)
     }

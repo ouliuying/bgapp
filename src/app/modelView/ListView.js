@@ -70,7 +70,7 @@ class ListView extends React.Component{
         const {columns,rows,currentPage,totalCount,pageSize} = self.cmmHost.getViewDatas(self,viewData)
         const {searchBox} = localData
         const {visible:showSearchBox} = (searchBox||{})
-
+        
         return <div className="bg-model-op-view bg-flex-full">
 
                 {/* list action items*/}

@@ -71,14 +71,14 @@ export class StaticField extends React.Component{
 
 export class TextField extends React.Component{
     render(){
-        const {type,value,onChange}=this.props
+        const {type,value,onChange,enable}=this.props
         try{
             return type==="singleLine"?(
-                <Input placeholder="请输入内容"  value={value} onChange={(evt)=>{
+                <Input placeholder="请输入内容" disabled={!enable}  value={value} onChange={(evt)=>{
                     onChange(evt.target.value)
                 }}/>
             ):(
-                <TextArea value={value} placeholder="请输入内容" onChange={(evt)=>{
+                <TextArea value={value} placeholder="请输入内容" disabled={!enable} onChange={(evt)=>{
                     onChange(evt.target.value)
                 }}/>
             )
@@ -91,16 +91,18 @@ export class TextField extends React.Component{
     }
 }
 export class SingleLineTextField extends React.Component{
-
+   
     render(){
-        return <TextField type="singleLine" {...this.props}>
+        const {enable,...rest} = this.props
+        return <TextField type="singleLine" enable={enable} {...rest}>
             
         </TextField>
     }
 }
 export class MultiLineTextField extends React.Component{
     render(){
-        return <TextField type="multiLine" {...this.props}>
+        const {enable,...rest} = this.props
+        return <TextField type="multiLine" enable={enable} {...rest}>
         
         </TextField>
     }
@@ -110,9 +112,9 @@ export class TelephoneField extends React.Component{
         return value
     }
     render(){
-        const {value,onChange,...rest}=this.props
+        const {value,onChange,enable,...rest}=this.props
         const telephone=this.getTelephone(value)
-        return <Input {...rest} value={telephone} onChange={(evt)=>{
+        return <Input {...rest} value={telephone} disabled={!enable} onChange={(evt)=>{
             onChange(evt.target.value)
         }} placeholder="输入电话号码"></Input>
     }
@@ -122,9 +124,9 @@ export class MobileField extends React.Component{
         return value
     }
     render(){
-        const {value,onChange,...rest}=this.props
+        const {value,onChange,enable,...rest}=this.props
         const mobile=this.getMobile(value)
-        return <Input {...rest} value={mobile} onChange={(evt)=>{
+        return <Input {...rest} value={mobile} disabled={!enable} onChange={(evt)=>{
             onChange(evt.target.value)
         }} placeholder="输入手机号码"></Input>
     }
@@ -134,16 +136,17 @@ export class NumberField extends React.Component{
         return value
     }
     render(){
-        const {value,onChange,getNumber,...rest}=this.props
+        const {value,onChange,getNumber,enable,...rest}=this.props
         const number=(getNumber||this.getNumber)(value)
-        return <Input {...rest} value={number} onChange={(evt)=>{
+        return <Input {...rest} value={number} disabled={!enable} onChange={(evt)=>{
             onChange(evt.target.value)
         }}></Input>
     }
 }
 export class RealField extends React.Component{
     render(){
-        return <NumberField {...this.props} getNumber={(value)=>{
+        const {enable,...rest} = this.props
+        return <NumberField enable={enable} {...rest} getNumber={(value)=>{
             return value
         }}>
         </NumberField>
@@ -151,15 +154,18 @@ export class RealField extends React.Component{
 }
 export class LongField extends React.Component{
     render(){
-        return <NumberField {...this.props} getNumber={(value)=>{
+        const {enable,...rest} = this.props
+        return <NumberField enable={enable} {...rest} getNumber={(value)=>{
             return value
         }}>
         </NumberField>
     }
 }
+
 export class IntField extends React.Component{
     render(){
-        return <NumberField {...this.props} getNumber={(value)=>{
+        const {enable,...rest} = this.props
+        return <NumberField enable={enable} {...rest} getNumber={(value)=>{
             return value
         }}>
         </NumberField>
@@ -167,14 +173,16 @@ export class IntField extends React.Component{
 }
 export class ImageUploadField extends React.Component{
     render(){
-        return <SingleLineTextField></SingleLineTextField>
+        const {enable,...rest} = this.props
+        return <SingleLineTextField enable={enable} {...rest}></SingleLineTextField>
     }
 }
 
 export  class AvatarField extends React.Component{
     render(){
+        const {enable,...rest} = this.props
         return <div className="bg-avatar">
-            <Upload action="#">
+            <Upload action="#" disabled={!enable} {...rest}>
                 <Icon.UploadIcon></Icon.UploadIcon>
             </Upload>
             </div>
@@ -183,15 +191,14 @@ export  class AvatarField extends React.Component{
 
 export class SingleCheckBoxField extends React.Component{
     render(){
-        const{meta,value,onChange}=this.props
-
-        return value>0?<Checkbox checked label={(meta||{}).label}   onChange={
+        const{meta,value,enable,onChange}=this.props
+        let checked = false
+        if(value==1){
+            checked=true
+        }
+        return <Checkbox  checked={checked} label={(meta||{}).label} disabled={!enable}   onChange={
             (evt)=>{
-                onChange && onChange(evt.target.value?1:0)
-            }
-        }></Checkbox>:<Checkbox  label={(meta||{}).label}  onChange={
-            (evt)=>{
-                onChange && onChange(evt.target.value?1:0)
+                onChange && onChange(evt.target.checked?1:0)
             }
         }></Checkbox>
     }
@@ -222,9 +229,9 @@ export class DateField extends React.Component{
     }
     render(){
         try{
-            const {onChange,value}=this.props
+            const {onChange,value,enable}=this.props
             let setValue = this.toDate(value)
-            return <DatePicker onChange={(value)=>{
+            return <DatePicker disabled ={!enable} onChange={(value)=>{
                 let strValue = this.formatDate(value)
                 onChange && onChange(strValue)}
             } value={setValue}></DatePicker>
@@ -242,9 +249,9 @@ export class EmailField extends React.Component{
         return value
     }
     render(){
-        const {value,onChange,...rest}=this.props
+        const {value,onChange,enable,...rest}=this.props
         const email=this.getEmail(value)
-        return <Input {...rest} value={email} onChange={(evt)=>{
+        return <Input {...rest} disabled={!enable} value={email} onChange={(evt)=>{
             onChange(evt.target.value)
         }} placeholder="输入Email"></Input>
     }
@@ -319,7 +326,7 @@ export class Many2OneDataSetSelectField extends React.Component{
     }
     render(){
         var self=this
-        const {meta,value,relationData,ctrlProps}=this.props
+        const {meta,value,relationData,enable,ctrlProps}=this.props
         const {moreBtn} = ctrlProps||{}
         console.log("ctrlProps = "+ctrlProps)
         let options=[]
@@ -341,7 +348,7 @@ export class Many2OneDataSetSelectField extends React.Component{
             }
         }
         let idValue =value?parseInt(value.record["id"]):undefined
-        return <div className="bg-many2one-select-co"><Select onChange={(idValue)=>{
+        return <div className="bg-many2one-select-co"><Select disabled={!enable} onChange={(idValue)=>{
            self.onChange(idValue)
         }} value={idValue}>
         {
@@ -355,7 +362,7 @@ export class Many2OneDataSetSelectField extends React.Component{
         }
       </Select>
     {
-        moreBtn!==false?<Button type="text" onClick={()=>{
+        (moreBtn!==false && enable)?<Button type="text" onClick={()=>{
             self.selMore()
     }} className="bg-many2one-select-more-btn">
         <FontIcon type="search" />
@@ -374,9 +381,9 @@ export class CriteriaEnumSelect  extends React.Component{
         super(props)
     }
     render(){
-        const {onChange,fd,value}=this.props
+        const {onChange,fd,enable,value}=this.props
         let meta = fd.meta
-        return <Select value={value} placeholder="请选择" onChange={(value)=>{onChange && onChange(value)}}>
+        return <Select disabled={!enable} value={value} placeholder="请选择" onChange={(value)=>{onChange && onChange(value)}}>
         {
           meta.options.map(vt => {
             return <Select.Option key={vt.value} label={vt.label} value={vt.value} />
@@ -395,16 +402,16 @@ export class CriteriaNumberRangeInput extends React.Component{
         onChange&&onChange(value)
     }
     render(){
-        let {value} = this.props
+        let {value,enable} = this.props
         let [minValue,maxValue] =[undefined,undefined]
         if(value instanceof Array){
             minValue=value[0]
             maxValue=value[1]
         }
         return <div>
-            <Input placeholder="最小值" value={minValue} onChange={(evt)=>{
+            <Input disabled={!enable} placeholder="最小值" value={minValue} onChange={(evt)=>{
                     this.onValueChange([evt.target.value,maxValue])
-            }}></Input> - <Input placeholder="最大值" value={maxValue} onChange={
+            }}></Input> - <Input disabled={!enable} placeholder="最大值" value={maxValue} onChange={
                 (evt)=>{
                     this.onValueChange([minValue,evt.target.value])
                 }
@@ -421,8 +428,8 @@ export class CriteriaNumberLessEqualInput extends React.Component{
         onChange&&onChange(value)
     }
     render(){
-        let {value}=this.props
-        return <Input value={value} onChange={(evt)=>{this.onChange(evt.target.value)}}>
+        let {value,enable}=this.props
+        return <Input disabled={!enable} value={value} onChange={(evt)=>{this.onChange(evt.target.value)}}>
         </Input>
     }
 }
@@ -436,8 +443,8 @@ export class CriteriaNumberGreaterEqualInput extends React.Component{
         onChange && onChange(value)
     }
     render(){
-        const {value}=this.props
-        return <Input value={value} onChange={(evt)=>{
+        const {value,enable}=this.props
+        return <Input disabled={!enable} value={value} onChange={(evt)=>{
             this.onChange(evt.target.value)
         }}>
         </Input>
@@ -453,8 +460,8 @@ export class CriteriaNumberEqualInput extends React.Component{
         onChange&&onChange(value)
     }
     render(){
-        const {value}=this.props
-        return <Input value={value} onChange={(evt)=>{
+        const {value,enable}=this.props
+        return <Input disabled={!enable} value={value} onChange={(evt)=>{
             this.onChange(evt.target.value)
         }}>
         </Input>
@@ -469,8 +476,8 @@ export class CriteriaStringILikeEqualInput extends React.Component{
         onChange&&onChange(value)
     }
     render(){
-        let {value,title}=this.props
-        return <Input value={value} onChange={(evt)=>{
+        let {value,title,enable}=this.props
+        return <Input disabled={!enable} value={value} onChange={(evt)=>{
             this.onChange(evt.target.value)
         }} placeholder={title}>
         </Input>
@@ -486,8 +493,8 @@ export class CriteriaStringLikeEqualInput extends React.Component{
         onChange&&onChange(value)
     }
     render(){
-        const {value,title}=this.props
-        return <Input value={value} onChange={()=>{
+        const {value,title,enable}=this.props
+        return <Input disabled={!enable} value={value} onChange={()=>{
             this.onChange(value)
         }} placeholder={title}>
         </Input>
@@ -503,8 +510,8 @@ export class CriteriaStringEqualInput extends React.Component{
         onChange&&onChange(value)
     }
     render(){
-        const {value,title}=this.props
-        return <Input value={value} onChange={(evt)=>this.onChange(evt.target.value)} placeholder={title}>
+        const {value,title,enable}=this.props
+        return <Input disabled={!enable} value={value} onChange={(evt)=>this.onChange(evt.target.value)} placeholder={title}>
         </Input>
     }
 }
@@ -518,8 +525,8 @@ export class CriteriaMobileEqualInput extends React.Component{
        onChange && onChange(value)
     }
     render(){
-        const {value,title}=this.props
-        return <Input value={value} onChange={(evt)=>this.onChange(evt.target.value)} placeholder={title}>
+        const {value,title,enable}=this.props
+        return <Input disabled={!enable} value={value} onChange={(evt)=>this.onChange(evt.target.value)} placeholder={title}>
         </Input>
     }
 }
@@ -533,9 +540,9 @@ export class CriteriaDateEqualInput extends React.Component{
         onchange && onChange(strValue)
     }
     render(){
-        const {value}=this.props
+        const {value,enable}=this.props
         let mValue=moment(value,["YYYY-MM-DD HH:mm:ss","YYYY-MM-DD"])
-        return <DatePicker value={mValue} onChange={evt=>{
+        return <DatePicker disabled={!enable} value={mValue} onChange={evt=>{
             this.onChange(evt.target.value)
         }}>
         </DatePicker>
@@ -552,9 +559,9 @@ export class CriteriaDateTimeEqualInput extends React.Component{
         onchange && onChange(strValue)
     }
     render(){
-        const {value}=this.props
+        const {value,enable}=this.props
         let mValue=moment(value,["YYYY-MM-DD HH:mm:ss","YYYY-MM-DD"])
-        return <DatePicker value={mValue} onChange={evt=>{
+        return <DatePicker disabled={!enable} value={mValue} onChange={evt=>{
             this.onChange(evt.target.value)
         }}>
         </DatePicker>
@@ -569,7 +576,8 @@ export class CriteriaDateRangeInput extends React.Component{
        
     }
     render(){
-        return <RangePicker value={this.state.value} onChange={evt=>{
+        const {enable} = this.props
+        return <RangePicker disabled={!enable} value={this.state.value} onChange={evt=>{
             this.onChange(evt.target.value)
         }}>
         </RangePicker>
@@ -588,10 +596,10 @@ export class CriteriaDateTimeRangeInput extends React.Component{
         onchange && onChange([strValue,strValue2])
     }
     render(){
-        const {value}=this.props
+        const {value,enable}=this.props
         let mValue=moment(value[0],["YYYY-MM-DD HH:mm:ss","YYYY-MM-DD"])
         let mValue2=moment(value[1],["YYYY-MM-DD HH:mm:ss","YYYY-MM-DD"])
-        return <RangePicker value={[mValue,mValue2]} onChange={evt=>{
+        return <RangePicker disabled={!enable} value={[mValue,mValue2]} onChange={evt=>{
             this.onChange(evt.target.value)
         }}>
         </RangePicker>
@@ -628,7 +636,7 @@ export class ChinaFullAddress extends React.Component{
     }
 
     render(){
-        const {onChange,value} = this.props
+        const {onChange,value,enable} = this.props
         let jVal ={}
         try
         {
@@ -648,7 +656,7 @@ export class ChinaFullAddress extends React.Component{
         }
         return <div>
                 <div>
-                    <Cascader placeholder="选择 省份/市/区/县" value={rVal} options={this.options} onChange={
+                    <Cascader disabled={!enable} placeholder="选择 省份/市/区/县" value={rVal} options={this.options} onChange={
                         v=>{
                             let nVal= Object.assign({},jVal,{province:v[0],city:v[1],district:v[2]})
 

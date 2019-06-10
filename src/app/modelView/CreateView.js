@@ -17,6 +17,7 @@ import {getModelView} from './ModelViewRegistry'
 import {produce} from 'immer'
 import { Divider } from "../../ui"
 import { VIEW_COMMON_FIELDS_TAB_TITLE, VIEW_COMMON_FIELDS_TAB_KEY } from '../ReservedKeyword';
+import { testCriteria } from './ViewFieldCriteria';
 class CreateView extends React.Component{
     constructor(props){
         super(props)
@@ -57,9 +58,11 @@ class CreateView extends React.Component{
         const ownerField= (viewParam||{}).ownerField
         const  {view,data,triggerGroups,subViews}=(viewData||{})
         const createData = data && data.record
+        console.log(createData)
         let relationViews = (subViews||[]).filter((subView)=>{
             return subView.refView.style===ViewFieldStyle.RELATION
         })
+        let showFields = ((view&&view.fields)||[]).filter(x=>x.visibleCriteria.test(createData))||[]
         return <hookView.HookProvider value={{cmmHost:self.cmmHost,parent:self}}>
                 <div className="bg-model-op-view bg-flex-full ">
                 <hookView.Hook hookTag="actions"  render={()=>{
@@ -106,8 +109,8 @@ class CreateView extends React.Component{
                                 return <div className="bg-model-op-view-body-main">
                                         {/*  body-main-h begin  */}
                                         <hookView.Hook hookTag="body-main-h"  render={()=>{
-                                            let mainFields = view&&view.fields.filter(x=>x.style==ViewFieldStyle.HEAD)||[]
-                                            let subMainFields = view&&view.fields.filter(x=>x.style==ViewFieldStyle.SUB_HEAD)||[]
+                                            let mainFields = showFields.filter(x=>x.style==ViewFieldStyle.HEAD)||[]
+                                            let subMainFields = showFields.filter(x=>x.style==ViewFieldStyle.SUB_HEAD)||[]
                                             return <div className="bg-model-op-view-body-main-h">
                                                         <div className="bg-model-op-view-body-main-h1">
                                                             <Form>
@@ -118,12 +121,13 @@ class CreateView extends React.Component{
                                                                         let meta=field.meta
                                                                         let ctrlProps = field.ctrlProps
                                                                         let nValue=createData&&createData[field.name]!==undefined?createData[field.name]:""
+                                                                        let enable = testCriteria(field.enableCriteria,createData)
                                                                         const FieldComponent=ViewFieldTypeRegistry.getComponent(type)
                                                                         let key=`${field.app}_${field.model}_${field.name}`
                                                                         return <Form.Item label={field.title} key={`form-item${key}`}>
                                                                                     <FieldComponent onChange={(value)=>{
                                                                                         self.onFieldValueChange(field,value)
-                                                                                    }} value={nValue } key={key} meta={meta} ctrlProps={ctrlProps} title={field.title} relationData={field.relationData} field={field}></FieldComponent>    
+                                                                                    }} value={nValue } key={key} meta={meta} enable={enable} ctrlProps={ctrlProps} title={field.title} relationData={field.relationData} field={field}></FieldComponent>    
                                                                             </Form.Item>
                                                                     })
                                                             }
@@ -141,10 +145,11 @@ class CreateView extends React.Component{
                                                                         const FieldComponent=ViewFieldTypeRegistry.getComponent(type)
                                                                         let nValue=createData&&createData[field.name]!==undefined?createData[field.name]:""
                                                                         let key=`${field.app}_${field.model}_${field.name}`
+                                                                        let enable = testCriteria(field.enableCriteria,createData)
                                                                         return <Form.Item label={field.title} key={`form-item${key}`}>
                                                                                 <FieldComponent onChange={(value)=>{
                                                                                         self.onFieldValueChange(field,value)
-                                                                                    }} value={nValue} key={key} meta={meta} ctrlProps={ctrlProps} title={field.title} relationData={field.relationData} field={field}></FieldComponent>    
+                                                                                    }} value={nValue} key={key} meta={meta} enable={enable} ctrlProps={ctrlProps} title={field.title} relationData={field.relationData} field={field}></FieldComponent>    
                                                                             </Form.Item>
                                                                     })
                                                             } 
@@ -157,7 +162,7 @@ class CreateView extends React.Component{
 
                                         {/*  body-main-label begin  */}
                                         <hookView.Hook hookTag="body-main-label"  render={()=>{
-                                            let fields=(view&&view.fields.filter(x=>{
+                                            let fields=(showFields.filter(x=>{
                                                 return x.style==ViewFieldStyle.LABEL
                                             })||[])
                                             return <div className="bg-model-op-view-body-main-label">
@@ -168,10 +173,12 @@ class CreateView extends React.Component{
                                                                     let ctrlProps = field.ctrlProps
                                                                     let meta = field.meta
                                                                     const FieldComponent=ViewFieldTypeRegistry.getComponent(type)
+                                                                    let enable = testCriteria(field.enableCriteria,createData)
                                                                     return <FieldComponent 
                                                                             title={field.title} 
                                                                             icon={field.icon} 
                                                                             ctrlProps={ctrlProps}
+                                                                            enable={enable}
                                                                             meta={meta}
                                                                             className="bg-op-label" 
                                                                             iconClassName="bg-op-label-icon"
@@ -275,7 +282,7 @@ class CreateView extends React.Component{
                                             {/* common begin */}
                                             <hookView.Hook  hookTag="body-common"  render={()=>{
                                                 let commonGroupFields=[]
-                                                for(var fd of (view||{}).fields||[]){
+                                                for(var fd of showFields){
                                                     if(fd.style===ViewFieldStyle.NORMAL){
                                                         let currGF=null
                                                         if(fd.colSpan>1){
@@ -319,9 +326,12 @@ class CreateView extends React.Component{
                                                                     let meta2=null
                                                                     let ctrlProps1=null
                                                                     let ctrlProps2=null
+                                                                    let enable1 =true
+                                                                    let enable2 =true
                                                                     const  Com2=gfs.components.length>1?gfs.components[1]:null
                                                                     if(Com1){
                                                                         let fd=gfs.fields[0]
+                                                                        enable1 = testCriteria(fd.enableCriteria,createData)
                                                                         meta1=fd.meta
                                                                         ctrlProps1=fd.ctrlProps
                                                                         key1=`${fd.app}_${fd.model}_${fd.name}`
@@ -336,6 +346,7 @@ class CreateView extends React.Component{
                                                                     }
                                                                     if(Com2){
                                                                         let fd=gfs.fields[1]
+                                                                        enable2 = testCriteria(fd.enableCriteria,createData)
                                                                         meta2=fd.meta
                                                                         ctrlProps2=fd.ctrlProps
                                                                         value2=createData&&createData[fd.name]!==null?createData[fd.name]:""
@@ -355,14 +366,14 @@ class CreateView extends React.Component{
                                                                                     <Form.Item label={gfs.fields[0].title}>
                                                                                         <Com1 {...props1} onChange={(value)=>{
                                                                                                     self.onFieldValueChange(gfs.fields[0],value)
-                                                                                                }} key={key1} value={value1} meta={meta1} ctrlProps={ctrlProps1} relationData={gfs.fields[0].relationData} field={gfs.fields[0]}></Com1>
+                                                                                                }} key={key1} value={value1} enable={enable1} meta={meta1} ctrlProps={ctrlProps1} relationData={gfs.fields[0].relationData} field={gfs.fields[0]}></Com1>
                                                                                     </Form.Item>
                                                                                     </div>
                                                                                     <div className="bg-model-op-view-body-common-two-col-second">
                                                                                     {Com2!=null && (<Form.Item label={gfs.fields[1].title}>
                                                                                         <Com2 {...props2} onChange={(value)=>{
                                                                                                     self.onFieldValueChange(gfs.fields[1],value)
-                                                                                                }} key={key2} value={value2} meta={meta2} ctrlProps={ctrlProps2} relationData={gfs.fields[1].relationData} field={gfs.fields[1]}></Com2>
+                                                                                                }} key={key2} value={value2} meta={meta2} enable={enable2}  ctrlProps={ctrlProps2} relationData={gfs.fields[1].relationData} field={gfs.fields[1]}></Com2>
                                                                                     </Form.Item>)
                                                                                 }
                                                                                     </div>
@@ -374,7 +385,7 @@ class CreateView extends React.Component{
                                                                                 <Form.Item label={gfs.fields[0].title}>
                                                                                         <Com1 {...props1} onChange={(value)=>{
                                                                                                     self.onFieldValueChange(gfs.fields[0],value)
-                                                                                                }} key={key1} value={value1} meta={meta1} ctrlProp2={ctrlProps1} relationData={gfs.fields[0].relationData} field={gfs.fields[0]}></Com1>
+                                                                                                }} key={key1} value={value1} meta={meta1} enable={enable1} ctrlProps={ctrlProps1} relationData={gfs.fields[0].relationData} field={gfs.fields[0]}></Com1>
                                                                                     </Form.Item>  
                                                                                 </div>
                                                                             

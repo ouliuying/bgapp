@@ -17,6 +17,7 @@ import {getModelView} from './ModelViewRegistry'
 import {produce} from 'immer'
 import { Divider } from "../../ui"
 import { VIEW_COMMON_FIELDS_TAB_TITLE, VIEW_COMMON_FIELDS_TAB_KEY } from '../ReservedKeyword';
+import { testCriteria } from './ViewFieldCriteria';
 class DetailView extends React.Component{
     constructor(props){
         super(props)
@@ -54,6 +55,7 @@ class DetailView extends React.Component{
         let relationViews = (subViews||[]).filter((subView)=>{
             return subView.refView.style===ViewFieldStyle.RELATION
         })
+        let showFields = ((viewMeta&&viewMeta.fields)||[]).filter(x=>x.visibleCriteria.test(detailData))||[]
         return <hookView.HookProvider value={{cmmHost:self.cmmHost,parent:self}}>
                 <div className="bg-model-op-view bg-flex-full ">
                 {
@@ -112,10 +114,10 @@ class DetailView extends React.Component{
                                 return <div className="bg-model-op-view-body-main">
                                         {/*  body-main-h begin  */}
                                         <hookView.Hook hookTag="body-main-h"  render={()=>{
-                                            let mainFields = viewMeta&&viewMeta.fields.filter(x=>{
+                                            let mainFields = showFields.filter(x=>{
                                                 return x.style==ViewFieldStyle.HEAD
                                             })||[]
-                                            let subMainFields = viewMeta&&viewMeta.fields.filter(x=>{
+                                            let subMainFields = showFields.filter(x=>{
                                                 return x.style==ViewFieldStyle.SUB_HEAD
                                             })||[]
                                             return <div className="bg-model-op-view-body-main-h">
@@ -126,6 +128,7 @@ class DetailView extends React.Component{
                                                             mainFields.map((field,index)=>{
                                                                     let type=field.type
                                                                     let meta=field.meta
+                                                                    let enable = testCriteria(field.enableCriateria,detailData)
                                                                     let ctrlProps = field.ctrlProps
                                                                     let nValue=detailData&&detailData[field.name]!==undefined?detailData[field.name]:""
                                                                     const FieldComponent=ViewFieldTypeRegistry.getComponent(type)
@@ -133,7 +136,7 @@ class DetailView extends React.Component{
                                                                     return<Form.Item label={field.title} key={`form-item${key}`}>
                                                                                 <FieldComponent onChange={(value)=>{
                                                                                     host.onFieldValueChange(field,value)
-                                                                                }} value={nValue } key={key} meta={meta} ctrlProps={ctrlProps} title={field.title} relationData={field.relationData}></FieldComponent>    
+                                                                                }} value={nValue } key={key} meta={meta} enable={enable} ctrlProps={ctrlProps} title={field.title} relationData={field.relationData}></FieldComponent>    
                                                                         </Form.Item>
                                                                 })
                                                         }
@@ -148,6 +151,7 @@ class DetailView extends React.Component{
                                                                 subMainFields.map((field,index)=>{
                                                                     let type=field.type
                                                                     let meta=field.meta
+                                                                    let enable = testCriteria(field.enableCriateria,detailData)
                                                                     let ctrlProps = field.ctrlProps
                                                                     const FieldComponent=ViewFieldTypeRegistry.getComponent(type)
                                                                     let nValue=detailData&&detailData[field.name]!==undefined?detailData[field.name]:""
@@ -155,7 +159,7 @@ class DetailView extends React.Component{
                                                                     return <Form.Item label={field.title} key={`form-item${key}`}>
                                                                             <FieldComponent onChange={(value)=>{
                                                                                     host.onFieldValueChange(field,value)
-                                                                                }} value={nValue} key={key} meta={meta} ctrlProps={ctrlProps} title={field.title} relationData={field.relationData}></FieldComponent>    
+                                                                                }} value={nValue} key={key} meta={meta} enable={enable} ctrlProps={ctrlProps} title={field.title} relationData={field.relationData}></FieldComponent>    
                                                                         </Form.Item>
                                                                 })
                                                         } 
@@ -177,12 +181,14 @@ class DetailView extends React.Component{
                                                                     let type=field.type
                                                                     let key=`${field.app}_${field.model}_${field.name}`
                                                                     let meta = field.meta
+                                                                    let enable = testCriteria(field.enableCriateria,detailData)
                                                                     let ctrlProps = field.ctrlProps
                                                                     const FieldComponent=ViewFieldTypeRegistry.getComponent(type)
                                                                     return <FieldComponent 
                                                                             title={field.title} 
                                                                             icon={field.icon}
                                                                             meta={meta}
+                                                                            enable={enable}
                                                                             ctrlProps={ctrlProps}
                                                                             className="bg-op-label" 
                                                                             iconClassName="bg-op-label-icon"
@@ -286,7 +292,7 @@ class DetailView extends React.Component{
                                                 {/* common begin */}
                                                 <hookView.Hook  hookTag="body-common"  render={()=>{
                                                     let commonGroupFields=[]
-                                                    for(var fd of (viewMeta||{}).fields||[]){
+                                                    for(var fd of showFields){
                                                         if(fd.style===ViewFieldStyle.NORMAL){
                                                             let currGF=null
                                                             if(fd.colSpan>1){
@@ -330,9 +336,12 @@ class DetailView extends React.Component{
                                                                         let meta2=null
                                                                         let ctrlProps1=null
                                                                         let ctrlProps2=null
+                                                                        let enable1 =true
+                                                                        let enable2=true
                                                                         const  Com2=gfs.components.length>1?gfs.components[1]:null
                                                                         if(Com1){
                                                                             let fd=gfs.fields[0]
+                                                                            enable1=testCriteria(fd.enableCriateria,detailData)
                                                                             meta1=fd.meta
                                                                             ctrlProps1=fd.ctrlProps
                                                                             key1=`${fd.app}_${fd.model}_${fd.name}`
@@ -347,6 +356,7 @@ class DetailView extends React.Component{
                                                                         }
                                                                         if(Com2){
                                                                             let fd=gfs.fields[1]
+                                                                            enable2=testCriteria(fd.enableCriateria,detailData)
                                                                             meta2=fd.meta
                                                                             ctrlProps2=fd.ctrlProps
                                                                             value2=detailData&&detailData[fd.name]!==null?detailData[fd.name]:""
@@ -366,14 +376,14 @@ class DetailView extends React.Component{
                                                                                         <Form.Item label={gfs.fields[0].title}>
                                                                                             <Com1 {...props1} onChange={(value)=>{
                                                                                                         host.onFieldValueChange(gfs.fields[0],value)
-                                                                                                    }} key={key1} value={value1} meta={meta1} ctrlProps={ctrlProps1} relationData={gfs.fields[0].relationData}></Com1>
+                                                                                                    }} key={key1} value={value1} meta={meta1} enable={enable1} ctrlProps={ctrlProps1} relationData={gfs.fields[0].relationData}></Com1>
                                                                                         </Form.Item>
                                                                                         </div>
                                                                                         <div className="bg-model-op-view-body-common-two-col-second">
                                                                                         {Com2!=null && (<Form.Item label={gfs.fields[1].title}>
                                                                                             <Com2 {...props2} onChange={(value)=>{
                                                                                                         host.onFieldValueChange(gfs.fields[1],value)
-                                                                                                    }} key={key2} value={value2} meta={meta2} ctrlProps={ctrlProps2} relationData={gfs.fields[1].relationData}></Com2>
+                                                                                                    }} key={key2} value={value2} meta={meta2} enable={enable2} ctrlProps={ctrlProps2} relationData={gfs.fields[1].relationData}></Com2>
                                                                                         </Form.Item>)
                                                                                     }
                                                                                         </div>
@@ -383,7 +393,7 @@ class DetailView extends React.Component{
                                                                                         <Form.Item label={gfs.fields[0].title}>
                                                                                             <Com1 {...props1} onChange={(value)=>{
                                                                                                         host.onFieldValueChange(gfs.fields[0],value)
-                                                                                                    }} key={key1} value={value1} meta={meta1} ctrlProps={ctrlProps1} relationData={gfs.fields[0].relationData}></Com1>
+                                                                                                    }} key={key1} value={value1} meta={meta1} enable={enable1} ctrlProps={ctrlProps1} relationData={gfs.fields[0].relationData}></Com1>
                                                                                         </Form.Item>  
                                                                                     </div>
                                                                                 

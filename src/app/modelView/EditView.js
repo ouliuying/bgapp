@@ -16,6 +16,7 @@ import {mapStateToProps} from './editViewMapStateToProps'
 import {getModelView} from './ModelViewRegistry'
 import {produce} from 'immer'
 import { VIEW_COMMON_FIELDS_TAB_TITLE, VIEW_COMMON_FIELDS_TAB_KEY } from '../ReservedKeyword';
+import { testCriteria } from './ViewFieldCriteria';
 class EditView extends React.Component{
     constructor(props){
         super(props)
@@ -33,7 +34,6 @@ class EditView extends React.Component{
     componentDidMount(){
         let {cmmHost} = this.props
         cmmHost.didMount(this)
-      
     }
     
     componentWillMount(){
@@ -57,6 +57,7 @@ class EditView extends React.Component{
         let relationViews = (subViews||[]).filter((subView)=>{
             return subView.refView.style===ViewFieldStyle.RELATION
         })
+        let showFields = ((viewMeta&&viewMeta.fields)||[]).filter(x=>x.visibleCriteria.test(editData))||[]
         return <hookView.HookProvider value={{cmmHost:self.cmmHost,parent:self}}>
                 <div className="bg-model-op-view bg-flex-full ">
                 {
@@ -115,10 +116,10 @@ class EditView extends React.Component{
                                 return <div className="bg-model-op-view-body-main">
                                         {/*  body-main-h begin  */}
                                         <hookView.Hook hookTag="body-main-h"  render={()=>{
-                                            let mainFields = viewMeta&&viewMeta.fields.filter(x=>{
+                                            let mainFields = showFields.filter(x=>{
                                                 return x.style==ViewFieldStyle.HEAD
                                             })||[]
-                                            let subMainFields = viewMeta&&viewMeta.fields.filter(x=>{
+                                            let subMainFields = showFields.filter(x=>{
                                                 return x.style==ViewFieldStyle.SUB_HEAD
                                             })||[]
                                             return <div className="bg-model-op-view-body-main-h">
@@ -129,6 +130,7 @@ class EditView extends React.Component{
                                                                 mainFields.map((field,index)=>{
                                                                         let type=field.type
                                                                         let meta=field.meta
+                                                                        let enable = testCriteria(field.enableCriteria,editData)
                                                                         let ctrlProps = field.ctrlProps
                                                                         let nValue=editData&&editData[field.name]!==undefined?editData[field.name]:""
                                                                         const FieldComponent=ViewFieldTypeRegistry.getComponent(type)
@@ -136,7 +138,7 @@ class EditView extends React.Component{
                                                                         return <Form.Item label={field.title} key={`form-item${key}`}>
                                                                                     <FieldComponent onChange={(value)=>{
                                                                                         self.onFieldValueChange(field,value)
-                                                                                    }} value={nValue } key={key} meta={meta} ctrlProps={ctrlProps} title={field.title} relationData={field.relationData}  field={field}>></FieldComponent>    
+                                                                                    }} value={nValue } key={key} meta={meta} enable={enable} ctrlProps={ctrlProps} title={field.title} relationData={field.relationData}  field={field}>></FieldComponent>    
                                                                             </Form.Item>
                                                                     })
                                                             }
@@ -148,6 +150,7 @@ class EditView extends React.Component{
                                                             {
                                                                     subMainFields.map((field,index)=>{
                                                                         let type=field.type
+                                                                        let enable = testCriteria(field.enableCriteria,editData)
                                                                         let meta=field.meta
                                                                         let ctrlProps = field.ctrlProps
                                                                         const FieldComponent=ViewFieldTypeRegistry.getComponent(type)
@@ -156,7 +159,7 @@ class EditView extends React.Component{
                                                                         return <Form.Item label={field.title} key={`form-item${key}`}>
                                                                                 <FieldComponent onChange={(value)=>{
                                                                                         self.onFieldValueChange(field,value)
-                                                                                    }} value={nValue} key={key} meta={meta} ctrlProps={ctrlProps} title={field.title} relationData={field.relationData} field={field}></FieldComponent>    
+                                                                                    }} value={nValue} key={key} meta={meta} enable={enable} ctrlProps={ctrlProps} title={field.title} relationData={field.relationData} field={field}></FieldComponent>    
                                                                             </Form.Item>
                                                                     })
                                                             } 
@@ -175,6 +178,7 @@ class EditView extends React.Component{
                                             return <div className="bg-model-op-view-body-main-label">
                                                 {
                                                     fields.map((field,index)=>{
+                                                                    let enable = testCriteria(field.enableCriteria,editData)
                                                                     let type=field.type
                                                                     let key=`${field.app}_${field.model}_${field.name}`
                                                                     let meta = field.meta
@@ -184,6 +188,7 @@ class EditView extends React.Component{
                                                                             title={field.title} 
                                                                             icon={field.icon} 
                                                                             meta={meta}
+                                                                            enable={enable}
                                                                             ctrlProps={ctrlProps}
                                                                             className="bg-op-label" 
                                                                             iconClassName="bg-op-label-icon"
@@ -271,7 +276,7 @@ class EditView extends React.Component{
                                               {/* common start */}
                                                <hookView.Hook  hookTag="body-common"  render={()=>{
                                                     let commonGroupFields=[]
-                                                    for(var fd of (viewMeta||{}).fields||[]){
+                                                    for(var fd of showFields){
                                                         if(fd.style===ViewFieldStyle.NORMAL){
                                                             let currGF=null
                                                             if(fd.colSpan>1){
@@ -315,9 +320,12 @@ class EditView extends React.Component{
                                                                         let meta2=null
                                                                         let ctrlProps1=null
                                                                         let ctrlProps2=null
+                                                                        let enable1 = true
+                                                                        let enable2 = true
                                                                         const  Com2=gfs.components.length>1?gfs.components[1]:null
                                                                         if(Com1){
                                                                             let fd=gfs.fields[0]
+                                                                            enable1=testCriteria(fd.enableCriteria,editData)
                                                                             meta1=fd.meta
                                                                             ctrlProps1=fd.ctrlProps
                                                                             key1=`${fd.app}_${fd.model}_${fd.name}`
@@ -332,6 +340,7 @@ class EditView extends React.Component{
                                                                         }
                                                                         if(Com2){
                                                                             let fd=gfs.fields[1]
+                                                                            enable1=testCriteria(fd.enableCriteria,editData)
                                                                             meta2=fd.meta
                                                                             ctrlProps2=fd.ctrlProps
                                                                             value2=editData&&editData[fd.name]!==null?editData[fd.name]:""
@@ -351,14 +360,14 @@ class EditView extends React.Component{
                                                                                         <Form.Item label={gfs.fields[0].title}>
                                                                                             <Com1 {...props1} onChange={(value)=>{
                                                                                                         self.onFieldValueChange(gfs.fields[0],value)
-                                                                                                    }} key={key1} value={value1} meta={meta1} ctrlProps={ctrlProps1} relationData={gfs.fields[0].relationData} field={gfs.fields[0]}></Com1>
+                                                                                                    }} key={key1} value={value1} meta={meta1} enable={enable1} ctrlProps={ctrlProps1} relationData={gfs.fields[0].relationData} field={gfs.fields[0]}></Com1>
                                                                                         </Form.Item>
                                                                                         </div>
                                                                                         <div className="bg-model-op-view-body-common-two-col-second">
                                                                                         {Com2!=null && (<Form.Item label={gfs.fields[1].title}>
                                                                                             <Com2 {...props2} onChange={(value)=>{
                                                                                                         self.onFieldValueChange(gfs.fields[1],value)
-                                                                                                    }} key={key2} value={value2} meta={meta2} ctrlProps={ctrlProps2} relationData={gfs.fields[1].relationData} field={gfs.fields[1]}></Com2>
+                                                                                                    }} key={key2} value={value2} meta={meta2} enable={enable2} ctrlProps={ctrlProps2} relationData={gfs.fields[1].relationData} field={gfs.fields[1]}></Com2>
                                                                                         </Form.Item>)
                                                                                     }
                                                                                         </div>
@@ -368,7 +377,7 @@ class EditView extends React.Component{
                                                                                         <Form.Item label={gfs.fields[0].title}>
                                                                                             <Com1 {...props1} onChange={(value)=>{
                                                                                                         self.onFieldValueChange(gfs.fields[0],value)
-                                                                                                    }} key={key1} value={value1} meta={meta1} ctrlProps={ctrlProps1} relationData={gfs.fields[0].relationData}  field={gfs.fields[0]}></Com1>
+                                                                                                    }} key={key1} value={value1} meta={meta1} enable={enable1} ctrlProps={ctrlProps1} relationData={gfs.fields[0].relationData}  field={gfs.fields[0]}></Com1>
                                                                                         </Form.Item>  
                                                                                     </div>
                                                                                 

@@ -21,6 +21,7 @@ import {createViewParam,createDetailParam} from '../modelView/ViewParam'
 import ViewType from '../modelView/ViewType'
 import {RECORD_TAG} from '../ReservedKeyword'
 import _ from 'lodash'
+import { createCriteria } from '../modelView/ViewFieldCriteria';
 export class CreateViewCMM extends ViewCMM{
 
     constructor(app,model,viewType){
@@ -81,9 +82,9 @@ export class CreateViewCMM extends ViewCMM{
 
     didMount(view){
         let self= this
-        let {viewParam, viewData,viewRefType}= view.props
+        let {viewParam,viewRefType}= view.props
         let {ownerField,ownerFieldValue,external,ownerModelID} = (viewParam||{})
-        let {getDatasource,setDatasource} = (external||{})
+        let {getDatasource} = (external||{})
         let rawOwnerFieldValue = self.getOwnerFieldRawFieldValue(this.app,this.model,ownerField,ownerFieldValue)
         let recordTag = ownerField?ownerField[RECORD_TAG]:undefined
         let datasource = getDatasource&&getDatasource(recordTag)
@@ -109,7 +110,7 @@ export class CreateViewCMM extends ViewCMM{
             self.app,
             self.model,
             self.viewType,
-            self.initDatasource(data.bag,datasource),
+            self.initDatasource(data.bag,datasource,ownerField,ownerFieldValue),
             ownerField
         )
         },function(err){
@@ -118,15 +119,68 @@ export class CreateViewCMM extends ViewCMM{
         })
     }
 
-    initDatasource(bag,datasource){
+    initDatasource(bag,datasource,ownerField,ownerFieldValue){
+      this.createFieldEnableAndVisibleCriteria(bag,ownerField,ownerFieldValue)
       if(datasource){
          bag["data"]=datasource
       }
       return bag
     }
     
-    getOwnerRelationFieldValues(view){
-      const {viewParam,viewData} = view.props
+    createFieldEnableAndVisibleCriteria(bag,ownerField,ownerFieldValue){
+      let {view,subViews} = bag||{}
+      let self = this
+      try{
+        ((view||{}).fields||[]).map(fd=>{
+            fd.visibleCriteria= createCriteria(fd.visible)
+            fd.enableCriteria = createCriteria(fd.enable)
+            return fd
+        })
+        if(ownerField && ownerFieldValue!==undefined){
+          let relFd = self.getOwnerRelationField((view||{}).fields,(view||{}).app,(view||{}).model,ownerField,ownerFieldValue)
+          if(relFd){
+            let rFD = ((view||{}).fields||[]).find(x=>x.name === relFd.name)
+            if(rFD){
+                rFD.enableCriteria=createCriteria("false")
+            }
+          }
+        }
+       
+        (subViews||[]).map(rv=>{
+           if(rv.view){
+              (rv.view.fields||[]).map(rfd=>{
+                rfd.visibleCriteria= createCriteria(rfd.visible)
+                rfd.enableCriteria = createCriteria(rfd.enable)
+                return rfd
+              })
+              let relFd = self.getOwnerRelationField(rv.view.fields,rv.view.app,rv.view.model,ownerField,ownerFieldValue)
+              if(relFd){
+                let rFD = ((view||{}).fields||[]).find(x=>x.name === relFd.name)
+                if(rFD){
+                    rFD.enableCriteria=createCriteria("false")
+                }
+              }
+           }
+           return rv
+        })
+      }
+      catch
+      {
+
+      }
+    }
+    
+    getOwnerRelationField(fields,app,model,ownerField,ownerFieldValue){
+      if(ownerField.relationData.targetApp===app && ownerField.relationData.targetModel===model){
+          return fields.find(x=>x.name===ownerField.relationData.targetField)
+      }
+      else if(ownerField.relationData.relationApp===app && ownerField.relationData.relationModel === model){
+          return fields.find(x=>x.name===ownerField.relationData.relationField)
+      }
+    }
+
+    getOwnerRelationFieldValues(viewParam,viewData){
+      //const {viewParam,viewData} = view.props
       let {ownerField,ownerFieldValue} = (viewParam||{})
       if(ownerField){
         if(ownerField.relationData.targetApp==this.app && ownerField.relationData.targetModel==this.model){
@@ -174,7 +228,8 @@ export class CreateViewCMM extends ViewCMM{
     // }
 
     onFieldValueChange(fd,value,view){
-      let relationFieldValues =this.getOwnerRelationFieldValues(view)
+      const {viewParam,viewData} = view.props
+      let relationFieldValues =this.getOwnerRelationFieldValues(viewParam,viewData)
       if(!relationFieldValues){
         setCreateContextFieldValue([[fd,value]])
       }
