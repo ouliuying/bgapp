@@ -115,7 +115,7 @@ const ViewFieldCirteriaOperator=[
     },
     {
         name:"none",
-        symbols:["*"],
+        symbols:[],
         test:(record)=>{
             return true
         }

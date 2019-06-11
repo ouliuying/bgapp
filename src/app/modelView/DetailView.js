@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 import {connect} from 'react-redux'
 import {ReducerRegistry} from '../../ReducerRegistry'
 import {
@@ -80,12 +80,14 @@ class DetailView extends React.Component{
                                         {
                                         mainActionGroup.triggers?(
                                             mainActionGroup.triggers.map(t=>{
-                                                    return <Button onClick={()=>{
+                                                    let enable = testCriteria(t.enableCriteria,detailData)
+                                                    let visible = testCriteria(t.visibleCriteria,detailData)
+                                                    return visible?<Button disabled={!enable} onClick={()=>{
                                                         host.doAction(self, t)
                                                     }} key={t.name}>{
                                                         t.title
                                                     }
-                                                    </Button>  
+                                                    </Button>:null 
                                             })
                                         ):null 
                                         }
@@ -95,9 +97,30 @@ class DetailView extends React.Component{
                                     
                                     <hookView.Hook hookTag="actions-sub-group"   render={
                                         ()=>{
-                                            return <div className="bg-model-op-view-actions-sub-group">
-                                            
-                                            </div>
+                                            let subActionGroups=triggerGroups&&triggerGroups.filter(x=>{
+                                                console.log(x.name)
+                                                return   x.name!="main"
+                                             })
+                                            return subActionGroups && subActionGroups.length>0?<div className="bg-model-op-view-actions-sub-group">
+                                                {
+                                                    subActionGroups.map(sg=>{
+                                                        return <Fragment key={sg.name}>
+                                                            {
+                                                                sg.triggers.map((t)=>{
+                                                                    let enable = testCriteria(t.enableCriteria,detailData)
+                                                                    let visible = testCriteria(t.visibleCriteria,detailData)
+                                                                    return visible?<Button disabled={!enable} onClick={()=>{
+                                                                                host.doAction(self, t)
+                                                                            }} key={t.name}>{
+                                                                                t.title
+                                                                            }
+                                                                            </Button>:null
+                                                                })
+                                                            } 
+                                                        </Fragment>
+                                                    })
+                                                }
+                                            </div>:null
                                         }
                                     }>
                                     </hookView.Hook>

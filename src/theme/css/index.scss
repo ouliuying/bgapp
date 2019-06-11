@@ -225,6 +225,7 @@ button:focus {
 }
 
 .bg-model-op-view-actions {
+    display: flex;
     background: $View-actions-background-color;
     margin: 5px;
     padding: 10px;

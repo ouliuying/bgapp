@@ -139,15 +139,20 @@ export class NumberField extends React.Component{
         const {value,onChange,getNumber,enable,...rest}=this.props
         const number=(getNumber||this.getNumber)(value)
         return <Input {...rest} value={number} disabled={!enable} onChange={(evt)=>{
-            onChange(evt.target.value)
+            onChange((getNumber||this.getNumber)(evt.target.value))
         }}></Input>
     }
 }
 export class RealField extends React.Component{
     render(){
-        const {enable,...rest} = this.props
-        return <NumberField enable={enable} {...rest} getNumber={(value)=>{
-            return value
+        const {enable,value:oldValue,...rest} = this.props
+
+        return <NumberField enable={enable} value={oldValue} {...rest} getNumber={(value)=>{
+            if(/^\d+(\.\d*)?$/.test(value))
+                return parseFloat(value)
+            else{
+                return oldValue
+            }
         }}>
         </NumberField>
     }

@@ -147,8 +147,19 @@ export class DetailViewCMM extends ViewCMM{
     }
       
       createFieldEnableAndVisibleCriteria(bag,ownerField,ownerFieldValue){
-        let {view,subViews} = bag||{}
+        let {view,subViews,triggerGroups} = bag||{}
         let self = this
+        try{
+            (triggerGroups||[]).map(tg=>{
+                tg.triggers.map(t=>{
+                    t.visibleCriteria = createCriteria(t.visible)
+                    t.enableCriteria = createCriteria(t.enable)
+                })
+            })
+        }
+        catch(ex){
+            console.log(ex)
+        }
         try{
           ((view||{}).fields||[]).map(fd=>{
               fd.visibleCriteria= createCriteria(fd.visible)
