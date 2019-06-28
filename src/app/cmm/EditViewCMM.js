@@ -268,6 +268,10 @@ export class EditViewCMM extends ViewCMM{
               if(external && external.setDatasource){
                  external.setDatasource(datasource)
               }
+              if(external.reload){
+                const r=external.reload
+                r&&r()
+              }
               external.close()
             }
             else{
@@ -286,7 +290,7 @@ export class EditViewCMM extends ViewCMM{
     }
 
     doAction(view,trigger){
-        this[trigger.name].call(this,view)
+        super.doAction(view,trigger)//this[trigger.name].call(this,view)
     }
  
     doReload(view){

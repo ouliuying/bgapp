@@ -10,7 +10,7 @@ import { ModelAction } from '../mq/ModelAction'
 import { getRoutePath,goRoute } from '../routerHelper'
 import {
     viewDataFromDetailContext} from '../reducers/appContext'
-import {createViewParam,createEditParam} from '../modelView/ViewParam'
+import {createViewParam,createEditParam, createDetailParam} from '../modelView/ViewParam'
 import ViewType from '../modelView/ViewType'
 import { createCriteria } from '../modelView/ViewFieldCriteria';
 export class DetailViewCMM extends ViewCMM{
@@ -209,7 +209,56 @@ export class DetailViewCMM extends ViewCMM{
         }
       }
     doAction(view,trigger){
-        this[trigger.name].call(this,view)
+        let self= this
+        if(!super.doAction(view,trigger)){
+            const {viewParam,viewRefType} = view.props
+            const {orgState} = (viewParam||{})
+            let app = trigger.app=="*"?self.app:trigger.app
+            let model = trigger.model=="*"?self.model:trigger.model
+            let {ownerField,ownerFieldValue} = self.getFieldByFieldName(view,trigger.ownerField)
+            let ownerModelID = self.getModelID(view)
+            let subModelID = (ownerFieldValue!==null && ownerFieldValue!==undefined && ownerFieldValue instanceof Object)?((ownerFieldValue||{}).record||{}).id:undefined
+            if(ownerField){
+                if(trigger.viewType===ViewType.LIST){
+                    
+                }
+                else if(trigger.viewType=== ViewType.CREATE){
+                    let createParam = createViewParam(ownerField,ownerFieldValue,ownerModelID,{
+                        reload:()=>{
+                            self.didMount(view)
+                        }
+                    },orgState)
+                    this.showAppModelViewInModalQueue(app,model,trigger.viewType,trigger.viewRefType,createParam)
+                }
+                else if(trigger.viewType===ViewType.EDIT){
+                    let eViewParam = createEditParam(ownerField,
+                        ownerFieldValue,
+                        ownerModelID,
+                        subModelID,
+                        {
+                            reload:()=>{
+                                self.didMount(view)
+                            }
+                        },
+                        orgState)
+                    this.showAppModelViewInModalQueue(app,model,trigger.viewType,trigger.viewRefType,eViewParam)
+                }
+                else if(trigger.viewType === ViewType.DETAIL){
+                    let dViewParam = createDetailParam(ownerField,ownerFieldValue,ownerModelID,subModelID,{
+
+                    },orgState)
+                    this.showAppModelViewInModalQueue(app,model,trigger.viewType,trigger.viewRefType,dViewParam)
+                }
+            }
+           
+        }
+    }
+    getFieldByFieldName(view,fieldName){
+        const {viewData}=view.props
+        const  {view:viewMeta,data}=viewData
+        let ownerField = viewMeta.fields.find(x=>x.name==fieldName)
+        let ownerFieldValue = ((data||{}).record||{})[fieldName]
+        return {ownerField,ownerFieldValue}
     }
     toEdit(view,trigger){
         var id = this.getModelID(view)

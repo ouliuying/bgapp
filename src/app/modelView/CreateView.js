@@ -18,6 +18,7 @@ import {produce} from 'immer'
 import { Divider } from "../../ui"
 import { VIEW_COMMON_FIELDS_TAB_TITLE, VIEW_COMMON_FIELDS_TAB_KEY } from '../ReservedKeyword';
 import { testCriteria } from './ViewFieldCriteria';
+import { realpath } from 'fs';
 class CreateView extends React.Component{
     constructor(props){
         super(props)
@@ -62,6 +63,9 @@ class CreateView extends React.Component{
             return subView.refView.style===ViewFieldStyle.RELATION
         })
         let showFields = ((view&&view.fields)||[]).filter(x=>testCriteria(x.visibleCriteria,createData))||[]
+        relationViews = relationViews.filter(rv=>{
+           return  showFields.findIndex(x=>x.name == rv.refView.fieldName)>-1
+        })
         return <hookView.HookProvider value={{cmmHost:self.cmmHost,parent:self}}>
                 <div className="bg-model-op-view bg-flex-full ">
                 <hookView.Hook hookTag="actions"  render={()=>{

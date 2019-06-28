@@ -1,5 +1,46 @@
 
-
+function getRecordValue(record,fieldName){
+    let v =undefined
+    if(record===undefined || record===null){
+        return v
+    }
+    if(fieldName.indexOf(".")<0){
+        v = record[fieldName]
+    }
+    else{
+        let deepFields = fieldName.split(".")
+        let obj = record
+        for(let subField of deepFields){
+            
+           v= obj[subField]
+           if(v &&v.app && v.model && v.record){
+             v=v.record
+           }
+           if(v==undefined || v==null){
+               break;
+           }
+           obj = v
+        }
+    }
+    if(v==="null"){
+        return null
+    }
+    if(v==="undefined"){
+        return undefined
+    }
+    return v
+}
+function getTestValue(tv){
+    if(tv==="undefined"){
+        return undefined
+    }
+    else if(tv==="null"){
+        return null
+    }
+    else {
+        return tv
+    }
+}
 const ViewFieldCirteriaOperator=[
     {
         name:"or",
@@ -7,7 +48,7 @@ const ViewFieldCirteriaOperator=[
         test:(exp,startIndex)=>{
             for(let s of ["or","或","||"]){
                 let ss = ` ${s} `
-                if(exp.indexOf(ss,startIndex)===0){
+                if(exp.indexOf(ss,startIndex)===startIndex){
                     return ss.length
                 }
             }
@@ -20,7 +61,7 @@ const ViewFieldCirteriaOperator=[
         test:(exp,startIndex)=>{
              for(let s of ["and","并","与","&&"]){
                 let ss = ` ${s} `
-                if(exp.indexOf(ss,startIndex)===0){
+                if(exp.indexOf(ss,startIndex)===startIndex){
                     return ss.length
                 }
             }
@@ -31,7 +72,7 @@ const ViewFieldCirteriaOperator=[
         name:"no_eq",
         symbols:["!=","<>","不等"],
         test:(record,fieldName,testValue)=>{
-            let v = record[fieldName]
+            let v = getRecordValue(record,fieldName)
             return v!=testValue
         }
     },
@@ -40,40 +81,45 @@ const ViewFieldCirteriaOperator=[
         index:1,
         symbols:["=","eq","等于","相同"],
         test:(record,fieldName,testValue)=>{
-            let v = record[fieldName]
-            return v == testValue
+            let v = getRecordValue(record,fieldName)
+            let tv=getTestValue(testValue)
+            return v == tv
         }
     },
     {
         name:"gt",
         symbols:[">","大于"],
         test:(record,fieldName,testValue)=>{
-            let v = record[fieldName]
-            return v > testValue
+            let v = getRecordValue(record,fieldName)
+            let tv=getTestValue(testValue)
+            return v > tv
         }
     },
     {
         name:"lt",
         symbols:["<","小于"],
         test:(record,fieldName,testValue)=>{
-            let v = record[fieldName]
-            return v <=testValue
+            let v = getRecordValue(record,fieldName)
+            let tv=getTestValue(testValue)
+            return v < tv
         }
     },
     {
         name:"gt_eq",
         symbols:[">=","大于等于"],
         test:(record,fieldName,testValue)=>{
-            let v = record[fieldName]
-            return v >=testValue
+            let v = getRecordValue(record,fieldName)
+            let tv=getTestValue(testValue)
+            return v >=tv
         }
     },
     {
         name:"lt_eq",
         symbols:["<=","小于等于"],
         test:(record,fieldName,testValue)=>{
-            let v = record[fieldName]
-            return v <=testValue
+            let v = getRecordValue(record,fieldName)
+            let tv=getTestValue(testValue)
+            return v <=tv
         }
     },
     {
@@ -81,8 +127,9 @@ const ViewFieldCirteriaOperator=[
         symbols:["in","包含在"],
         test:(record,fieldName,testValue)=>{
             if(testValue instanceof Array){
-                let v = record[fieldName]
-                return testValue.indexOf(v)>-1
+                let v = getRecordValue(record,fieldName)
+                let tv=getTestValue(testValue)
+                return tv.indexOf(v)>-1
             }
             else{
                 return false
@@ -95,8 +142,9 @@ const ViewFieldCirteriaOperator=[
         symbols:["not in","不包含在"],
         test:(record,fieldName,testValue)=>{
             if(testValue instanceof Array){
-                let v = record[fieldName]
-                return testValue.indexOf(v)<0
+                let v = getRecordValue(record,fieldName)
+                let tv=getTestValue(testValue)
+                return tv.indexOf(v)<0
             }
             else{
                 return true
@@ -133,18 +181,18 @@ export const testCriteria=(criterias,record)=>{
     let lastSymbal = undefined
     if(criterias instanceof Array){
         for(let c of criterias){
-           ret = testCriteria(c)
+           //ret = testCriteria(c.criteria,record)
            if(lastSymbal==="or"){
-                ret = ret || createCriteria(c,record)
-                lastSymbal = c.symbol
+                ret = ret || testCriteria(c.criteria,record)
+                lastSymbal = c.op
            }
            else if(lastSymbal==="and"){
-            ret = ret && createCriteria(c,record)
-            lastSymbal = c.symbol
+            ret = ret && testCriteria(c.criteria,record)
+            lastSymbal = c.op
            }    
            else{
-                ret = testCriteria(c,record)
-                lastSymbal = c.symbol
+                ret = testCriteria(c.criteria,record)
+                lastSymbal = c.op
            }
         }
     }
@@ -186,7 +234,7 @@ function createCriteriaImp(expr){
                         return false
                     }
                     let rr = x.symbols.join("|")
-                    let rj = `^([a-zA-A][a-zA-Z0-9]{0,255})(\\s+)?(${rr})(\\s+)?([\\s\\S]*)`
+                    let rj = `^([a-zA-A][a-zA-Z0-9\\.]{0,255})(\\s+)?(${rr})(\\s+)?([\\s\\S]*)`
                     if(new RegExp(rj).test(exprLogicTokens[0].expr)){
                         return true
                     }

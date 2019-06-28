@@ -262,8 +262,8 @@ export class CreateViewCMM extends ViewCMM{
       let self=this
       const {viewParam,viewData} = view.props
       const {ownerField,orgState,external}=(viewParam||{})
-      let {getDatasource,setDatasource,close} = (external||{})
-      if(close && setDatasource){
+      let {getDatasource,setDatasource,close,reload} = (external||{})
+       if(close && setDatasource){
         let tag = ownerField[RECORD_TAG]
         let datasource = _.cloneDeep(viewData.data||{})
         datasource[RECORD_TAG]=tag
@@ -274,6 +274,11 @@ export class CreateViewCMM extends ViewCMM{
         let createData= buildServerCreateData(self.app,self.model,self.viewType,ownerField,orgState)
         new ModelAction(this.app,this.model).call("create",createData,function(res){
             if(res.errorCode==0){
+                if(reload){
+                   reload()
+                   close && close()
+                   return
+                }
                 var newID=res.bag["id"]
                 self.showDetail(view,newID)
             }
@@ -291,7 +296,7 @@ export class CreateViewCMM extends ViewCMM{
   }
   
   doAction(view,trigger){
-     this[trigger.name].call(this,view)
+     super.doAction(view,trigger)//this[trigger.name].call(this,view)
   }
 
   doCancel(view){

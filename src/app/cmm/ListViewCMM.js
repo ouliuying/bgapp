@@ -335,9 +335,10 @@ export class ListViewCMM extends  ViewCMM{
     }
 
     doAction(view,trigger){
-        if(this[trigger.name]){
-            this[trigger.name].call(this,view,trigger)
-        }
+        // if(this[trigger.name]){
+        //     this[trigger.name].call(this,view,trigger)
+        // }
+        super.doAction(view,trigger)
     }
 
     search(view){

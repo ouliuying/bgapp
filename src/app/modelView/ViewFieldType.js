@@ -15,8 +15,11 @@ import ViewRefType from './ViewRefType'
 import { createViewParam } from './ViewParam';
 import moment from 'moment';
 import chinaArea from '../../lib/china-area'
+import produce  from 'immer'
+import { instanceOf } from 'prop-types';
 const {RangePicker} = DatePicker
 const { TextArea } = Input
+
 export const ViewFieldType={
     TextField:'text',
     SingleLineTextField:'singleLineText',
@@ -71,15 +74,36 @@ export class StaticField extends React.Component{
 
 export class TextField extends React.Component{
     render(){
-        const {type,value,onChange,enable}=this.props
+        const {type,value,onChange,enable,relationData}=this.props
+        let showValue = value
+        if(relationData && (value instanceof Object)){
+            showValue=value.record[relationData.toName]
+        }
         try{
             return type==="singleLine"?(
-                <Input placeholder="请输入内容" disabled={!enable}  value={value} onChange={(evt)=>{
-                    onChange(evt.target.value)
+                <Input placeholder="请输入内容" disabled={!enable}  value={showValue} onChange={(evt)=>{
+                    if(relationData && (value instanceof Object)){
+                        onchange(produce(value,draft=>{
+                            draft.record=draft.record||{}
+                            draft.record[relationData.toName] = evt.target.value
+                        }))
+                    }
+                    else{
+                        onChange(evt.target.value)
+                    }
+                   
                 }}/>
             ):(
-                <TextArea value={value} placeholder="请输入内容" disabled={!enable} onChange={(evt)=>{
-                    onChange(evt.target.value)
+                <TextArea value={showValue} placeholder="请输入内容" disabled={!enable} onChange={(evt)=>{
+                    if(relationData && (value instanceof Object)){
+                        onchange(produce(value,draft=>{
+                            draft[relationData.toName] = evt.target.value
+                        }))
+                    }
+                    else{
+                        onChange(evt.target.value)
+                    }
+                   
                 }}/>
             )
         }

@@ -56,6 +56,9 @@ class DetailView extends React.Component{
             return subView.refView.style===ViewFieldStyle.RELATION
         })
         self.showFields = ((viewMeta&&viewMeta.fields)||[]).filter(x=>testCriteria(x.visibleCriteria,detailData))||[]
+        relationViews = relationViews.filter(rv=>{
+            return  self.showFields.findIndex(x=>x.name == rv.refView.fieldName)>-1
+         })
         return <hookView.HookProvider value={{cmmHost:self.cmmHost,parent:self}}>
                 <div className="bg-model-op-view bg-flex-full ">
                 {

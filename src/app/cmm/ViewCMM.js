@@ -30,7 +30,11 @@ export class ViewCMM{
     }
 
     doAction(view, trigger){
-        
+        const f = this[trigger.name]
+        if(f && f instanceof Function){
+             f.call(this,view,trigger)
+            return true
+        }
     }
 
     showAppModelViewInModalQueue(app,model,viewType,viewRefType,viewParam){

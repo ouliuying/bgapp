@@ -546,22 +546,54 @@ function buildServerModelDataObject(view,dataRecord,state,subViews){
             }
             else{
                 let {relationApp:app,relationModel:model} = f.relationData
-                let subView = (subViews||[]).find(x=>{
-                    return x.refView.fieldName == f.name
-                })
-                if(subView){
-                    let contextKey = getViewTypeViewDataContextkey(subView.refView.viewType)
-                    let createData=buildServerViewTypeData(app,model,subView.refView.viewType,contextKey,f,state)
-                    createData=removeRedundancyProperty(createData)
-                    if(createData.record && createData.record.length>0){
-                        record["relRegistries"]=record["relRegistries"]||{}
-                        record["relRegistries"][f.relationData.relationModel]=createData
+                if(subViews){
+                    let subView = (subViews||[]).find(x=>{
+                        return x.refView.fieldName == f.name
+                    })
+                    if(subView){
+                        let contextKey = getViewTypeViewDataContextkey(subView.refView.viewType)
+                        let createData=buildServerViewTypeData(app,model,subView.refView.viewType,contextKey,f,state)
+                        createData=removeRedundancyProperty(createData)
+                        if(createData.record && createData.record.length>0){
+                            record["relRegistries"]=record["relRegistries"]||{}
+                            record["relRegistries"][f.relationData.relationModel]=createData
+                        }
+                    }
+                    else{
+                        record[f.name]= removeRedundancyProperty(dataRecord[f.name])
                     }
                 }
+                else{
+                    record[f.name]= removeRedundancyProperty(dataRecord[f.name])
+                }
+
             }
         }
         else if(f.relationData.type=="One2Many"){
                 let {targetApp:app,targetModel:model} = f.relationData
+                if(subViews){
+                    let subView = subViews.find(x=>{
+                        return x.refView.fieldName == f.name
+                    })
+                    if(subView){
+                        let contextKey = getViewTypeViewDataContextkey(subView.refView.viewType)
+                        let createData=buildServerViewTypeData(app,model,subView.refView.viewType,contextKey,f,state)
+                        createData=removeRedundancyProperty(createData)
+                        if(createData.record && createData.record.length>0){
+                            record[f.name]=createData
+                        }
+                    }
+                    else{
+                        record[f.name]= removeRedundancyProperty(dataRecord[f.name])
+                    }
+                }
+                else{
+                    record[f.name]= removeRedundancyProperty(dataRecord[f.name])
+                }
+        }
+        else if(f.relationData.type=="VirtualOne2One" || f.relationData.type=="One2One"){
+            let {targetApp:app,targetModel:model} = f.relationData
+            if(subViews){
                 let subView = subViews.find(x=>{
                     return x.refView.fieldName == f.name
                 })
@@ -569,23 +601,16 @@ function buildServerModelDataObject(view,dataRecord,state,subViews){
                     let contextKey = getViewTypeViewDataContextkey(subView.refView.viewType)
                     let createData=buildServerViewTypeData(app,model,subView.refView.viewType,contextKey,f,state)
                     createData=removeRedundancyProperty(createData)
-                    if(createData.record && createData.record.length>0){
+                    if(createData.record && Object.keys(createData.record).length>0){
                         record[f.name]=createData
                     }
                 }
-        }
-        else if(f.relationData.type=="VirtualOne2One" || f.relationData.type=="One2One"){
-            let {targetApp:app,targetModel:model} = f.relationData
-            let subView = subViews.find(x=>{
-                return x.refView.fieldName == f.name
-            })
-            if(subView){
-                let contextKey = getViewTypeViewDataContextkey(subView.refView.viewType)
-                let createData=buildServerViewTypeData(app,model,subView.refView.viewType,contextKey,f,state)
-                createData=removeRedundancyProperty(createData)
-                if(createData.record && Object.keys(createData.record).length>0){
-                    record[f.name]=createData
+                else{
+                    record[f.name]= removeRedundancyProperty(dataRecord[f.name])
                 }
+            }
+            else{
+                record[f.name]= removeRedundancyProperty(dataRecord[f.name])
             }
         }
         else{
