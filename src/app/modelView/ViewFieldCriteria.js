@@ -281,7 +281,7 @@ function createSamePriorityExprLogicToken(expr){
                 leftBracketCount = leftBracketCount + 1
             }
             else if(c===")"){
-                leftBracketCount = leftBracketCount + 1
+                leftBracketCount = leftBracketCount - 1
             }
             else if(index<(count-1) && c==="'" && expr.expr[index+1]!=="'"){
                 inStringModel=true

@@ -247,6 +247,12 @@ export const ModalSheetManager={
             title:title,
             content:msg
         })
+    },
+    alert(props){
+        this.openAlert(props)
+    },
+    confirm(props){
+        this.openConfirm(props)
     }
 }
 

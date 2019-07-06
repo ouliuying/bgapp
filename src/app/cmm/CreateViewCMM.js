@@ -272,7 +272,7 @@ export class CreateViewCMM extends ViewCMM{
       }
       else{
         let createData= buildServerCreateData(self.app,self.model,self.viewType,ownerField,orgState)
-        new ModelAction(this.app,this.model).call("create",createData,function(res){
+        createData && createData.record && (new ModelAction(this.app,this.model).call("create",createData,function(res){
             if(res.errorCode==0){
                 if(reload){
                    reload()
@@ -291,7 +291,7 @@ export class CreateViewCMM extends ViewCMM{
               ModalSheetManager.openAlert({title:"提示",
               msg:"通讯失败！"
               })
-            })
+            }))
       }
   }
   

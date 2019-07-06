@@ -261,7 +261,8 @@ export class EditViewCMM extends ViewCMM{
         let datasource = _.cloneDeep(viewData.data||{})
         const {ownerField,orgState,external}=(viewParam||{})
         let editData= buildServerEditData(self.app,self.model,self.viewType,ownerField,orgState)
-        new ModelAction(this.app,this.model).call("edit",editData,function(res){
+
+        editData && editData.record && (new ModelAction(this.app,this.model).call("edit",editData,function(res){
         if(res.errorCode==0){
             
             if(external && external.close){
@@ -286,7 +287,7 @@ export class EditViewCMM extends ViewCMM{
        
         },function(err){
           ModalSheetManager.alert({title:"提示",msg:"通讯失败！"})
-        })
+        }))
     }
 
     doAction(view,trigger){

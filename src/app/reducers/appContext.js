@@ -650,12 +650,85 @@ function buildServerModelDataArray(app,model,viewType,data,ownerField,state){
     return records
 }
 
+
+function flushServerData(data,newData){
+     newData.app=data.app
+     newData.model=data.model
+    if(data.record instanceof Object){
+        let r = flushServerModelRecord(data.record)
+        if(r){
+            newData.record=r
+        }
+    }
+    else if(data.record instanceof Array){
+        newData.record=[]
+        for(let dr of data.record){
+            let r = flushServerModelRecord(dr)
+            if(r){
+                newData.record.push(r)
+            }
+        }
+    }
+}
+function flushServerModelRecord(record){
+    let newRecord={}
+    Object.keys(record).map(key=>{
+        if(key === "relRegistries"){
+            let v = record[key]
+            let relValue={}
+            if(v){
+                Object.keys(v).map(mKey=>{
+                    let nr = flushServerModelRecord(v[mKey].record)
+                    if(nr){
+                        relValue[mKey]={
+                            app:v[mKey].app,
+                            model:v[mKey].model,
+                            record:nr
+                        }
+                    }
+                })
+            }
+            if(Object.keys(relValue).length>0){
+                newRecord["relRegistries"]=relValue
+            }
+        }
+        else{
+            let v = record[key]
+            if((v instanceof Object) && v.app && v.model){
+                let newData ={}
+                flushServerData(v,newData)
+                if(newData.record && newData.record){
+                    if(newData.record instanceof Array){
+                        if(newData.record.length>0){
+                            newRecord[key]=newData
+                        }
+                    }
+                    else{
+                        newRecord[key]=newData
+                    }
+                }
+            }
+            else{
+                newRecord[key]=v
+            }
+        }
+    })
+    if(Object.keys(newRecord).length>0){
+        return newRecord
+    }
+}
 export function buildServerCreateData(app,model,viewType,ownerField,state){
-    return buildServerViewTypeData(app,model,viewType,CREATE_VIEW_DATA,ownerField,state)
+    let data= buildServerViewTypeData(app,model,viewType,CREATE_VIEW_DATA,ownerField,state)
+    let newData={}
+    flushServerData(data,newData)
+    return newData
 }
 
 export function buildServerEditData(app,model,viewType,ownerField,state){
-    return buildServerViewTypeData(app,model,viewType,EDIT_VIEW_DATA,ownerField,state)
+    let data= buildServerViewTypeData(app,model,viewType,EDIT_VIEW_DATA,ownerField,state)
+    let newData={}
+    flushServerData(data,newData)
+    return newData
 }
 export function buildServerListData(app,model,viewType,ownerField,state){
     return buildServerViewTypeData(app,model,viewType,LIST_VIEW_DATA,ownerField,state)

@@ -14,7 +14,14 @@ export function createViewParam(
             orgState
         }
 }
-
+export function createModelActionParam(modelID,ownerField,external,orgState){
+    return {
+        modelID,
+        ownerField,
+        external,
+        orgState
+    }
+}
 export function createDetailParam(ownerField,
     ownerFieldValue,
     ownerModelID,

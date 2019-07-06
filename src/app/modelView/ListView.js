@@ -31,7 +31,7 @@ class ListView extends React.Component{
     }
    
     componentDidMount(){
-        console.log("listview componentDidMount")
+       // console.log("listview componentDidMount")
        // window.addEventListener("resize", ()=>{this.windowSizeUpdate()});
         this.cmmHost.didMount(this)
     }

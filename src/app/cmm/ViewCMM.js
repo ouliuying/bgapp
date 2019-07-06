@@ -49,6 +49,19 @@ export class ViewCMM{
             })
         )
     }
+    showAppModelViewModelActionInModalQueue(app,model,viewType,viewRefType,viewParam,actionName){
+        let view = getModelView(app,model,viewType)
+        view && (
+            ModalSheetManager.openModal(view,{
+                app,
+                model,
+                viewType,
+                viewParam,
+                viewRefType,
+                actionName
+            })
+        )
+    }
 }
 
 
