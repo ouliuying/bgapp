@@ -23,7 +23,7 @@ const ChatApp = createIconFromSvg({
 })
 
 const AddRmApp = createIconFromSvg({
-    src:"/icon/res/add_rm_app.svg",
+    src:"/icon/res/icon_more.svg",
     svgStyle:{
         width:28,
         height:28,

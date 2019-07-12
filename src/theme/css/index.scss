@@ -69,8 +69,8 @@ body {
 }
 
 .bg-app-frame-header-icon {
-    background: $logo-background-color;
-    flex-basis: 143px;
+    background: $primary-background-color;
+    flex-basis: 180px;
     align-items: center;
     display: flex;
     color: white;
@@ -81,7 +81,9 @@ body {
     height:48px;
 }
 .bg-app-frame-header-icon span {
-    font-size: 18px;
+    font-size: 25px;
+    margin-left: 5px;
+    letter-spacing: 0.099em;
 }
 
 .bg-app-frame-header-nav {
@@ -139,7 +141,7 @@ body {
 .bg-app-shortcut-action-btn {
  
     display: flex;
-    color:#bfcbd9;
+    color:white;
     cursor: pointer;
     align-items: center;
     padding: 0px 10px;
@@ -147,7 +149,7 @@ body {
 .bg-app-shortcut-action-btn:hover,
 .bg-app-shortcut-action-btn.active
 {
-    color:#d3dfee;
+    color:white;
     background: $logo-bottom-color;
 }
 
@@ -652,7 +654,6 @@ button:focus {
     position: absolute;
     top:15%;
     width:80%;
-    min-height:60%;
     left: 50%;
     transform: translateX(-50%);
     background: $primary-color;
@@ -690,7 +691,6 @@ button:focus {
   .bg-sheet-dialog-body{
     position: relative;
     overflow: auto;
-    padding: 30px 20px;
     color: #48576a;
     font-size: 14px;
     background:$body-background-color;
@@ -768,3 +768,46 @@ button:focus {
   .bg-model-op-view-body-relation-body{
       background: #fff;
   }
+  .bg-app-shorcut-setting{
+    display: block;
+    position: relative;
+  }
+  .bg-app-shorcut-setting ul{
+      padding: 10px 3px;
+      margin: 0;
+      list-style: none;
+      list-style-type: none;
+      position: relative;
+      display: flex;
+      flex-wrap: wrap;
+      background:white;
+      min-height: 98px;
+  }
+  .bg-app-shorcut-setting ul > li.app{
+    padding: 0;
+    margin: 2px;
+    list-style: none;
+    list-style-type: none;
+    display: inline-block;
+    background:#1890ff;
+    padding:5px 10px;
+    cursor: pointer;
+    color:white;
+    text-align: center;
+    min-width:78px;
+  }
+  .bg-app-shorcut-setting ul > li.app h4{
+      color:white;
+      text-align: center;
+      margin-bottom:0;
+  }
+  .bg-app-shorcut-setting ul > li.save{
+    padding: 0;
+    margin: 2px;
+    list-style: none;
+    list-style-type: none;
+    display: inline-block;
+    padding:5px 10px;
+    min-width:78px;
+    height: auto;
+}

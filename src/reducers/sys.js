@@ -1,4 +1,4 @@
-import {SET_SYS,SET_PARTNER_CORPS,SET_PARTNER_CURR_CORP} from '../actions/sys'
+import {SET_SYS,SET_PARTNER_CORPS,SET_PARTNER_CURR_CORP,UPDATE_SHORTCUT_APPS} from '../actions/sys'
 import { createSelector, createSelectorCreator } from 'reselect'
 import memoize from 'lodash.memoize'
 //todo cache in memory, load after login/refresh page
@@ -6,7 +6,8 @@ const initSys={
     installApps:{},
     corps:[],
     currCorp:{},
-    shortcutApps:[]
+    shortcutApps:[],
+    roleApps:[]
 }
 
 export function sys(state,action){
@@ -32,6 +33,11 @@ export function sys(state,action){
             let newState=action.payload
             return  Object.assign({},state,newState)
         }
+        case UPDATE_SHORTCUT_APPS:
+        {
+            let newState=action.payload
+            return  Object.assign({},state,newState)
+        }
         default:
             return state
     }
@@ -49,6 +55,18 @@ export const getShortcutAppsSelector=createSelector(state=>state.sys.installApps
         }
         return apps
     })
+
+        
+export const getRoleAppsSelector=createSelector(state=>state.sys.installApps,
+    state=>state.sys.roleApps,
+    (installApps,roleApps)=>{
+        var apps=[]
+        for(var appName of roleApps){
+            apps.push(installApps[appName])
+        }
+        return apps
+    })
+
 
 
 

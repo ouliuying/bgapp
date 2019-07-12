@@ -10,6 +10,8 @@ import Icon from './icon'
 import {createIconFromSvg} from './icon/createIconFromSvg'
 import {setCurrApp} from './actions/config'
 import {getCurrentApp} from './reducers/config'
+import AppSetting from './AppSetting'
+import { ModalSheetManager } from './app/modelView/ModalSheetManager';
 export class AppNav extends Component {
     static propTypes = {
         store: PropTypes.object,
@@ -18,6 +20,9 @@ export class AppNav extends Component {
     static contextTypes = {
         store: PropTypes.object,
     }
+    showAppSetting(){
+        ModalSheetManager.openModal(AppSetting,{})
+    }
     render() {
         let self =this
         return <div className="bg-app-nav-button-bar">
@@ -25,7 +30,7 @@ export class AppNav extends Component {
                 self.props.shortcutApps.map(sApp=>{
                     const AppIcon=createIconFromSvg({
                         src:sApp.icon,
-                        svgStyle:{width:22,height:22,fill:'#bfcbd9'}
+                        svgStyle:{width:22,height:22,fill:'white'}
                     })
                     let active=(self.props.currApp.name == sApp.name)?" active":""
                     return (<a className={"bg-app-shortcut-action-btn"+active} onClick={()=>{
@@ -37,8 +42,10 @@ export class AppNav extends Component {
                 })
             }
             
-            <a className="bg-app-shortcut-action-btn">
-            <Icon.AddRmApp></Icon.AddRmApp>
+            <a className="bg-app-shortcut-action-btn" onClick={()=>{
+                self.showAppSetting()
+            }}>
+                <Icon.AddRmApp></Icon.AddRmApp>
             </a>
 
          
