@@ -48,7 +48,7 @@ class App extends Component {
                     return <><Switch>
                     <Route exact path="/" render={ props=>
                         this.isLogin()?(<Redirect to={{
-                            pathname: "/app",
+                            pathname: "/app/dynamic/worktable",
                             state: { from: props.location }
                           }}></Redirect>):(<Redirect to={{
                             pathname: "/login",

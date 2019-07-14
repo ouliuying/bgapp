@@ -811,3 +811,43 @@ button:focus {
     min-width:78px;
     height: auto;
 }
+.bg-worktable{
+    display: flex;
+    margin:0;
+    padding:0px;
+    flex-direction: column;
+    flex: max-content;
+}
+.bg-worktable-header{
+    background:#50aefd;
+    flex-basis: 120px;
+    margin-bottom: 4px;
+    box-shadow: 0 0 30px rgba(16,14,23,.25);
+    padding:10px;
+    display: flex;
+    flex-direction: row;
+    color:white;
+}
+.bg-worktable-header .p-logo{
+    margin-right: 4px;
+}
+.bg-worktable-header .p-name{
+    font-size:2rem;
+    font-weight: 500;
+}
+.bg-worktable-header .p-corp-name{
+    font-size:1.5rem;
+    font-weight: 500;
+    color:#ffffffc2;
+}
+.bg-worktable-body{
+    background:white;
+    border:1px solid #ddd;
+    min-height: 600px;
+    padding:0 10px;
+}
+.bg-worktable-footer{
+    background:white;
+    border:1px solid #ddd;
+    flex-basis: auto;
+}

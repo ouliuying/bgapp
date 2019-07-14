@@ -148,7 +148,7 @@ class DetailView extends React.Component{
                                             })||[]
                                             return <div className="bg-model-op-view-body-main-h">
                                                         <div className="bg-model-op-view-body-main-h1">
-                                                        <Form  >
+                                                        <Form>
                                                         {
                                                             
                                                             mainFields.map((field,index)=>{
@@ -171,25 +171,25 @@ class DetailView extends React.Component{
                                                         </div>
 
                                                         <div className="bg-model-op-view-body-main-h2">
-                                                        <Form  >
-                                                        {
-                                                                
-                                                                subMainFields.map((field,index)=>{
-                                                                    let type=field.type
-                                                                    let meta=field.meta
-                                                                    let enable = testCriteria(field.enableCriateria,detailData)
-                                                                    let ctrlProps = field.ctrlProps
-                                                                    const FieldComponent=ViewFieldTypeRegistry.getComponent(type)
-                                                                    let nValue=detailData&&detailData[field.name]!==undefined?detailData[field.name]:""
-                                                                    let key=`${field.app}_${field.model}_${field.name}`
-                                                                    return <Form.Item label={field.title} key={`form-item${key}`}>
-                                                                            <FieldComponent onChange={(value)=>{
-                                                                                    host.onFieldValueChange(field,value)
-                                                                                }} value={nValue} key={key} meta={meta} enable={enable} ctrlProps={ctrlProps} title={field.title} relationData={field.relationData}></FieldComponent>    
-                                                                        </Form.Item>
-                                                                })
-                                                        } 
-                                                        </Form>
+                                                            <Form>
+                                                                {
+                                                                        
+                                                                        subMainFields.map((field,index)=>{
+                                                                            let type=field.type
+                                                                            let meta=field.meta
+                                                                            let enable = testCriteria(field.enableCriteria,detailData)
+                                                                            let ctrlProps = field.ctrlProps
+                                                                            const FieldComponent=ViewFieldTypeRegistry.getComponent(type)
+                                                                            let nValue=detailData&&detailData[field.name]!==undefined?detailData[field.name]:""
+                                                                            let key=`${field.app}_${field.model}_${field.name}`
+                                                                            return <Form.Item label={field.title} key={`form-item${key}`}>
+                                                                                    <FieldComponent onChange={(value)=>{
+                                                                                            host.onFieldValueChange(field,value)
+                                                                                        }} value={nValue} key={key} meta={meta} enable={enable} ctrlProps={ctrlProps} title={field.title} relationData={field.relationData}></FieldComponent>    
+                                                                                </Form.Item>
+                                                                        })
+                                                                } 
+                                                            </Form>
                                                         </div>
                                                 </div>
                                         }}></hookView.Hook>

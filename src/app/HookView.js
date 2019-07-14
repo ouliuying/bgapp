@@ -61,7 +61,8 @@ class  HookView extends React.Component{
                     try{
                         return render(rest)
                     }
-                    catch{
+                    catch(err){
+                        console.error(err)
                         return <></>
                     }
                    

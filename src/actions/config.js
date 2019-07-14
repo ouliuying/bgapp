@@ -2,11 +2,11 @@ import {ReducerRegistry} from '../ReducerRegistry'
 
 export const SET_CURR_APP='SET_CURR_APP'
 export const SET_OPEN_MENU_KEYS="SET_OPEN_MENU_KEYS"
-export function setCurrApp(data) {
+export function setCurrApp(app) {
     const {store}=ReducerRegistry
     store.dispatch({
         type:SET_CURR_APP,
-        payload:data
+        payload:{currApp:app}
     })
 }
 export function setOpenMenuKeys(data) {

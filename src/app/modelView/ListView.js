@@ -16,6 +16,7 @@ import {getDynamicRouterAppModelViewType} from '../../reducers/router'
 import {getRoutePath} from '../routerHelper'
 import {mapStateToProps} from './listViewMapStateToProps'
 import { RECORD_TAG } from '../ReservedKeyword';
+import { testCriteria } from './ViewFieldCriteria';
 class ListView extends React.Component{
     constructor(props){
         super(props)
@@ -83,8 +84,9 @@ class ListView extends React.Component{
                         let startIndex=0
                         let lastGFields=[]
                         let gfields=[]
+                        let showFields = searchBox.view.fields.filter(x=>testCriteria(x.visibleCriteria,undefined))||[]
                         do{
-                            gfields = searchBox.view.fields.slice(startIndex,startIndex+3)
+                            gfields = showFields.slice(startIndex,startIndex+3)
                             if(gfields.length>0 ){
                                 lastGFields=gfields
                                 searchFieldRows.push(gfields)
@@ -126,10 +128,11 @@ class ListView extends React.Component{
                                                         row.map(fd=>{
                                                             let CCom = ViewFieldTypeRegistry.getComponent(fd&&fd.type)
                                                             let cValue = self.cmmHost.getSearchBoxFieldValue(self,fd,localData)
+                                                            let enable = fd?testCriteria(fd.enableCriteria,undefined):true
                                                             return fd?<Col span={6}>
                                                                 <div className="bg-list-view-search-box-item">
                                                                     <label>{fd.title}</label>
-                                                                    <CCom field={fd} onChange={(value)=>self.cmmHost.onSearchBoxCriteriaChange(self,fd,value)} value={cValue}></CCom>
+                                                                    <CCom field={fd} onChange={(value)=>self.cmmHost.onSearchBoxCriteriaChange(self,fd,value)} value={cValue} enable={enable}></CCom>
                                                                 </div>
                                                             </Col>:<Col span={6}>
                                                             <Button  className="bg-list-view-search-box-btn" type="primary" icon="search" onClick={()=>{

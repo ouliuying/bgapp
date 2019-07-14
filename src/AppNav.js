@@ -6,12 +6,14 @@ import {
 } from 'react-router-dom'
 import {push} from "connected-react-router"
 import {getShortcutAppsSelector} from './reducers/sys'
-import Icon from './icon'
+//import Icon from './icon'
 import {createIconFromSvg} from './icon/createIconFromSvg'
 import {setCurrApp} from './actions/config'
 import {getCurrentApp} from './reducers/config'
 import AppSetting from './AppSetting'
 import { ModalSheetManager } from './app/modelView/ModalSheetManager';
+import { getSvg } from './svg';
+import {Icon} from './ui'
 export class AppNav extends Component {
     static propTypes = {
         store: PropTypes.object,
@@ -25,19 +27,17 @@ export class AppNav extends Component {
     }
     render() {
         let self =this
+        let MoreApp=getSvg("/svg/more-app.svg")
         return <div className="bg-app-nav-button-bar">
             {
                 self.props.shortcutApps.map(sApp=>{
-                    const AppIcon=createIconFromSvg({
-                        src:sApp.icon,
-                        svgStyle:{width:22,height:22,fill:'white'}
-                    })
+                    const AppIcon=getSvg(sApp.icon)
                     let active=(self.props.currApp.name == sApp.name)?" active":""
                     return (<a className={"bg-app-shortcut-action-btn"+active} onClick={()=>{
-                        setCurrApp({currApp:sApp})
+                        setCurrApp(sApp)
                         self.props.dispatch(push(`/app/dynamic/${sApp.name}`))}
                         } key={sApp.name}>
-                            <AppIcon></AppIcon><span className="bg-app-shortcut-action-btn-title"> {sApp.title}</span>
+                            <Icon component={AppIcon}></Icon><span className="bg-app-shortcut-action-btn-title"> {sApp.title}</span>
                     </a>)
                 })
             }
@@ -45,7 +45,7 @@ export class AppNav extends Component {
             <a className="bg-app-shortcut-action-btn" onClick={()=>{
                 self.showAppSetting()
             }}>
-                <Icon.AddRmApp></Icon.AddRmApp>
+               <Icon component={MoreApp}/>
             </a>
 
          

@@ -11,6 +11,8 @@ import PropTypes from 'prop-types'
 import AppNav from './AppNav'
 import RemoteMainFrame from './app/RemoteMainFrame'
 import Icon from './icon'
+import {setCurrApp} from './actions/config'
+import {getAppsSelector} from './reducers/sys'
 class AppFrame extends React.Component{
     static propTypes = {
         store: PropTypes.object,
@@ -21,6 +23,8 @@ class AppFrame extends React.Component{
     }
 
     render(){
+        let self= this
+        const {installApps} = this.props
         return <div className="bg-app-frame bg-flex-full">
                     <div className="bg-app-frame-header">
                         <div className="bg-app-frame-header-icon">
@@ -37,14 +41,16 @@ class AppFrame extends React.Component{
                             <ul>
                                 <li>
                                 <Icon.AppGroup onClick={()=>{
-                                    this.props.dispatch(push("/app/dynamic"))
+                                    this.props.dispatch(push("/app/dynamic/worktable"))
+                                    let workApp = installApps["worktable"]||{}
+                                    setCurrApp(workApp)
                                 }}></Icon.AppGroup>
                                 </li>
                                 <li>
                                 <Icon.ChatApp onClick={
                                     ()=>{
                                      this.props.dispatch(push("/app/static/chat"))
-
+                                     setCurrApp({})
                                     }
                                 }></Icon.ChatApp>
                                 </li>
@@ -58,6 +64,7 @@ class AppFrame extends React.Component{
     }
 }
 function mapStateToProps(state){
-    return state
+    let installApps = getAppsSelector(state)
+    return {...installApps}
  }
 export default withRouter(connect(mapStateToProps)(AppFrame))

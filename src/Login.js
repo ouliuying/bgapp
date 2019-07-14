@@ -60,7 +60,7 @@ class Login extends Component {
     render(){
         return (
             (this.isLogin())?(<Redirect to={{
-                pathname: "/app",
+                pathname: "/app/dynamic/worktable",
                 state: { from: this.props.location }
               }}/>):(<div>
                 <ThemeStyle body={`bg-login-body`} root={`bg-login-root`}/>

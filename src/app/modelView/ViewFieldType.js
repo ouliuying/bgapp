@@ -1,5 +1,5 @@
 import React from 'react'
-import {Input,DatePicker,Select,notification ,Button,Upload,Checkbox,Icon as FontIcon,Row,Col,Cascader} from "../../ui"
+import {Input,DatePicker,Select,notification ,Button,Upload,Checkbox,Icon as FontIcon,Row,Col,Cascader,Divider} from "../../ui"
 
 import {createIconFromSvg} from "../../icon/createIconFromSvg"
 import Icon from '../../icon'
@@ -393,7 +393,7 @@ export class Many2OneDataSetSelectField extends React.Component{
     {
         (moreBtn!==false && enable)?<Button type="text" onClick={()=>{
             self.selMore()
-    }} className="bg-many2one-select-more-btn">
+        }} className="bg-many2one-select-more-btn">
         <FontIcon type="search" />
         </Button>:null
     }

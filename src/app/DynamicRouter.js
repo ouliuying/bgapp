@@ -25,6 +25,11 @@ const appInContainers={
         loader: () => import('../bgaccount/AccountInContainer'),
         loading: () => <div/>,
     })
+    ,
+    "worktable":Loadable({
+        loader: () => import('../bgworktable/WorktableInContainer'),
+        loading: () => <div/>,
+    })
 }
 function TestApp(){
     return <div>test</div>
