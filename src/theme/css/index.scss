@@ -784,7 +784,7 @@ button:focus {
       min-height: 98px;
   }
   .bg-app-shorcut-setting ul > li.app{
-    padding: 0;
+    padding: 10px !important;
     margin: 2px;
     list-style: none;
     list-style-type: none;
@@ -800,6 +800,7 @@ button:focus {
       color:white;
       text-align: center;
       margin-bottom:0;
+      margin-top:5px;
   }
   .bg-app-shorcut-setting ul > li.save{
     padding: 0;

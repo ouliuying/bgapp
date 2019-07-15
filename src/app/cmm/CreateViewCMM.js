@@ -292,6 +292,11 @@ export class CreateViewCMM extends ViewCMM{
               msg:"通讯失败！"
               })
             }))
+            if(!createData || !createData.record){
+              ModalSheetManager.openAlert({title:"提示",
+              msg:"输入数据后再提交"
+              })
+            }
       }
   }
   

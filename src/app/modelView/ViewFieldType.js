@@ -1,5 +1,16 @@
 import React from 'react'
-import {Input,DatePicker,Select,notification ,Button,Upload,Checkbox,Icon as FontIcon,Row,Col,Cascader,Divider} from "../../ui"
+import {Input,
+    DatePicker,
+    Select,
+    notification,
+    Button,
+    Upload,
+    Checkbox,
+    Icon as FontIcon,
+    Row,
+    Col,
+    Cascader,
+    Divider} from "../../ui"
 
 import {createIconFromSvg} from "../../icon/createIconFromSvg"
 import Icon from '../../icon'
@@ -38,8 +49,9 @@ export const ViewFieldType={
     Many2OneDataSetSelectField:'many2OneDataSetSelect',
     SingleCheckBoxField:'singleCheckbox',
     StaticField:'static',
+    EnumStaticTextField:"enumStatic",
     ChinaFullAddress:'chinaFullAddress',
-
+    SelectField:"select",
 
     //criteria
     CriteriaEnumSelect:"criteriaSelect",
@@ -62,13 +74,65 @@ export class StaticField extends React.Component{
         if(typeof value ==="string"){
             return value
         }
+        const {relationData} = this.props
+        if(relationData){
+            if((value||{}).record){
+                if(value.record instanceof Object){
+                    return value.record[relationData.toName]
+                }
+                else if(value.record instanceof Array){
+                    if(value.record.length>0){
+                        return value.record[0][relationData.toName]
+                    }
+                }
+            }
+            return (value||{})[relationData.toName]
+        }
         return JSON.stringify(value)
     }
     render(){
-        const {value} = this.props
-        return <span>
-                {this.getText(value)}
-        </span>
+        const {value,getText:txtFn} = this.props
+        const getText = txtFn||((value)=>{return this.getText(value)})
+        return <span>{getText(value)}</span>
+    }
+}
+
+export class EnumStaticTextField extends React.Component{
+    getText(){
+        const {meta}= this.props
+        const rValue = this.getRealValue()
+        if(rValue!==undefined){
+            return (meta||{})[`${rValue}`]
+        }
+        return ""
+    }
+    getRealValue(){
+        const {value,relationData} = this.props
+        if(typeof value ==="string"){
+            return value
+        }
+        if((value instanceof Object)){
+            if(relationData){
+                if(value.record){
+                    if(value.record instanceof Object){
+                        return value.record[relationData.toName]
+                    }
+                    else if(value.record instanceof Array){
+                        if(value.record.length>0){
+                            return value.record[0][relationData.toName]
+                        }
+                    }
+                }
+                return value[relationData.toName]
+            }
+            else{
+                return ""
+            }
+        }
+        return value
+    }
+    render(){
+        return <StaticField {...this.props} getText={()=>{return this.getText()}}></StaticField>
     }
 }
 
@@ -403,6 +467,21 @@ export class Many2OneDataSetSelectField extends React.Component{
     }
 }
 
+export class SelectField extends React.Component{
+    
+    render(){
+        const {meta,value,onChange} = this.props
+        return <Select value={value} onChange={(value)=>{
+            onChange&&onChange(value)
+        }}>
+                {
+                    ((meta||{}).options||[]).map(o=>{
+                        return <Select.Option value={o.value}>{o.text}</Select.Option>
+                    })
+                }
+        </Select>
+    }
+}
 //export const Many2OneDataSetSelectField = withRouter(InnerMany2OneDataSetSelectField)
 
 export class CriteriaEnumSelect  extends React.Component{

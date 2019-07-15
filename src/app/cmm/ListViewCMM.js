@@ -28,6 +28,7 @@ import {bindRecordTag} from '../fieldHelper'
 import {nextRecordTag} from '../../lib/tag-helper'
 import {getExpression} from '../../lib/criteria-helper'
 import { createCriteria } from "../modelView/ViewFieldCriteria";
+import ViewFieldTypeRegistry from '../modelView/ViewFieldTypeRegistry'
 export class ListViewCMM extends  ViewCMM{
     constructor(app,model,viewType){
         super(app,model,viewType)
@@ -78,8 +79,21 @@ export class ListViewCMM extends  ViewCMM{
                 columns.push({
                     title:f.title,
                     dataIndex:f.name,
-                    key:f.name
-                    })
+                    key:f.name,
+                    render:(value)=>{
+                        const FieldComponent=ViewFieldTypeRegistry.getComponent(f.type)
+                        if(FieldComponent){
+                            return <FieldComponent 
+                            value={value}
+                            meta={f.meta} 
+                            enable={true} 
+                            ctrlProps={f.ctrlProps}
+                            title={f.title}
+                            relationData={f.relationData}></FieldComponent>    
+                        }
+                        return value
+                    }
+                })
             }
             else{
                 columns.push({
@@ -88,6 +102,11 @@ export class ListViewCMM extends  ViewCMM{
                     dataIndex:f.name,
                     render:(text,reocrd)=>{
                         let d =text
+                        const FieldComponent=ViewFieldTypeRegistry.getComponent(f.type)
+                        if(FieldComponent){
+                            //return null
+                            return <FieldComponent  value={d}  meta={f.meta} enable={true} ctrlProps={f.ctrlProps} title={f.title} relationData={f.relationData}></FieldComponent>    
+                        }
                         if(d instanceof Object && d.record){
                             if(d.record instanceof Array){
                                 return (d.record[0]||{})[f.relationData.toName]

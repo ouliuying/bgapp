@@ -6,12 +6,13 @@ import {
     Route,
     matchPath
 } from 'react-router-dom'
-import  {Divider,Button} from './ui'
+import  {Divider,Button,Icon} from './ui'
 import {ModalSheetManager} from './app/modelView/ModalSheetManager'
 import {getShortcutAppsSelector,getRoleAppsSelector,getAppsSelector} from './reducers/sys'
 import {updateShortcutApps} from './actions/sys'
 import {createIconFromSvg} from './icon/createIconFromSvg'
 import {ModelAction} from './app/mq/ModelAction'
+import { getSvg } from "./svg";
 class AppSetting extends React.Component{
     constructor(props){
         super(props)
@@ -171,19 +172,13 @@ class AppSetting extends React.Component{
                     }} onDragOver={(evt)=>{evt.nativeEvent.preventDefault()}}>
                         {
                             shortcutApps.map(app=>{
-                                var AppIcon = createIconFromSvg({
-                                    src:app.icon,
-                                    svgStyle:{
-                                        width:32,
-                                        height:32
-                                    }
-                                })
+                                const AppIcon = getSvg(app.icon)
                                 return <li className="app" appname={app.name} key={app.name} draggable={true} onDragStart={(evt)=>{
                                     evt.nativeEvent.dataTransfer.setData('text',"shortcut|"+app.name)
                                     var img = new Image(); 
                                     evt.nativeEvent.dataTransfer.setDragImage(img, 0, 0);
                             }}>
-                                    <AppIcon></AppIcon>
+                                     <Icon component={AppIcon} style={{ fontSize: '32px'}}></Icon>
                                     <h4>
                                         <span>{app.title}</span>
                                     </h4>
@@ -238,19 +233,13 @@ class AppSetting extends React.Component{
                     }} onDragOver={(evt)=>{evt.nativeEvent.preventDefault()}}>
                         {
                             roleApps.map(app=>{
-                                var AppIcon = createIconFromSvg({
-                                    src:app.icon,
-                                    svgStyle:{
-                                        width:32,
-                                        height:32
-                                    }
-                                })
+                                const AppIcon = getSvg(app.icon)
                                 return <li className="app" appname={app.name} key={app.name} draggable={true} onDragStart={(evt)=>{
                                     evt.nativeEvent.dataTransfer.setData('text',"role|"+app.name)
                                     var img = new Image(); 
                                     evt.nativeEvent.dataTransfer.setDragImage(img, 0, 0);
                             }}>
-                                    <AppIcon></AppIcon>
+                                    <Icon component={AppIcon} style={{ fontSize: '32px'}}></Icon>
                                     <h4>
                                         <span>{app.title}</span>
                                     </h4>

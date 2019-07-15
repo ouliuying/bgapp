@@ -624,14 +624,14 @@ function buildServerModelDataObject(view,dataRecord,state,subViews){
 }
 
 //TODO 
-function buildServerModelDataArray(app,model,viewType,data,ownerField,state){
+function buildServerModelDataArray(app,model,viewType,data,viewDataConextkey,ownerField,state){
     let records = []
     if(ownerField){
         (data.record||[]).map((r)=>{
                 let tag = r[RECORD_TAG]
                 if(tag){
                     let tagOwnerField = bindRecordTag(ownerField,tag)
-                    let addData = buildServerCreateData(app,model,ViewType.CREATE,tagOwnerField,state)
+                    let addData = buildServerViewTypeData(app,model,ViewType.CREATE,viewDataConextkey,tagOwnerField,state)
                     if(addData && addData.record && Object.keys(addData.record).length>0){
                         let nr={}
                         Object.keys(addData.record).map(key=>{
@@ -678,12 +678,21 @@ function flushServerModelRecord(record){
             let relValue={}
             if(v){
                 Object.keys(v).map(mKey=>{
-                    let nr = flushServerModelRecord(v[mKey].record)
-                    if(nr){
+                    let newRecords= []
+                    let oldRecords=v[mKey].record||[]
+                    for(let r of oldRecords){
+                        let nr = flushServerModelRecord(r)
+                        if(nr){
+                            newRecords.push(nr)
+                        }
+                    }
+                    
+                   
+                    if(newRecords.length>0){
                         relValue[mKey]={
                             app:v[mKey].app,
                             model:v[mKey].model,
-                            record:nr
+                            record:newRecords
                         }
                     }
                 })
@@ -745,7 +754,7 @@ function buildServerViewTypeData(app,model,viewType,viewDataConextkey,ownerField
 
         if(((modelData.viewData||{}).data||{}).record && (modelData.viewData.data.record instanceof Array)){
             serverData.record=buildServerModelDataArray(app,model,viewType,
-                modelData.viewData.data,ownerField,state)
+                modelData.viewData.data,CREATE_VIEW_DATA,ownerField,state)
         }
         else{
             serverData.record=buildServerModelDataObject(modelData.viewData.view,

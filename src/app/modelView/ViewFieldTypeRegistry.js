@@ -17,7 +17,9 @@ import {TextField,
     Many2OneDataSetSelectField,
     SingleCheckBoxField,
     StaticField,
+    EnumStaticTextField,
     ChinaFullAddress,
+    SelectField,
     // ViewFieldType
     ViewFieldType,
     //** criteria control  begin*/
@@ -78,7 +80,9 @@ registry.add(ViewFieldType.IconLabelField,IconLabelField)
 registry.add(ViewFieldType.Many2OneDataSetSelectField,Many2OneDataSetSelectField)
 registry.add(ViewFieldType.SingleCheckBoxField,SingleCheckBoxField)
 registry.add(ViewFieldType.StaticField,StaticField)
+registry.add(ViewFieldType.EnumStaticTextField,EnumStaticTextField)
 registry.add(ViewFieldType.ChinaFullAddress,ChinaFullAddress)
+registry.add(ViewFieldType.SelectField,SelectField)
 
 registry.add(ViewFieldType.CriteriaEnumSelect,CriteriaEnumSelect)
 registry.add(ViewFieldType.CriteriaNumberRangeInput,CriteriaNumberRangeInput)
