@@ -654,19 +654,18 @@ function buildServerModelDataArray(app,model,viewType,data,viewDataConextkey,own
 function flushServerData(data,newData){
      newData.app=data.app
      newData.model=data.model
-    if(data.record instanceof Object){
-        let r = flushServerModelRecord(data.record)
-        if(r){
-            newData.record=r
-        }
-    }
-    else if(data.record instanceof Array){
+     if(data.record instanceof Array){
         newData.record=[]
         for(let dr of data.record){
             let r = flushServerModelRecord(dr)
             if(r){
                 newData.record.push(r)
             }
+        }
+    } else if(data.record instanceof Object){
+        let r = flushServerModelRecord(data.record)
+        if(r){
+            newData.record=r
         }
     }
 }

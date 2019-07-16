@@ -77,13 +77,13 @@ export class StaticField extends React.Component{
         const {relationData} = this.props
         if(relationData){
             if((value||{}).record){
-                if(value.record instanceof Object){
-                    return value.record[relationData.toName]
-                }
-                else if(value.record instanceof Array){
+                if(value.record instanceof Array){
                     if(value.record.length>0){
                         return value.record[0][relationData.toName]
                     }
+                }
+                else if(value.record instanceof Object){
+                    return value.record[relationData.toName]
                 }
             }
             return (value||{})[relationData.toName]
@@ -114,13 +114,13 @@ export class EnumStaticTextField extends React.Component{
         if((value instanceof Object)){
             if(relationData){
                 if(value.record){
-                    if(value.record instanceof Object){
-                        return value.record[relationData.toName]
-                    }
-                    else if(value.record instanceof Array){
+                    if(value.record instanceof Array){
                         if(value.record.length>0){
                             return value.record[0][relationData.toName]
                         }
+                    }
+                    else if(value.record instanceof Object){
+                        return value.record[relationData.toName]
                     }
                 }
                 return value[relationData.toName]
