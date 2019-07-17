@@ -441,7 +441,7 @@ export class ListViewCMM extends  ViewCMM{
         if((viewParam||{}).ownerField){
             if(id){
                 const {ownerField,ownerFieldValue,orgState} = viewParam
-                let dViewParam = createDetailParam(ownerField,ownerFieldValue,undefined,orgState,id)
+                let dViewParam = createDetailParam(ownerField,ownerFieldValue,undefined,id,{},orgState)
                 this.showAppModelViewInModalQueue(trigger.app,trigger.model,trigger.viewType,viewRefType,dViewParam)
             }
             else{
@@ -452,7 +452,7 @@ export class ListViewCMM extends  ViewCMM{
                 }
                 let tag =arg.tag
                 let bindOwnerField = bindRecordTag(ownerField,tag)
-                let dViewParam = createViewParam(bindOwnerField,ownerFieldValue,external,orgState)
+                let dViewParam = createViewParam(bindOwnerField,ownerFieldValue,undefined,external,orgState)
                 this.showAppModelViewInModalQueue(this.app,this.model,ViewType.CREATE,viewRefType,dViewParam)
             }
         }
