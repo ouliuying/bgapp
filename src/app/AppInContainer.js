@@ -86,7 +86,7 @@ function RenderMenuItem(props){
     const {item:sm,index,key,...rest}= props
     let MenuIcon = sm.icon?getSvg(sm.icon):null
 
-    return MenuIcon?<Menu.Item key={key}><Icon component={MenuIcon} {...rest}/><span>{sm.title}</span></Menu.Item>:<Menu.Item key={key} {...rest}>
+    return MenuIcon?<Menu.Item key={key}  {...rest}><Icon component={MenuIcon}/><span>{sm.title}</span></Menu.Item>:<Menu.Item key={key} {...rest}>
     {sm.title}</Menu.Item>
 }
 class AppInContainer extends React.Component{
