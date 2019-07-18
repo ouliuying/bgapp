@@ -289,11 +289,12 @@ export class SingleCheckBoxField extends React.Component{
         if(value==1){
             checked=true
         }
-        return <Checkbox  checked={checked} label={(meta||{}).label} disabled={!enable}   onChange={
+        let label = (meta||{}).label
+        return <Checkbox  checked={checked}  disabled={!enable}   onChange={
             (evt)=>{
                 onChange && onChange(evt.target.checked?1:0)
             }
-        }></Checkbox>
+        }>{label}</Checkbox>
     }
 }
 
