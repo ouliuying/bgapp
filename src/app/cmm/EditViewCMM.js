@@ -261,10 +261,11 @@ export class EditViewCMM extends ViewCMM{
         let datasource = _.cloneDeep(viewData.data||{})
         const {ownerField,orgState,external}=(viewParam||{})
         let editData= buildServerEditData(self.app,self.model,self.viewType,ownerField,orgState)
-
+        if(!editData.record){
+          ModalSheetManager.alert({title:"提示",msg:"没有输入任何数据！"})
+        }
         editData && editData.record && (new ModelAction(this.app,this.model).call("edit",editData,function(res){
         if(res.errorCode==0){
-            
             if(external && external.close){
               if(external && external.setDatasource){
                  external.setDatasource(datasource)

@@ -29,6 +29,15 @@ const appInContainers={
     "worktable":Loadable({
         loader: () => import('../bgworktable/WorktableInContainer'),
         loading: () => <div/>,
+    }),
+    "setting":Loadable({
+        loader: () => import('../bgsetting/SettingInContainer'),
+        loading: () => <div/>,
+    })
+    ,
+    "sms":Loadable({
+        loader: () => import('../bgsms/SmsInContainer'),
+        loading: () => <div/>,
     })
 }
 function TestApp(){

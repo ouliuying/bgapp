@@ -103,6 +103,8 @@ body {
     background: $empty-background-color;
     flex-basis: 61px;
     flex-direction: column;
+    flex-grow: 0;
+    flex-shrink: 0;
 }
 
 .bg-app-frame-body-app-group ul {
@@ -851,4 +853,29 @@ button:focus {
     background:white;
     border:1px solid #ddd;
     flex-basis: auto;
+}
+.bg-model-op-view-body-main-label{
+    padding:5px;
+}
+.bg-model-op-view-body-main-label .ant-descriptions-view table{
+    width:auto;
+}
+.bg-form-workarea{
+    padding:10px;
+    background: white;
+    padding-bottom: 40px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.3);
+    box-sizing: border-box;
+}
+.bg-sms-attach-controls{
+    display: flex;
+    flex-direction: row;
+    background: #f4f4f4;
+    padding: 20px;
+}
+.bg-sms-attach-controls > div{
+    margin-right: 20px;
+}
+.bg-sms-attach-controls > div span{
+    margin-right: 5px;
 }

@@ -79,3 +79,5 @@ export const corpModelsSelector=createSelector(state=>state.sys.installApps,
 export const    getUIAppCache=()=>{}
 export const getViewActionsSelector=()=>{}
 
+export const getCurrCorp = createSelector(state=>state.sys.currCorp,currCorp=>(currCorp))
+

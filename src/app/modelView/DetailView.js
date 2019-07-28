@@ -74,7 +74,8 @@ class DetailView extends React.Component{
                     // }/>
                 }
                 <hookView.Hook hookTag="actions"  render={()=>{
-                        return <div className="bg-model-op-view-actions">
+                   
+                        return (triggerGroups&&triggerGroups.length>0) && <div className="bg-model-op-view-actions">
                                     <hookView.Hook hookTag="actions-main-group"  render={()=>{
                                         let mainActionGroup=triggerGroups&&triggerGroups.find(x=>{
                                            return   x.name=="main"

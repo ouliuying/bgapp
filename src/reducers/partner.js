@@ -48,3 +48,4 @@ export const userNamePasswordSelector=createSelector(state=>state.partner.userNa
 
 
 export const statusSelector=state=>({status:state.partner.status,errorDescription:state.partner.errorDescription})
+export const getCurrPartner=createSelector(state=>state.partner,partner=>(partner))

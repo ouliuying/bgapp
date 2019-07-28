@@ -28,6 +28,7 @@ import moment from 'moment';
 import chinaArea from '../../lib/china-area'
 import produce  from 'immer'
 import { instanceOf } from 'prop-types';
+import Password from 'antd/lib/input/Password';
 const {RangePicker} = DatePicker
 const { TextArea } = Input
 
@@ -52,6 +53,7 @@ export const ViewFieldType={
     EnumStaticTextField:"enumStatic",
     ChinaFullAddress:'chinaFullAddress',
     SelectField:"select",
+    PasswordField:"password",
 
     //criteria
     CriteriaEnumSelect:"criteriaSelect",
@@ -187,6 +189,17 @@ export class SingleLineTextField extends React.Component{
         </TextField>
     }
 }
+
+export class PasswordField extends React.Component{
+    render(){
+        const {enable,onChange,...rest} = this.props
+        return <Password type="singleLine" enable={enable} {...rest} onChange={(evt)=>{
+            onChange && onChange(evt.target.value)
+        }}>
+        </Password>
+    }
+}
+
 export class MultiLineTextField extends React.Component{
     render(){
         const {enable,...rest} = this.props

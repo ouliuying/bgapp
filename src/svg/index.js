@@ -15,6 +15,12 @@ import {ReactComponent as CrmAppOppo} from '../svg/crm-app-oppo.svg'
 import {ReactComponent as CrmAppQuot} from '../svg/crm-app-quot.svg'
 import {ReactComponent as CrmAppOrder} from '../svg/crm-app-order.svg'
 import {ReactComponent as CrmAppCustomer} from '../svg/crm-app-customer.svg'
+import {ReactComponent as AccountApp} from '../svg/account-app.svg'
+import {ReactComponent as AccountPayReceivable} from '../svg/account-pay.svg'
+import {ReactComponent as SettingApp} from '../svg/setting-app.svg'
+import {ReactComponent as SmsApp} from '../svg/sms-app.svg'
+import {ReactComponent as SmsAppSend} from '../svg/sms-send.svg'
+import {ReactComponent as SmsAppSendLog} from '../svg/sms-log.svg'
 //
 const svgs={
     
@@ -37,6 +43,12 @@ svgs["/svg/crm-app-oppo.svg"]=CrmAppOppo
 svgs["/svg/crm-app-quot.svg"]=CrmAppQuot
 svgs["/svg/crm-app-order.svg"]=CrmAppOrder
 svgs["/svg/crm-app-customer.svg"]=CrmAppCustomer
+svgs["/svg/account-app.svg"]=AccountApp
+svgs["/svg/account-pay.svg"]=AccountPayReceivable
+svgs["/svg/setting-app.svg"]=SettingApp
+svgs["/svg/sms-app.svg"]=SmsApp
+svgs["/svg/sms-send.svg"]=SmsAppSend
+svgs["/svg/sms-log.svg"]=SmsAppSendLog
 export function regSvg(path,component){
     svgs[path]=component
 }

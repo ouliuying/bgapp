@@ -22,6 +22,7 @@ import {TextField,
     SelectField,
     // ViewFieldType
     ViewFieldType,
+    PasswordField,
     //** criteria control  begin*/
     CriteriaEnumSelect,
     CriteriaNumberRangeInput,
@@ -83,6 +84,7 @@ registry.add(ViewFieldType.StaticField,StaticField)
 registry.add(ViewFieldType.EnumStaticTextField,EnumStaticTextField)
 registry.add(ViewFieldType.ChinaFullAddress,ChinaFullAddress)
 registry.add(ViewFieldType.SelectField,SelectField)
+registry.add(ViewFieldType.PasswordField,PasswordField)
 
 registry.add(ViewFieldType.CriteriaEnumSelect,CriteriaEnumSelect)
 registry.add(ViewFieldType.CriteriaNumberRangeInput,CriteriaNumberRangeInput)
