@@ -13,6 +13,7 @@ import zhCN from 'antd/es/locale-provider/zh_CN';
 import {LocaleProvider} from './ui'
 import moment from 'moment'
 import 'moment/locale/zh-cn';
+import { MessageBus, SYS_INIT } from './mb/MessageBus';
 const {store,history}= ReducerRegistry.create(reducers)
 moment.locale('zh-cn');
 ReactDOM.render(
@@ -23,3 +24,4 @@ ReactDOM.render(
             </LocaleProvider>
         </ConnectedRouter>
     </Provider>,document.getElementById('root'))
+MessageBus.ref.send(SYS_INIT,null)

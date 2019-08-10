@@ -4,11 +4,13 @@ import {
 
 } from '../actions/partner'
 import { createSelector } from 'reselect'
+import {ChatCore} from '../bgchat/core/Chat'
 const initPartner={
     userName:'',
     password:'',
     status:0,
     devType:0,
+    chatUUID:"",
     errorDescription:""
 }
 export function partner(state,action){

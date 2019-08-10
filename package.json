@@ -23,7 +23,8 @@
         "react-svg": "^7.2.14",
         "redux": "^4.0.4",
         "redux-persist": "^5.10.0",
-        "reselect": "^4.0.0"
+        "reselect": "^4.0.0",
+        "vertx3-eventbus-client": "^3.8.0"
     },
     "scripts": {
         "start": "react-scripts start",

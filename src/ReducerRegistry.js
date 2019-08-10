@@ -7,6 +7,8 @@ import { connectRouter, routerMiddleware} from 'connected-react-router'
 import { persistStore,persistReducer} from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
 import ViewContext from './app/modelView/ViewContext'
+import { MessageBus, SYS_INIT, PARTNER_INIT } from './mb/MessageBus';
+import { getCurrPartner } from './reducers/partner';
 const persistConfig = {
     key: 'root',
     storage:storage,
@@ -40,8 +42,8 @@ export class ReducerRegistry {
             compose(applyMiddleware(middleware))
         )
         let persistor = persistStore(store,null,() => {
-                    store.getState() 
-            })
+            let state = store.getState() 
+        })
         ReducerRegistry.store=store
         ReducerRegistry.history=history
         ReducerRegistry.persistor=persistor

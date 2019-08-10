@@ -19,6 +19,7 @@ import {setSys} from './actions/sys'
 import {userNamePasswordSelector, statusSelector} from './reducers/partner'
 import {req,APPLICATION_X_WWW_FORM_URLENCODED} from './lib/http-helper'
 import {ModalSheetManager} from './app/modelView/ModalSheetManager'
+import { SYS_INIT, MessageBus } from './mb/MessageBus';
 class Login extends Component {
     static propTypes = {
         store: PropTypes.object,
@@ -32,7 +33,7 @@ class Login extends Component {
         setPartnerUserNamePassword(td)
     }
     doLogin(){
-       
+       let self=this
         const {userName,password}=this.props
         let devType=0
         let pData={userName,password,devType}
@@ -53,6 +54,9 @@ class Login extends Component {
         },function(){
             ModalSheetManager.openAlert({title:"提示",msg:"请求失败！"})
         })
+    }
+    getCurrPartner(data){
+
     }
     isLogin(){
         return this.props.status>0
