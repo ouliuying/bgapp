@@ -1,15 +1,14 @@
 import React from 'react'
-import { Route, withRouter,Switch} from "react-router-dom"
+import { Route, withRouter,Switch,Redirect} from "react-router-dom"
 import {connect} from 'react-redux'
-import Loadable from 'react-loadable';
-const LoadableChatFrame = withRouter((state=>state)(Loadable({
-    loader: () => import('../bgchat/MainFrame'),
-    loading: () => <div/>,
-})));
 class StaticRouter extends React.Component{
     render(){
         return <Switch>
-                <Route path="/app/static/chat" component={LoadableChatFrame}></Route>
+                <Route path="/app/static/chat" render={
+                    ()=>{
+                        return <Redirect to={{pathname:"/app/dynamic/chat"}}></Redirect>
+                    }
+                }></Route>
         </Switch>
     }
 }

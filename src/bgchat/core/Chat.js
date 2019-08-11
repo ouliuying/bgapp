@@ -31,13 +31,12 @@ export class ChatCore {
 
     startRegClient(success,fail){
         new ModelAction("","").call("",{},(data)=>{
-
+            
         },()=>{
             setTimeout(()=>{
                 this.startRegClient(success,fail)
             },5000)
         })
-
     }
 
     getCurrChatUUID(){

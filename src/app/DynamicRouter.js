@@ -2,6 +2,7 @@ import React from 'react'
 import { Route, withRouter,Switch} from "react-router-dom"
 import {connect} from 'react-redux'
 import Loadable from 'react-loadable'
+import MainFrame from '../bgchat/MainFrame';
 const appInContainers={
     "core":Loadable({
         loader: () => import('../bgcore/CoreInContainer'),
@@ -39,6 +40,8 @@ const appInContainers={
         loader: () => import('../bgsms/SmsInContainer'),
         loading: () => <div/>,
     })
+    ,
+    "chat":MainFrame
 }
 function TestApp(){
     return <div>test</div>

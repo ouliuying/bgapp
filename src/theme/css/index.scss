@@ -879,3 +879,9 @@ button:focus {
 .bg-sms-attach-controls > div span{
     margin-right: 5px;
 }
+
+
+.bg-chat-main-frame{
+    display: flex;
+    flex-direction: column;
+}
