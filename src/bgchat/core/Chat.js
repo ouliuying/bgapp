@@ -2,6 +2,7 @@ import EventBus  from 'vertx3-eventbus-client'
 import { MessageBus } from '../../mb/MessageBus';
 import { ReducerRegistry } from '../../ReducerRegistry';
 import { ModelAction } from '../../app/mq/ModelAction';
+import { getCurrChatSessionID, getCurrChatUUID } from '../../reducers/partner';
 export const MESSAGE_COMMING_TOPIC = "chat:message_comming_topic"
 export const SEND_MESSAGE_TO_SERVER_TOPIC = "chat:send_message_to_server_topic"
 export const INIT_UI = "chat:init_ui"
@@ -9,9 +10,11 @@ export class ChatCore {
     constructor(){
       this._eb = new EventBus("http://localhost:8088/eventbus")
     }
+
     get eventBus(){
         return this._eb
     }
+
     static get ref(){
         return ChatCore.singleton || (ChatCore.singleton = new ChatCore())
     }
@@ -30,8 +33,15 @@ export class ChatCore {
     }
 
     startRegClient(success,fail){
-        new ModelAction("","").call("",{},(data)=>{
-            
+        let chatSessionID = this.getCurrChatSessionID()||""
+        new ModelAction("chat","chat").call("loadChannelMeta",{
+            chatSessionID
+        },(ret)=>{
+            if(ret.errorCode!=0){
+                setTimeout(()=>{
+                    this.startRegClient(success,fail)
+                },5000)   
+            }
         },()=>{
             setTimeout(()=>{
                 this.startRegClient(success,fail)
@@ -41,9 +51,12 @@ export class ChatCore {
 
     getCurrChatUUID(){
         const state = ReducerRegistry.Store.getState()
-
+        return getCurrChatUUID(state)
     }
-
+    getCurrChatSessionID(){
+        const state = ReducerRegistry.Store.getState()
+        return getCurrChatSessionID(state)
+    }
 
     startChatSession(chatSessionID){
         this.initChatData(chatSessionID).then(()=>{

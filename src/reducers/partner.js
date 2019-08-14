@@ -11,6 +11,7 @@ const initPartner={
     status:0,
     devType:0,
     chatUUID:"",
+    chatSessionID:"",
     errorDescription:""
 }
 export function partner(state,action){
@@ -51,3 +52,5 @@ export const userNamePasswordSelector=createSelector(state=>state.partner.userNa
 
 export const statusSelector=state=>({status:state.partner.status,errorDescription:state.partner.errorDescription})
 export const getCurrPartner=createSelector(state=>state.partner,partner=>(partner))
+export const getCurrChatSessionID = createSelector(state=>state.partner,partner=>(partner.chatSessionID))
+export const getCurrChatUUID = createSelector(state=>state.partner,partner=>(partner.chatUUID))

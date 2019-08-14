@@ -94,7 +94,7 @@ class MainFrame extends React.Component{
                 </div>
 
                 <div className="bg-chat-channel-message-window-input">
-                      <Input.TextArea className="bg-chat-channel-message-window-input-area">
+                      <Input.TextArea className="bg-chat-channel-message-window-input-area" placeholder="输入要发送的内容...">
                           
                       </Input.TextArea>
                       <div className="bg-chat-channel-message-window-input-actions">
