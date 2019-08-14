@@ -10,7 +10,7 @@ import ViewContext from './app/modelView/ViewContext'
 import { MessageBus, SYS_INIT, PARTNER_INIT } from './mb/MessageBus';
 import { getCurrPartner } from './reducers/partner';
 const persistConfig = {
-    key: 'root',
+    key: 'bgworkroot',
     storage:storage,
     blacklist: [ViewContext.APP_CONTEXT,"router","modalSheetQueue"]
 }

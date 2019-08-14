@@ -883,5 +883,170 @@ button:focus {
 
 .bg-chat-main-frame{
     display: flex;
+    flex-direction: row;
+    align-items:stretch;
+}
+
+.bg-chat_channel-members-area{
+    background:#21272e;
+    display: flex;
+    flex-direction: row;
+    align-items:stretch;
+    flex-basis: 28.6rem;
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+.bg-chat-channel-bar{
+    flex-shrink:0;
+    flex-basis: 13.5rem;
+    flex-grow:0;
+    background:#282e36;
+    margin-right:0.1rem;
+}
+.bg-chat-channel-members-bar{
+    flex-shrink:0;
+    flex-basis: 15rem;
+    flex-grow:0;
+
+    background: #333a44;
+}
+.bg-chat-channel-message-window{
+    flex-shrink:1;
+    flex-basis:100%;
+    flex-grow:1;
+    background:#eef0f3;
+}
+.bg-chat-channel-active-session-bar{
+    flex-shrink:0;
+    flex-basis: 10rem;
+    flex-grow:0;
+    background:#fff;
+}
+.bg-chat-channel-header{
+    color:white;
+    padding:0.8rem;
+}
+.bg-chat-channel-body{
+    padding:0.0rem 0.0rem;
+}
+.bg-chat-channel-bar .bg-chat-channel-header{
+    border-bottom: #31373f  2px solid;
+}
+.bg-chat-channel-bar .bg-chat-channel-body{
+    background: none;
+}
+
+.bg-chat-channel-members-bar .bg-chat-channel-header{
+    border-bottom: #31373f  2px solid;
+}
+.bg-chat-channel-body-channel-container{
+    color:#7f8286;
+    list-style: none;
+    list-style-type: none;
+    padding:0;
+    margin:0;
+}
+.bg-chat-channel-body-channel-container .bg-chat-channel-body-channel-item{
+    list-style-type: none;
+    list-style: none;
+    padding:0.6rem 0.5rem;
+    cursor: pointer;
+    font-size: 95%;
+}
+.bg-chat-channel-body-channel-container .bg-chat-channel-body-channel-item:hover,
+.bg-chat-channel-body-channel-container .bg-chat-channel-body-channel-item.active
+{
+    color:#fff;
+    background:#343c45;
+}
+.bg-chat-channel-members-container{
+    color:#7f8286;
+    list-style: none;
+    list-style-type: none;
+    padding:0;
+    margin:0;
+}
+.bg-chat-channel-members-container  .bg-chat-channel-members-channel-item{
+    list-style-type: none;
+    list-style: none;
+    padding:0.3rem 0.5rem;
+    cursor: pointer;
+    font-size: 95%;
+    display: flex;
+    flex-direction: row;
+}
+.bg-chat-channel-members-container  .bg-chat-channel-members-channel-item:hover,
+.bg-chat-channel-members-container  .bg-chat-channel-members-channel-item.active{
+    background:#1890ff;
+}
+.bg-chat-channel-members-container  .bg-chat-channel-members-channel-item:hover .bg-chat-channel-members-item-userinfo-title,
+.bg-chat-channel-members-container  .bg-chat-channel-members-channel-item.active .bg-chat-channel-members-item-userinfo-title{
+    color:#eee;
+}
+.bg-chat-channel-members-item-icon > img{
+    width: 3rem;
+    border-radius: 1.5rem;
+    padding-top: 0.2rem;
+}
+.bg-chat-channel-members-item-userinfo{
+    display: flex;
     flex-direction: column;
+    margin-left: 0.5rem;
+}
+.bg-chat-channel-members-item-userinfo-nickname{
+    color:white;
+    margin-top: 0.3rem;
+}
+.bg-chat-channel-members-item-userinfo-title{
+    margin-top: 0.2rem;
+    font-size: 90%;
+}
+.bg-chat-channel-message-window{
+    background:#e9ecf2;
+    display: flex;
+    flex-direction: column;
+}
+
+.bg-chat-channel-message-window .bg-chat-channel-header{
+    border-bottom: rgb(185, 184, 184)  2px solid;
+    flex-basis: 4.5rem;
+    flex-grow: 0;
+    flex-shrink:0;
+}
+.bg-chat-channel-message-window .bg-chat-channel-header .bg-channel-icon{
+    width:3rem;
+    border-radius: 1.5rem;
+    margin-right: 0.3rem;
+}
+.bg-chat-channel-message-window .bg-chat-channel-header .bg-channel-name{
+    font-size:110%;
+    color:#000;
+    margin-right: 0.3rem;
+}
+.bg-chat-channel-message-window .bg-chat-channel-header .bg-channel-member-nickname{
+    font-size:95%;
+    color:#888;
+    margin-right: 0.3rem;
+}
+.bg-chat-channel-message-window .bg-chat-channel-header .bg-channel-member-status{
+    font-size:85%;
+    color:#1890ff;
+}
+.bg-chat-channel-message-window-body{
+    padding:0.6rem 1rem;
+    flex-grow: 1;
+    flex-shrink: 1;
+}
+.bg-chat-channel-message-window-input{
+    background: #fff;
+    flex-basis: 6rem;
+    flex-grow: 0;
+    flex-shrink:0;
+    padding:0.3rem;
+}
+.bg-chat-channel-message-window-input-area{
+    background:#e9ecf2;
+}
+.bg-chat-channel-message-window-input-actions{
+    padding:0.2rem 0.5rem;
 }

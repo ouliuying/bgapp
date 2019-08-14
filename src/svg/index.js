@@ -21,6 +21,10 @@ import {ReactComponent as SettingApp} from '../svg/setting-app.svg'
 import {ReactComponent as SmsApp} from '../svg/sms-app.svg'
 import {ReactComponent as SmsAppSend} from '../svg/sms-send.svg'
 import {ReactComponent as SmsAppSendLog} from '../svg/sms-log.svg'
+import {ReactComponent as ChatChannelLogo} from '../svg/chat-channel-logo.svg'
+import {ReactComponent as ChatChannelOpMore} from '../svg/chat-channel-op-more.svg'
+import {ReactComponent as ChatChannelMembers} from '../svg/chat-channel-members.svg'//chat-channel-ent.svg
+import {ReactComponent as ChatChannelEntity} from '../svg/chat-channel-ent.svg'
 //
 const svgs={
     
@@ -49,6 +53,11 @@ svgs["/svg/setting-app.svg"]=SettingApp
 svgs["/svg/sms-app.svg"]=SmsApp
 svgs["/svg/sms-send.svg"]=SmsAppSend
 svgs["/svg/sms-log.svg"]=SmsAppSendLog
+svgs["/svg/chat-channel-logo.svg"]=ChatChannelLogo
+svgs["/svg/chat-channel-op-more.svg"]=ChatChannelOpMore
+svgs["/svg/chat-channel-members.svg"] = ChatChannelMembers
+svgs["/svg/chat-channel-ent.svg"] = ChatChannelEntity
+
 export function regSvg(path,component){
     svgs[path]=component
 }
