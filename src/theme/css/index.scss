@@ -1050,3 +1050,36 @@ button:focus {
 .bg-chat-channel-message-window-input-actions{
     padding:0.2rem 0.5rem;
 }
+
+.bg-sheet-confirm-dialog{
+    width:40%;
+    min-width: 580px;
+    position: absolute;
+    top:15%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: $primary-color;
+    border-radius: 2px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.3);
+    box-sizing: border-box;
+    margin-bottom: 50px;
+}
+
+.bg-sheet-confirm-dialog-body{
+    padding: 24px;
+    font-size: 14px;
+    line-height: 1.5;
+    word-wrap: break-word;
+}
+
+.bg-sheet-confirm-dialog-footer{
+    padding: 10px 16px;
+    text-align: right;
+    background: transparent;
+    border-top: 1px solid #e8e8e8;
+    border-radius: 0 0 4px 4px;
+}
+.bg-sheet-confirm-dialog-footer button + button {
+    margin-bottom: 0;
+    margin-left: 8px;
+}

@@ -1,8 +1,8 @@
 import _ from 'lodash'
 import { createStore, combineReducers, applyMiddleware ,compose} from 'redux'
 
-import createHistory from 'history/createBrowserHistory'
-
+//import createHistory from 'history/createBrowserHistory'
+import { createBrowserHistory } from 'history';
 import { connectRouter, routerMiddleware} from 'connected-react-router'
 import { persistStore,persistReducer} from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
@@ -29,7 +29,7 @@ export class ReducerRegistry {
     }
     static create(reducers){
         ReducerRegistry.reducers= reducers;
-        const history = createHistory()
+        const history = createBrowserHistory()
         const middleware = routerMiddleware(history)
         ReducerRegistry.reducers={
             router: connectRouter(history),

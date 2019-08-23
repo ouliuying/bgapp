@@ -13,6 +13,7 @@ import {
 import {createViewParam,createEditParam, createDetailParam, createModelActionParam} from '../modelView/ViewParam'
 import ViewType from '../modelView/ViewType'
 import { createCriteria } from '../modelView/ViewFieldCriteria';
+import {original} from "immer"
 export class DetailViewCMM extends ViewCMM{
 
     constructor(app,model,viewType){
@@ -257,17 +258,46 @@ export class DetailViewCMM extends ViewCMM{
                
             }
             if(trigger.actionName){
-                let modelID = ownerModelID
-                let modelActionParam = createModelActionParam(modelID,orgOwnerField,{
-                    reload:()=>{
-                        self.didMount(view)
-                    }
-                },orgState)
-                this.showAppModelViewModelActionInModalQueue(app,model,trigger.viewType,trigger.viewRefType,modelActionParam,trigger.actionName)
+                switch(trigger.viewType){
+                    case ViewType.MODEL_ACTION_CONFIRM:
+                        {
+                            let modelID = ownerModelID
+                            let modelActionParam = createModelActionParam(modelID,orgOwnerField,{
+                                reload:()=>{
+                                    self.didMount(view)
+                                }
+                            },orgState,trigger.meta&&original(trigger.meta))
+                            this.showAppModelViewModelActionInModalQueue(app,
+                                model,
+                                trigger.viewType,
+                                trigger.viewRefType
+                                ,modelActionParam
+                                ,trigger.actionName)
+                            break
+                        }
+                   
+                    default:
+                        {
+                            let modelID = ownerModelID
+                            let modelActionParam = createModelActionParam(modelID,orgOwnerField,{
+                                reload:()=>{
+                                    self.didMount(view)
+                                }
+                            },orgState,trigger.meta&&original(trigger.meta))
+                            this.showAppModelViewModelActionInModalQueue(app,
+                                model,
+                                trigger.viewType,
+                                trigger.viewRefType
+                                ,modelActionParam,
+                                trigger.actionName)
+                        }
+                }
+
             }
-           
         }
     }
+
+
     getFieldByFieldName(view,fieldName){
         const {viewData}=view.props
         const  {view:viewMeta,data}=viewData

@@ -20,7 +20,7 @@ import { getRoutePath,goRoute } from '../routerHelper'
 import {viewDataFromListContext, localDataFromListContext} from '../reducers/appContext'
 import {ModalSheetManager} from '../modelView/ModalSheetManager'
 import {Button} from '../../ui'
-import {createDetailParam,createViewParam} from '../modelView/ViewParam'
+import {createDetailParam,createViewParam, createModelActionParam} from '../modelView/ViewParam'
 import { and } from '../../criteria'
 import ViewType from "../modelView/ViewType"
 import {produce} from 'immer'
@@ -29,6 +29,7 @@ import {nextRecordTag} from '../../lib/tag-helper'
 import {getExpression} from '../../lib/criteria-helper'
 import { createCriteria } from "../modelView/ViewFieldCriteria";
 import ViewFieldTypeRegistry from '../modelView/ViewFieldTypeRegistry'
+import {original} from "immer"
 export class ListViewCMM extends  ViewCMM{
     constructor(app,model,viewType){
         super(app,model,viewType)
@@ -128,24 +129,30 @@ export class ListViewCMM extends  ViewCMM{
             title: "操作",
             width: 120,
             render: (text,record)=>{
-                let tg= triggerGroups.find(x=>x.name=="opAction")
+                let excludeGroups=["main","selSingleItemAction"]
+                //let tg= triggerGroups.find(x=>x.name=="opAction")
                 let selSingleItemActionTg = triggerGroups.find(x=>x.name=="selSingleItemAction")
+                let tgs = triggerGroups.filter(x=>{
+                    return excludeGroups.indexOf(x.name)<0
+                })
                 return <span>
                     {
-                        tg && tg.triggers.map(t=>{
-                            return <Button type="text" size="small" onClick={()=>{
-                                produce(t,draft=>{
-                                    if(!draft.app || draft.app=="*"){
-                                        draft.app = self.app
-                                    }
-                                    if(!draft.model || draft.model=="*"){
-                                        draft.model = self.model
-                                    }
-                                    draft[ARGS]={id:record["id"],tag:record[RECORD_TAG]}
-                                    self.doAction(view,draft)
-                                })
-                               
-                            }} key={t.name}>{t.title}</Button>
+                        tgs && tgs.map(tg=>{
+                            return tg.triggers.map(t=>{
+                                return <Button type="text" size="small" onClick={()=>{
+                                    produce(t,draft=>{
+                                        if(!draft.app || draft.app=="*"){
+                                            draft.app = self.app
+                                        }
+                                        if(!draft.model || draft.model=="*"){
+                                            draft.model = self.model
+                                        }
+                                        draft[ARGS]={id:record["id"],tag:record[RECORD_TAG],data:record}
+                                        self.doAction(view,draft)
+                                    })
+                                   
+                                }} key={t.name}>{t.title}</Button>
+                            })
                         })
                     }
                     {
@@ -238,6 +245,7 @@ export class ListViewCMM extends  ViewCMM{
           }
         }
     }
+
     fetchData(opts){
         const {view}=opts
         let {viewParam,viewData,viewRefType,localData}= view.props
@@ -354,7 +362,25 @@ export class ListViewCMM extends  ViewCMM{
     }
 
     doAction(view,trigger){
-        super.doAction(view,trigger)
+        let self=this
+        let {viewParam} = view.props
+        const {orgState,ownerField:orgOwnerField} = (viewParam||{})
+        if(!super.doAction(view,trigger)){
+            if(trigger.viewType == ViewType.MODEL_ACTION_CONFIRM){
+                let modelID = trigger[ARGS].id
+                let modelActionParam = createModelActionParam(modelID,orgOwnerField,{
+                    reload:()=>{
+                        self.didMount(view)
+                    }
+                },orgState,trigger.meta && original(trigger.meta))
+                this.showAppModelViewModelActionInModalQueue(trigger.app,
+                    trigger.model,
+                    trigger.viewType,
+                    trigger.viewRefType,
+                    modelActionParam,
+                    trigger.actionName)
+            }
+        }
     }
 
     search(view){

@@ -12,7 +12,7 @@ class ModalSheetQueueContainer extends React.Component{
                     Object.keys(modalSheetQueue||{}).map(function(key){
                         let sheet = modalSheetQueue[key]
                         let props = {sheetIndex:key,view:sheet.view,...sheet.props}
-                        return <ModalSheet {...props} key={key}></ModalSheet>
+                         return <ModalSheet {...props} key={key}></ModalSheet>
                     })
                 }
                 </div>:null

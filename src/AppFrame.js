@@ -49,7 +49,7 @@ class AppFrame extends React.Component{
                                 <li>
                                 <Icon.ChatApp onClick={
                                     ()=>{
-                                     this.props.dispatch(push("/app/static/chat"))
+                                     this.props.dispatch(push("/app/static/im"))
                                      setCurrApp({})
                                     }
                                 }></Icon.ChatApp>

@@ -4,6 +4,7 @@ import DetailView from './DetailView'
 import ListView from './ListView'
 import DummyView from './DummyView'
 import ModelActionView from './ModelActionView';
+import ConfirmView from '../commonView/ConfirmView';
 export default function getDefaultModelView(viewType){
     switch(viewType){
         case "list":
@@ -16,6 +17,8 @@ export default function getDefaultModelView(viewType){
             return DetailView
         case "modelAction":
             return ModelActionView
+        case "modelActionConfirm":
+            return ConfirmView
         default:
             return DummyView
     }

@@ -114,7 +114,7 @@ class AppInContainer extends React.Component{
         new ModelAction("core","app").call("loadAppContainer",{
             app:routerApp,
             menu:{
-                app:self.app.name,
+                app:routerApp||self.app.name,
                 menu:"main"
             }
         },function(data){
@@ -216,6 +216,7 @@ class AppInContainer extends React.Component{
         </div>
     }
 }
+
 
 function inMapStateToProps(state){
     let app=getCurrentApp(state)

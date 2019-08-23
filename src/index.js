@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import App from './App'
-import 'antd/dist/antd.css'
+import 'antd/dist/antd.less'
 import './theme/css/antd.scss'
 import './theme/css/login.scss'
 import './theme/css/index.scss'
@@ -24,4 +24,4 @@ ReactDOM.render(
             </LocaleProvider>
         </ConnectedRouter>
     </Provider>,document.getElementById('root'))
-MessageBus.ref.send(SYS_INIT,null)
+//MessageBus.ref.send(SYS_INIT,null)

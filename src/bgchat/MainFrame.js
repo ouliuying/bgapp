@@ -6,11 +6,47 @@ import {
     Route,
     matchPath
 } from 'react-router-dom'
-import {Icon,Input,Button} from '../ui'
-import { getSvg } from "../svg";
+import {Icon,Input,Button,Menu,Dropdown} from '../ui'
+import { getSvg } from "../svg"
+import { ReducerRegistry } from "../ReducerRegistry";
+import { push } from "connected-react-router";
+
+function  ChannelMenu(props){
+    return <Menu theme="dark" onClick={(itemData)=>{
+        let key = itemData.key
+        const {store}=ReducerRegistry
+        switch(key){
+            case "join_channel":
+                    store.dispatch(push("/app/dynamic/chat/chatChannel/list"))
+                break
+            case "add_channel":
+                    store.dispatch(push("/app/dynamic/chat/chatChannel/create"))
+                break
+            case "channel_message_list":
+                    store.dispatch(push("/app/dynamic/chat/chatChannelMessage/list"))
+                break
+            default:
+                break
+        }
+    }}>
+      <Menu.Item key="join_channel">
+        <span>加入频道</span>
+      </Menu.Item>
+      <Menu.Item key="add_channel">
+        <span>添加频道</span>
+      </Menu.Item>
+      <Menu.Item key="channel_message_list">
+        <span>通讯日志</span>
+      </Menu.Item>
+    </Menu>
+}
+ 
+
+
 class MainFrame extends React.Component{
  
     render(){
+        const self =this
         const ChannelLogo = getSvg("/svg/chat-channel-logo.svg")
         const ChannelOpMore = getSvg("/svg/chat-channel-op-more.svg")
         const channelMembers = getSvg("/svg/chat-channel-members.svg")
@@ -20,7 +56,12 @@ class MainFrame extends React.Component{
             <div className="bg-chat_channel-members-area">
                 <div className="bg-chat-channel-bar">
                     <div className="bg-chat-channel-header">
-                    <Icon component={ChannelLogo} />频道 <Icon component={ChannelOpMore} style={{float:"right",marginTop:4,cursor:"pointer"}} />
+                    <Icon component={ChannelLogo} />频道 
+
+                    <Dropdown overlay={ChannelMenu} placement="bottomLeft">
+                         <Icon component={ChannelOpMore}   style={{float:"right",marginTop:4,cursor:"pointer"}} />
+                    </Dropdown>
+
                     </div>
                     <div className="bg-chat-channel-body">
                         <ul className="bg-chat-channel-body-channel-container">
@@ -90,7 +131,7 @@ class MainFrame extends React.Component{
                 </div>
 
                 <div className="bg-chat-channel-message-window-body">
-
+                    
                 </div>
 
                 <div className="bg-chat-channel-message-window-input">

@@ -23,6 +23,7 @@ export class ViewCMM{
     }
 
     update(view){
+        
     }
 
     didMount(view){

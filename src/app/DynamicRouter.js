@@ -41,7 +41,11 @@ const appInContainers={
         loading: () => <div/>,
     })
     ,
-    "chat":MainFrame
+    "im":MainFrame,
+    "chat":Loadable({
+        loader: () => import('../bgchat/ChatInContainer'),
+        loading: () => <div/>,
+    })
 }
 function TestApp(){
     return <div>test</div>
