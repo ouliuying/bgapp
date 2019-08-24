@@ -40,7 +40,7 @@ export class ModalSheet extends React.Component{
                 break
         }
         const {triggerMeta} = viewParam||{}
-        const title = triggerMeta.title
+        const title = (triggerMeta||{}).title
         return  <div className={sheetConatainerClassName} style={{zIndex:sheetIndex}}>
             <div class="bg-sheet-dialog-header">
                 <span>{title||"办公系统"}</span>
@@ -116,7 +116,7 @@ class ConfirmSheet extends React.Component{
                 document.body.removeChild(sheetHookElement)
             }
             catch{
-
+                
             }
         
         }
@@ -130,13 +130,13 @@ class ConfirmSheet extends React.Component{
         return <Modal
                 zIndex={sheetIndex}
                 title={title}
-                visible={this.state.show}
+                visible={self.state.show}
                 destroyOnClose={true}
                 afterClose={()=>{
-                    this.unHookElement();
+                    self.unHookElement();
                 }}
                 onOk={()=>{
-                    this.setState({
+                    self.setState({
                         show:false
                     })
                     cOk()}

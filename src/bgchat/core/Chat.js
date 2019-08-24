@@ -20,8 +20,8 @@ export class ChatCore {
     }
 
     start(){
-         this.stableChatSession().then(chatSessionID=>{
-             this.startChatSession(chatSessionID)
+         this.stableChatSession().then(channelMeta=>{
+             this.startChatSession(channelMeta)
          })
     }
 
@@ -42,6 +42,9 @@ export class ChatCore {
                     this.startRegClient(success,fail)
                 },5000)   
             }
+            else{
+                success && success(ret.bag.channelMeta)
+            }
         },()=>{
             setTimeout(()=>{
                 this.startRegClient(success,fail)
@@ -58,8 +61,9 @@ export class ChatCore {
         return getCurrChatSessionID(state)
     }
 
-    startChatSession(chatSessionID){
-        this.initChatData(chatSessionID).then(()=>{
+    startChatSession(channelMeta){
+        let chatSessionID = this.getCurrChatSessionID()
+        this.initChatData(channelMeta).then(()=>{
             const address = "server.to.client." + chatSessionID
             this._eb.consume(address,(msg)=>{
                 MessageBus.ref.send(MESSAGE_COMMING_TOPIC,msg)
@@ -71,9 +75,9 @@ export class ChatCore {
     }
 
 
-    initChatData(chatSessionID){
+    initChatData(channelMeta){
         return  new Promise((resolve,reject)=>{
-
+            console.log(JSON.stringify(channelMeta))
         })
     }
 

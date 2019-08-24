@@ -24,4 +24,4 @@ ReactDOM.render(
             </LocaleProvider>
         </ConnectedRouter>
     </Provider>,document.getElementById('root'))
-//MessageBus.ref.send(SYS_INIT,null)
+MessageBus.ref.send(SYS_INIT,null)
