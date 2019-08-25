@@ -6,6 +6,7 @@ import { getCurrChatSessionID, getCurrChatUUID } from '../../reducers/partner';
 export const MESSAGE_COMMING_TOPIC = "chat:message_comming_topic"
 export const SEND_MESSAGE_TO_SERVER_TOPIC = "chat:send_message_to_server_topic"
 export const INIT_UI = "chat:init_ui"
+
 export class ChatCore {
     constructor(){
       this._eb = new EventBus("http://localhost:8088/eventbus")
@@ -71,10 +72,23 @@ export class ChatCore {
             MessageBus.ref.consume(SEND_MESSAGE_TO_SERVER_TOPIC,(msg)=>{
                 this.sendToServer(msg)
             })
+
+            MessageBus.ref.consume(MESSAGE_COMMING_TOPIC,msg=>{
+                this.dispatchMessage(msg)
+            })
         })
     }
 
+    dispatchMessage(msg){
+        let resp = this.createMessageResponse(msg)
+        if(resp){
+            MessageBus.ref.send(SEND_MESSAGE_TO_SERVER_TOPIC,resp)
+        }
 
+    }
+    createMessageResponse(message){
+        return null
+    }
     initChatData(channelMeta){
         return  new Promise((resolve,reject)=>{
             console.log(JSON.stringify(channelMeta))

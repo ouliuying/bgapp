@@ -10,6 +10,8 @@ import {Icon,Input,Button,Menu,Dropdown} from '../ui'
 import { getSvg } from "../svg"
 import { ReducerRegistry } from "../ReducerRegistry";
 import { push } from "connected-react-router";
+import { getChannels, getActiveChannel, getActiveJoinModel, getActiveChatSessionMessages } from "./reducers/chat";
+import { getCurrChatUUID } from "../reducers/partner";
 
 function  ChannelMenu(props){
     return <Menu theme="dark" onClick={(itemData)=>{
@@ -44,13 +46,25 @@ function  ChannelMenu(props){
 
 
 class MainFrame extends React.Component{
- 
+    constructor(props){
+        super(props)
+        this.state={
+            message:""
+        }
+    }
+    sendMessage(message){
+        const {activeChannel,activeJoinModel,myUUID} = this.props
+
+    }
     render(){
         const self =this
         const ChannelLogo = getSvg("/svg/chat-channel-logo.svg")
         const ChannelOpMore = getSvg("/svg/chat-channel-op-more.svg")
         const channelMembers = getSvg("/svg/chat-channel-members.svg")
         const channelEntity = getSvg("/svg/chat-channel-ent.svg")
+
+        const {channels,activeChannel,activeJoinModel,messageQueue,myUUID} = self.props
+        const activeChannelJoinModels = (activeChannel||{}).joinModels||[]
         return <div className="bg-chat-main-frame bg-flex-full">
            
             <div className="bg-chat_channel-members-area">
@@ -65,18 +79,17 @@ class MainFrame extends React.Component{
                     </div>
                     <div className="bg-chat-channel-body">
                         <ul className="bg-chat-channel-body-channel-container">
-                            <li className="bg-chat-channel-body-channel-item">
-                               <Icon component={channelEntity} style={{marginRight:5}}></Icon>公司所有成员
-                            </li>
-                            <li className="bg-chat-channel-body-channel-item">
-                                <Icon component={channelEntity} style={{marginRight:5}}></Icon>财务部
-                            </li>
-                            <li className="bg-chat-channel-body-channel-item">
-                                <Icon component={channelEntity} style={{marginRight:5}}></Icon>人事部
-                            </li>
-                            <li className="bg-chat-channel-body-channel-item">
-                                <Icon component={channelEntity} style={{marginRight:5}}></Icon>客服部
-                            </li>
+                            {
+                                (channels||[]).map(ch=>{
+                                    let className = "bg-chat-channel-body-channel-item"
+                                    if(ch.UUID == (activeChannel||{}).UUID){
+                                        className = "bg-chat-channel-body-channel-item active"
+                                    }
+                                    return  <li className={className}>
+                                                <Icon component={channelEntity} style={{marginRight:5}}></Icon>{ch.name}
+                                           </li> 
+                                })
+                            }
                         </ul>
                     </div>
                 </div>
@@ -88,32 +101,24 @@ class MainFrame extends React.Component{
                     </div>
                     <div className="bg-chat-channel-body">
                         <ul className="bg-chat-channel-members-container">
-                            <li className="bg-chat-channel-members-channel-item">
-                            <div className="bg-chat-channel-members-item-icon">
-                                    <img src="/images/Avatar.jpg" alt=""/>
-                                </div>
-                                <div className="bg-chat-channel-members-item-userinfo">
-                                    <div className="bg-chat-channel-members-item-userinfo-nickname">
-                                        Nickname
-                                    </div>
-                                    <p className="bg-chat-channel-members-item-userinfo-title">
-                                         title information
-                                    </p>
-                                </div>
-                            </li>
-                            <li className="bg-chat-channel-members-channel-item">
-                                <div className="bg-chat-channel-members-item-icon">
-                                    <img src="/images/Avatar.jpg" alt=""/>
-                                </div>
-                                <div className="bg-chat-channel-members-item-userinfo">
-                                    <div className="bg-chat-channel-members-item-userinfo-nickname">
-                                        Nickname
-                                    </div>
-                                    <p className="bg-chat-channel-members-item-userinfo-title">
-                                         title information
-                                    </p>
-                                </div>
-                            </li>
+                            {
+                                activeChannelJoinModels.map(jm=>{
+
+                                    return  <li className="bg-chat-channel-members-channel-item">
+                                                    <div className="bg-chat-channel-members-item-icon">
+                                                        <img src="/images/Avatar.jpg" alt=""/>
+                                                    </div>
+                                                    <div className="bg-chat-channel-members-item-userinfo">
+                                                        <div className="bg-chat-channel-members-item-userinfo-nickname">
+                                                           {jm.nickName}
+                                                        </div>
+                                                        <p className="bg-chat-channel-members-item-userinfo-title">
+                                                            {jm.title}
+                                                        </p>
+                                                    </div>
+                                            </li>
+                                })
+                            }
                         </ul>
                     </div>
                 </div>
@@ -122,24 +127,45 @@ class MainFrame extends React.Component{
            
             <div className="bg-chat-channel-message-window bg-flex-full">
                 <div className="bg-chat-channel-header">
-                 
-                    <img src="/images/Avatar.jpg" alt="" className="bg-channel-icon"/>
-               
-                    <span className="bg-channel-name">财务部></span>
-                    <span className="bg-channel-member-nickname">对象昵称></span>
-                    <span className="bg-channel-member-status">正在交流</span>
+                    {
+                        activeChannel && activeJoinModel && <>
+                        <img src="/images/Avatar.jpg" alt="" className="bg-channel-icon"/>
+                        <span className="bg-channel-name">{activeChannel.name}></span>
+                        <span className="bg-channel-member-nickname">对象昵称></span>
+                        <span className="bg-channel-member-status">{activeJoinModel.nickName}</span>
+                        </>
+                    }
                 </div>
 
                 <div className="bg-chat-channel-message-window-body">
-                    
+                    {
+                        messageQueue.map(msg=>{
+                            if(msg.fromUUID != myUUID){
+                                return <div className="bg-chat-channel-message-from-other">
+                                        other
+                                    </div>
+                            }
+                            else{
+                                return <div className="bg-chat-channel-message-from-me">
+                                        me
+                                </div>
+                            }
+                        })
+                    }
                 </div>
 
                 <div className="bg-chat-channel-message-window-input">
-                      <Input.TextArea className="bg-chat-channel-message-window-input-area" placeholder="输入要发送的内容...">
-                          
-                      </Input.TextArea>
+                      <Input.TextArea className="bg-chat-channel-message-window-input-area" placeholder="输入要发送的内容..." onChange={(value)=>{
+                          self.setState({
+                              message:value
+                          })
+                      }}></Input.TextArea>
                       <div className="bg-chat-channel-message-window-input-actions">
-                          <Button type="primary">发送</Button>
+                          <Button type="primary" onClick={()=>{
+                              if(self.state.message){
+                                 self.sendMessage(self.state.message)
+                              }
+                          }}>发送</Button>
                       </div>
                 </div>
             </div>
@@ -148,6 +174,11 @@ class MainFrame extends React.Component{
 }
 
 function mapStateToProps(state){
-    return state
+    let channels = getChannels(state)
+    let activeChannel = getActiveChannel(state)
+    let activeJoinModel = getActiveJoinModel(state)
+    let messageQueue = getActiveChatSessionMessages(state)
+    let myUUID = getCurrChatUUID(state)
+    return {channels,activeChannel,activeJoinModel,messageQueue,myUUID}
  }
 export default withRouter(connect(mapStateToProps)(MainFrame))

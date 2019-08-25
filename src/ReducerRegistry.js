@@ -12,7 +12,7 @@ import { getCurrPartner } from './reducers/partner';
 const persistConfig = {
     key: 'bgworkroot',
     storage:storage,
-    blacklist: [ViewContext.APP_CONTEXT,"router","modalSheetQueue"]
+    blacklist: [ViewContext.APP_CONTEXT,"router","modalSheetQueue","chat"]
 }
 
 export class ReducerRegistry {
