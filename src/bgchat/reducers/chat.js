@@ -8,7 +8,8 @@ import {CHAT_INIT_UI_CHANNEL_LIST,
     CHAT_MESSAGE_COMMING,
     CHAT_SEND_MESSAGE,
     CHAT_SET_ACTIVE_CHANNEL,
-    CHAT_SET_ACTIVE_CHANNEL_JOIN_MODEL
+    CHAT_SET_ACTIVE_CHANNEL_JOIN_MODEL,
+    CHAT_INIT_UI_CHANNEL_JOIN_MODEL_LIST
 } from '../actions/chat'
 import producer from "immer"
 import {createSelector} from "reselect"
@@ -34,6 +35,20 @@ export function chat(state,action){
                     }
                     return clientChannel
                 })
+            })
+        case CHAT_INIT_UI_CHANNEL_JOIN_MODEL_LIST:
+            return producer(state,draft=>{
+                let clientChannel =draft.clientChannels.find(x=>x.UUID == payload.channelUUID)
+                if(clientChannel){
+                    let joinModels = []
+                    (payload.joinModels||[]).map(sJM=>{
+                        let cJM = getClientChannel(sJM)
+                        if(cJM){
+                            joinModels.push(cJM)
+                        }
+                    })
+                    clientChannel.joinModels=joinModels
+                }
             })
         case CHAT_ADD_UI_CHANNEL:
             return producer(state,draft=>{
