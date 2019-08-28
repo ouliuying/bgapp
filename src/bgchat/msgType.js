@@ -1,0 +1,6 @@
+
+
+export const TXT_MESSAGE = 1
+
+
+export const RECEIVE_MESSAGE_RESPONSE_SUCCESS_TYPE =1

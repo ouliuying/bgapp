@@ -16,6 +16,7 @@ import 'moment/locale/zh-cn';
 import { MessageBus, SYS_INIT } from './mb/MessageBus';
 const {store,history}= ReducerRegistry.create(reducers)
 moment.locale('zh-cn');
+MessageBus.ref.send(SYS_INIT,null)
 ReactDOM.render(
     <Provider store={store}>
         <ConnectedRouter history={history}>
@@ -24,4 +25,4 @@ ReactDOM.render(
             </LocaleProvider>
         </ConnectedRouter>
     </Provider>,document.getElementById('root'))
-MessageBus.ref.send(SYS_INIT,null)
+

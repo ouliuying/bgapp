@@ -15,7 +15,7 @@ import {req,APPLICATION_JSON} from '../../lib/http-helper'
         },function(res){
             success(JSON.parse(res))
         },function(err){
-            console.error(err)
+           // console.error(err)
             fail(err)
         })
     }

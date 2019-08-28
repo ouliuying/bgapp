@@ -3,14 +3,22 @@ import { MessageBus } from '../../mb/MessageBus';
 import { ReducerRegistry } from '../../ReducerRegistry';
 import { ModelAction } from '../../app/mq/ModelAction';
 import { getCurrChatSessionID, getCurrChatUUID } from '../../reducers/partner';
-import { initUIChannelList, initUIChannelJoinModelList } from '../actions/chat';
-export const MESSAGE_COMMING_TOPIC = "chat:message_comming_topic"
-export const SEND_MESSAGE_TO_SERVER_TOPIC = "chat:send_message_to_server_topic"
-export const INIT_UI = "chat:init_ui"
+//import { initUIChannelList, initUIChannelJoinModelList } from '../actions/chat';
+import {MessageApi} from '../MessageApi'
+export const MESSAGE_COMMING_TOPIC = "chat::message_comming_topic"
+export const SEND_MESSAGE_TO_SERVER_TOPIC = "chat::send_message_to_server_topic"
+export const INIT_UI = "chat::init_ui"
+export const INIT_CHANNEL_LIST_UI = "chat::init_channel_list_ui"
+export const INIT_CHANNEL_JOIN_MODEL_LIST_UI = "chat::init_channel_join_model_list_ui"
+export const SET_ACTIVE_CHANNEL = "chat::set_active_channel"
+export const SET_ACTIVE_CHANNEL_ACTIVE_JOIN_MODEL = "chat::set_active_channel_active_join_model"
 
 export class ChatCore {
     constructor(){
       this._eb = new EventBus("http://localhost:8088/eventbus")
+      this._eb.onopen=()=>{
+          console.log("connect stable...")
+      }
     }
 
     get eventBus(){
@@ -69,7 +77,7 @@ export class ChatCore {
         this.initChatData(channelMeta).then(()=>{
             self.loadChannelJoinModels(channelMeta).then(()=>{
                 const address = "server.to.client." + chatSessionID
-                this._eb.consume(address,(msg)=>{
+                this._eb.registerHandler(address,(msg)=>{
                     MessageBus.ref.send(MESSAGE_COMMING_TOPIC,msg)
                 })
                 MessageBus.ref.consume(SEND_MESSAGE_TO_SERVER_TOPIC,(msg)=>{
@@ -82,7 +90,6 @@ export class ChatCore {
 
         })
     }
-
     dispatchResponeMessage(msg){
         let resp = this.createMessageResponse(msg)
         if(resp){
@@ -90,13 +97,16 @@ export class ChatCore {
         }
     }
     createMessageResponse(message){
+        if(MessageApi.mustResponseReceiveStatus(message)){
+            return MessageApi.createResponseReceiveSuccessMessage(message)
+        }
         return null
     }
     initChatData(channelMeta){
         let self = this
         return  new Promise((resolve,reject)=>{
             console.log(JSON.stringify(channelMeta))
-            initUIChannelList(channelMeta)
+            MessageBus.ref.send(INIT_CHANNEL_LIST_UI,channelMeta)
             resolve()
         })
     }
@@ -109,7 +119,9 @@ export class ChatCore {
                     uuid:ch.uuid
                 },data=>{
                     if((data.bag||{}).joinModels){
-                        initUIChannelJoinModelList(ch.uuid,data.bag.joinModels)
+                        MessageBus.ref.send(INIT_CHANNEL_JOIN_MODEL_LIST_UI,{
+                            channelUUID:ch.uuid,joinModels:data.bag.joinModels
+                        })
                     }
                     resolve()
                 },()=>{
@@ -121,6 +133,7 @@ export class ChatCore {
         return  Promise.all(promises)
     }
     sendToServer(msg){
+        console.log("start send message")
         this._eb.publish("client.to.server",msg)
     }
 }

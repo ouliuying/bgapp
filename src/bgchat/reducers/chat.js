@@ -13,6 +13,7 @@ import {CHAT_INIT_UI_CHANNEL_LIST,
 } from '../actions/chat'
 import producer from "immer"
 import {createSelector} from "reselect"
+import {original,isDraft} from "immer"
 const chatData = {
     clientChannels:[],
     activeClientChannel:{
@@ -41,7 +42,8 @@ export function chat(state,action){
                 let clientChannel =draft.clientChannels.find(x=>x.UUID == payload.channelUUID)
                 if(clientChannel){
                     let joinModels = []
-                    (payload.joinModels||[]).map(sJM=>{
+                    let sJoinModels = payload.joinModels||[]
+                    sJoinModels.map(sJM=>{
                         let cJM = getClientChannel(sJM)
                         if(cJM){
                             joinModels.push(cJM)
@@ -91,7 +93,7 @@ export function chat(state,action){
                 })
         case CHAT_SEND_MESSAGE:
                 return producer(state,draft=>{
-                    addSendMessageToChannel(draft,payload)
+                    addSendMessageToChannel(draft.clientChannels,payload)
                 })
         case CHAT_SET_ACTIVE_CHANNEL:
                 return producer(state,draft=>{
@@ -186,6 +188,7 @@ function getClientMessage(clientChannels,serverMessage){
     }
     clientMessage =  Object.assign({
     },serverMessage,clientMessage)
+    return clientMessage
 }
 function addReceiveMessageToChannel(clientChannels,serverMessage){
     let clientMessage = getClientMessage(clientChannels,serverMessage)
@@ -223,6 +226,8 @@ function setActiveClientChannel(chatData,channelUUID){
     let channel = chatData.clientChannels.find(x=>x.UUID == channelUUID)
     if(channel){
         chatData.activeClientChannel.clientChannel = channel
+        let defActiveJoinModel = channel.joinModels && channel.joinModels[0]
+        chatData.activeClientChannel.activeJoinModel = defActiveJoinModel?defActiveJoinModel:null
     }
 }
 function setActiveClientChannelJoinModel(chatData,joinModelUUID){
@@ -233,6 +238,12 @@ function setActiveClientChannelJoinModel(chatData,joinModelUUID){
             chatData.activeClientChannel.activeJoinModel = joinModel
         }
     }
+}
+function getOriginalData(draft){
+    if(isDraft(draft)){
+        return original(draft)
+    }
+    return draft
 }
 
 export const getChannels = createSelector(state=>state.chat,chat=>(chat.clientChannels))

@@ -12,6 +12,12 @@ import { ReducerRegistry } from "../ReducerRegistry";
 import { push } from "connected-react-router";
 import { getChannels, getActiveChannel, getActiveJoinModel, getActiveChatSessionMessages } from "./reducers/chat";
 import { getCurrChatUUID } from "../reducers/partner";
+import { MessageBus } from "../mb/MessageBus";
+import { MessageApi } from "./MessageApi";
+import { TextMessageItem } from "./messageItem/TextMessageItem";
+import { TXT_MESSAGE, RECEIVE_MESSAGE_RESPONSE_SUCCESS_TYPE } from "./msgType";
+import { WEB_TYPE } from "./devType";
+import { SET_ACTIVE_CHANNEL, SET_ACTIVE_CHANNEL_ACTIVE_JOIN_MODEL } from "./core/Chat";
 
 function  ChannelMenu(props){
     return <Menu theme="dark" onClick={(itemData)=>{
@@ -54,7 +60,11 @@ class MainFrame extends React.Component{
     }
     sendMessage(message){
         const {activeChannel,activeJoinModel,myUUID} = this.props
-
+        message.fromUUID = myUUID
+        message.toUUID = (activeJoinModel||{}).UUID
+        message.channelUUID = (activeChannel||{}).UUID
+        message.fromDevType = WEB_TYPE
+        MessageApi.send(message)
     }
     render(){
         const self =this
@@ -85,7 +95,9 @@ class MainFrame extends React.Component{
                                     if(ch.UUID == (activeChannel||{}).UUID){
                                         className = "bg-chat-channel-body-channel-item active"
                                     }
-                                    return  <li className={className}>
+                                    return  <li className={className} onClick={()=>{
+                                        MessageBus.ref.send(SET_ACTIVE_CHANNEL,ch)
+                                    }}>
                                                 <Icon component={channelEntity} style={{marginRight:5}}></Icon>{ch.name}
                                            </li> 
                                 })
@@ -104,7 +116,9 @@ class MainFrame extends React.Component{
                             {
                                 activeChannelJoinModels.map(jm=>{
 
-                                    return  <li className="bg-chat-channel-members-channel-item">
+                                    return  <li className="bg-chat-channel-members-channel-item" onClick={()=>{
+                                        MessageBus.ref.send(SET_ACTIVE_CHANNEL_ACTIVE_JOIN_MODEL,jm)
+                                    }}>
                                                     <div className="bg-chat-channel-members-item-icon">
                                                         <img src="/images/Avatar.jpg" alt=""/>
                                                     </div>
@@ -140,30 +154,33 @@ class MainFrame extends React.Component{
                 <div className="bg-chat-channel-message-window-body">
                     {
                         messageQueue.map(msg=>{
-                            if(msg.fromUUID != myUUID){
-                                return <div className="bg-chat-channel-message-from-other">
-                                        other
-                                    </div>
+                            let isMe = msg.fromUUID == myUUID
+                            if(msg.type == TXT_MESSAGE){
+                                return <TextMessageItem isMe={isMe} msgBody={msg}></TextMessageItem>
                             }
                             else{
-                                return <div className="bg-chat-channel-message-from-me">
-                                        me
-                                </div>
+                                return <div>undefined</div>
                             }
                         })
                     }
                 </div>
 
                 <div className="bg-chat-channel-message-window-input">
-                      <Input.TextArea className="bg-chat-channel-message-window-input-area" placeholder="输入要发送的内容..." onChange={(value)=>{
+                      <Input.TextArea className="bg-chat-channel-message-window-input-area" placeholder="输入要发送的内容..." onChange={(evt)=>{
                           self.setState({
-                              message:value
+                              message:evt.target.value
                           })
                       }}></Input.TextArea>
                       <div className="bg-chat-channel-message-window-input-actions">
                           <Button type="primary" onClick={()=>{
                               if(self.state.message){
-                                 self.sendMessage(self.state.message)
+                                  let msg = {
+                                      type:TXT_MESSAGE,
+                                      content:self.state.message,
+                                      responeType:RECEIVE_MESSAGE_RESPONSE_SUCCESS_TYPE,
+                                      timestamp:new Date().getTime()
+                                  }
+                                 self.sendMessage(msg)
                               }
                           }}>发送</Button>
                       </div>
