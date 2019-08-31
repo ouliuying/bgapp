@@ -9,12 +9,14 @@ import {CHAT_INIT_UI_CHANNEL_LIST,
     CHAT_SEND_MESSAGE,
     CHAT_SET_ACTIVE_CHANNEL,
     CHAT_SET_ACTIVE_CHANNEL_JOIN_MODEL,
-    CHAT_INIT_UI_CHANNEL_JOIN_MODEL_LIST
+    CHAT_INIT_UI_CHANNEL_JOIN_MODEL_LIST,
+    CHAT_UPDATE_SEND_MESSAGE_UUID
 } from '../actions/chat'
 import producer from "immer"
 import {createSelector} from "reselect"
 import {original,isDraft} from "immer"
 const chatData = {
+    myUUID:"",
     clientChannels:[],
     activeClientChannel:{
         activeJoinModel:null,
@@ -29,7 +31,8 @@ export function chat(state,action){
     switch(type){
         case CHAT_INIT_UI_CHANNEL_LIST:
             return producer(state,draft=>{
-                payload.map(ch=>{
+                draft.myUUID = payload.myUUID
+                payload.channelMeta.map(ch=>{
                     let clientChannel = getClientChannel(ch)
                     if(clientChannel){
                         draft.clientChannels.push(clientChannel)
@@ -93,7 +96,7 @@ export function chat(state,action){
                 })
         case CHAT_SEND_MESSAGE:
                 return producer(state,draft=>{
-                    addSendMessageToChannel(draft.clientChannels,payload)
+                    addSendMessageToChannel(draft,payload)
                 })
         case CHAT_SET_ACTIVE_CHANNEL:
                 return producer(state,draft=>{
@@ -102,7 +105,11 @@ export function chat(state,action){
         case CHAT_SET_ACTIVE_CHANNEL_JOIN_MODEL:
                 return producer(state,draft=>{
                     setActiveClientChannelJoinModel(draft,payload)
-                })  
+                })
+        case CHAT_UPDATE_SEND_MESSAGE_UUID:
+            return producer(state,draft=>{
+                updateSendMessageUUID(draft,payload)
+            }) 
         default:
             return state
     }
@@ -190,33 +197,45 @@ function getClientMessage(clientChannels,serverMessage){
     },serverMessage,clientMessage)
     return clientMessage
 }
-function addReceiveMessageToChannel(clientChannels,serverMessage){
-    let clientMessage = getClientMessage(clientChannels,serverMessage)
+function addReceiveMessageToChannel(draft,serverMessage){
+    let clientMessage = getClientMessage(draft.clientChannels,serverMessage)
     let channelUUID = clientMessage.channelUUID
     if(channelUUID){
-        let clientChannel = clientChannels.find(x=>x.UUID == channelUUID)
+        let clientChannel = draft.clientChannels.find(x=>x.UUID == channelUUID)
         if(clientChannel){
             if(clientChannel.messageQueue){
                 clientChannel.messageQueue.push(clientMessage)
+                if(draft.activeClientChannel.clientChannel && draft.activeClientChannel.clientChannel.UUID == channelUUID){
+                    draft.activeClientChannel.clientChannel.messageQueue.push(clientMessage)
+                }
             }
             else{
                 clientChannel.messageQueue = [clientMessage]
+                if(draft.activeClientChannel.clientChannel && draft.activeClientChannel.clientChannel.UUID == channelUUID){
+                    draft.activeClientChannel.clientChannel.messageQueue = [clientMessage]
+                }
             }
         }
     }
 }
 
-function addSendMessageToChannel(clientChannels,serverMessage){
-    let clientMessage = getClientMessage(clientChannels,serverMessage)
+function addSendMessageToChannel(draft,serverMessage){
+    let clientMessage = getClientMessage(draft.clientChannels,serverMessage)
     let channelUUID = clientMessage.channelUUID
     if(channelUUID){
-        let clientChannel = clientChannels.find(x=>x.UUID == channelUUID)
+        let clientChannel = draft.clientChannels.find(x=>x.UUID == channelUUID)
         if(clientChannel){
             if(clientChannel.messageQueue){
                 clientChannel.messageQueue.push(clientMessage)
+                if(draft.activeClientChannel.clientChannel && draft.activeClientChannel.clientChannel.UUID == channelUUID){
+                    draft.activeClientChannel.clientChannel.messageQueue.push(clientMessage)
+                }
             }
             else{
                 clientChannel.messageQueue = [clientMessage]
+                if(draft.activeClientChannel.clientChannel && draft.activeClientChannel.clientChannel.UUID == channelUUID){
+                    draft.activeClientChannel.clientChannel.messageQueue = [clientMessage]
+                }
             }
         }
     }
@@ -236,6 +255,35 @@ function setActiveClientChannelJoinModel(chatData,joinModelUUID){
         let joinModel = clientChannel.joinModels.find(x=>x.UUID == joinModelUUID)
         if(joinModel){
             chatData.activeClientChannel.activeJoinModel = joinModel
+        }
+    }
+}
+
+function updateSendMessageUUID(draft,respMsg){
+  let myUUID = draft.myUUID
+  let channelUUID = respMsg.channelUUID
+  let seq = respMsg.seq
+  let uuid = respMsg.uuid
+  let clientChannel = draft.clientChannels.find(x=>x.UUID == channelUUID)
+  let messageQueue  = clientChannel.messageQueue
+  let msg = findLastMessage((messageQueue||[]),myUUID,channelUUID,seq)
+  if(msg){
+      msg.UUID = uuid
+  }
+  if(draft.activeClientChannel.clientChannel){
+    let messageQueue  = draft.activeClientChannel.clientChannel.messageQueue
+    let msg = findLastMessage((messageQueue||[]),myUUID,channelUUID,seq)
+    if(msg){
+        msg.UUID = uuid
+    }
+  }
+}
+function findLastMessage(messageQueue,myUUID,channelUUID,seq){
+    var len = messageQueue.length
+    for(let i = len-1;i>-1;i--){
+        let m = messageQueue[i]
+        if(m.fromUUID == myUUID && m.channelUUID == channelUUID && m.seq == seq){
+            return m
         }
     }
 }

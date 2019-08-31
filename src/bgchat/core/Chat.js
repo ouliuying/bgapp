@@ -77,14 +77,18 @@ export class ChatCore {
         this.initChatData(channelMeta).then(()=>{
             self.loadChannelJoinModels(channelMeta).then(()=>{
                 const address = "server.to.client." + chatSessionID
-                this._eb.registerHandler(address,(msg)=>{
-                    MessageBus.ref.send(MESSAGE_COMMING_TOPIC,msg)
+                this._eb.registerHandler(address,(_, msg)=>{
+                    MessageBus.ref.send(MESSAGE_COMMING_TOPIC,(msg||{}).body)
                 })
                 MessageBus.ref.consume(SEND_MESSAGE_TO_SERVER_TOPIC,(msg)=>{
                     this.sendToServer(msg)
                 })
                 MessageBus.ref.consume(MESSAGE_COMMING_TOPIC,msg=>{
                     this.dispatchResponeMessage(msg)
+                })
+                MessageBus.ref.consume(MESSAGE_COMMING_TOPIC,msg=>{
+                    //log add receive message
+                    console.log(JSON.stringify(msg))
                 })
             })
 
@@ -106,7 +110,8 @@ export class ChatCore {
         let self = this
         return  new Promise((resolve,reject)=>{
             console.log(JSON.stringify(channelMeta))
-            MessageBus.ref.send(INIT_CHANNEL_LIST_UI,channelMeta)
+            let myUUID = this.getCurrChatUUID()
+            MessageBus.ref.send(INIT_CHANNEL_LIST_UI,{channelMeta,myUUID})
             resolve()
         })
     }
@@ -133,7 +138,7 @@ export class ChatCore {
         return  Promise.all(promises)
     }
     sendToServer(msg){
-        console.log("start send message")
+        console.log("start send message"+new Date())
         this._eb.publish("client.to.server",msg)
     }
 }

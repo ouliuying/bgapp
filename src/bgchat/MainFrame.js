@@ -65,6 +65,9 @@ class MainFrame extends React.Component{
         message.channelUUID = (activeChannel||{}).UUID
         message.fromDevType = WEB_TYPE
         MessageApi.send(message)
+        this.setState({
+            message:""
+        })
     }
     render(){
         const self =this
@@ -97,7 +100,7 @@ class MainFrame extends React.Component{
                                     }
                                     return  <li className={className} onClick={()=>{
                                         MessageBus.ref.send(SET_ACTIVE_CHANNEL,ch)
-                                    }}>
+                                    }} key={ch.UUID}>
                                                 <Icon component={channelEntity} style={{marginRight:5}}></Icon>{ch.name}
                                            </li> 
                                 })
@@ -118,7 +121,7 @@ class MainFrame extends React.Component{
 
                                     return  <li className="bg-chat-channel-members-channel-item" onClick={()=>{
                                         MessageBus.ref.send(SET_ACTIVE_CHANNEL_ACTIVE_JOIN_MODEL,jm)
-                                    }}>
+                                    }} key={jm.UUID}>
                                                     <div className="bg-chat-channel-members-item-icon">
                                                         <img src="/images/Avatar.jpg" alt=""/>
                                                     </div>
@@ -155,8 +158,9 @@ class MainFrame extends React.Component{
                     {
                         messageQueue.map(msg=>{
                             let isMe = msg.fromUUID == myUUID
+                            let joinModel = activeChannel.joinModels.find(x=>x.UUID == msg.fromUUID)
                             if(msg.type == TXT_MESSAGE){
-                                return <TextMessageItem isMe={isMe} msgBody={msg}></TextMessageItem>
+                                return <TextMessageItem isMe={isMe} msgBody={msg} model= {joinModel||{}}></TextMessageItem>
                             }
                             else{
                                 return <div>undefined</div>
@@ -166,7 +170,7 @@ class MainFrame extends React.Component{
                 </div>
 
                 <div className="bg-chat-channel-message-window-input">
-                      <Input.TextArea className="bg-chat-channel-message-window-input-area" placeholder="输入要发送的内容..." onChange={(evt)=>{
+                      <Input.TextArea className="bg-chat-channel-message-window-input-area" placeholder="输入要发送的内容..." value={this.state.message} onChange={(evt)=>{
                           self.setState({
                               message:evt.target.value
                           })
@@ -177,7 +181,7 @@ class MainFrame extends React.Component{
                                   let msg = {
                                       type:TXT_MESSAGE,
                                       content:self.state.message,
-                                      responeType:RECEIVE_MESSAGE_RESPONSE_SUCCESS_TYPE,
+                                      responseType:RECEIVE_MESSAGE_RESPONSE_SUCCESS_TYPE,
                                       timestamp:new Date().getTime()
                                   }
                                  self.sendMessage(msg)

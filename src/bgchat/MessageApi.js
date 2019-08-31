@@ -1,9 +1,13 @@
 import { SEND_MESSAGE_TO_SERVER_TOPIC } from "./core/Chat";
 import { MessageBus } from "../mb/MessageBus";
+import { ReducerRegistry } from "../ReducerRegistry";
+import { getCurrChatSessionID } from "../reducers/partner";
 let msgSeq=Math.floor(Math.random()*10000000)
 export class MessageApi{
     static send(msg){
+        const state = ReducerRegistry.Store.getState()
         msg.seq = msgSeq
+        msg.sessionID = getCurrChatSessionID(state)
         msgSeq++
         MessageBus.ref.send(SEND_MESSAGE_TO_SERVER_TOPIC,msg)
     }

@@ -1083,3 +1083,102 @@ button:focus {
     margin-bottom: 0;
     margin-left: 8px;
 }
+.bg-chat-channel-message{
+    display: flex;
+    flex-direction: column;
+    padding:1rem;
+}
+.bg-chat-channel-message .msg-container-me{
+    display: flex;
+    flex-direction: column;
+}
+.bg-chat-channel-message .msg-container-me .msg-header{
+    display: flex;
+    flex-direction: row-reverse;
+}
+.bg-chat-channel-message .msg-container-me .msg-header > img{
+    width:2rem;
+    border-radius: 1rem;
+
+}
+.bg-chat-channel-message .msg-container-me .msg-header > span{
+    margin-right: 0.4rem;
+}
+.bg-chat-channel-message .msg-container-me .msg-header > span + span{
+    margin-right: 0.5rem;
+    color:#a5a5a5;
+    font-size: 0.8rem;
+}
+.bg-chat-channel-message .msg-container-me .msg-body{
+    display: flex;
+    flex-direction: row-reverse;
+}
+.bg-chat-channel-message .msg-container-me .msg-body > .msg-body-content{
+    background: #0084ff;
+    padding: 0.5rem 1.0rem;
+    color: white;
+    margin-top: 1.4rem;
+    border-radius: 0.2rem;
+    position: relative;
+}
+
+.bg-chat-channel-message .msg-container-me .msg-body > .msg-body-content::before{
+    content: " ";
+    width: 0px;
+    height: 0px;
+    border-left: 1rem solid transparent;
+    border-right: 1rem solid transparent;
+    border-bottom: 1rem solid #0084ff;
+    position: absolute;
+    display: block;
+    top:-1rem;
+    right:0.5rem;
+}
+
+
+.bg-chat-channel-message .msg-container-other{
+    display: flex;
+    flex-direction: column;
+}
+.bg-chat-channel-message .msg-container-other .msg-header{
+    display: flex;
+    flex-direction: row;
+}
+.bg-chat-channel-message .msg-container-other .msg-header > img{
+    width:2rem;
+    border-radius: 1rem;
+
+}
+.bg-chat-channel-message .msg-container-other .msg-header > span{
+    margin-left: 0.4rem;
+}
+.bg-chat-channel-message .msg-container-other .msg-header > span + span{
+    margin-left: 0.5rem;
+    color:#a5a5a5;
+    font-size: 0.8rem;
+}
+.bg-chat-channel-message .msg-container-other .msg-body{
+    display: flex;
+    flex-direction: row;
+}
+.bg-chat-channel-message .msg-container-other .msg-body > .msg-body-content{
+    background: white;
+    padding: 0.5rem 1.0rem;
+    color: black;
+    margin-top: 1.4rem;
+    border-radius: 0.2rem;
+    position: relative;
+}
+
+.bg-chat-channel-message .msg-container-other .msg-body > .msg-body-content::before{
+    content: " ";
+    width: 0px;
+    height: 0px;
+    border-left: 1rem solid transparent;
+    border-right: 1rem solid transparent;
+    border-bottom: 1rem solid white;
+    position: absolute;
+    display: block;
+    top:-1rem;
+    left:0.5rem;
+}
