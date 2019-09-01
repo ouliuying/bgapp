@@ -1126,8 +1126,8 @@ button:focus {
     content: " ";
     width: 0px;
     height: 0px;
-    border-left: 1rem solid transparent;
-    border-right: 1rem solid transparent;
+    border-left: 0.5rem solid transparent;
+    border-right: 0.5rem solid transparent;
     border-bottom: 1rem solid #0084ff;
     position: absolute;
     display: block;
@@ -1174,8 +1174,8 @@ button:focus {
     content: " ";
     width: 0px;
     height: 0px;
-    border-left: 1rem solid transparent;
-    border-right: 1rem solid transparent;
+    border-left: 0.5rem solid transparent;
+    border-right: 0.5rem solid transparent;
     border-bottom: 1rem solid white;
     position: absolute;
     display: block;

@@ -5,6 +5,7 @@ import { ModelAction } from '../../app/mq/ModelAction';
 import { getCurrChatSessionID, getCurrChatUUID } from '../../reducers/partner';
 //import { initUIChannelList, initUIChannelJoinModelList } from '../actions/chat';
 import {MessageApi} from '../MessageApi'
+import { req, APPLICATION_X_WWW_FORM_URLENCODED } from '../../lib/http-helper';
 export const MESSAGE_COMMING_TOPIC = "chat::message_comming_topic"
 export const SEND_MESSAGE_TO_SERVER_TOPIC = "chat::send_message_to_server_topic"
 export const INIT_UI = "chat::init_ui"
@@ -41,9 +42,27 @@ export class ChatCore {
         })
         return p
     }
-
+    activeSession(sessionID){
+        setTimeout(() => {
+            this.activeSessionImp(sessionID)
+        }, 1000*60*5);
+    }
+    activeSessionImp(sessionID){
+        let self = this
+        let pData={sessionID}
+        req("/ac/chat/chat/activeChatSession",pData,{
+            headers:{
+                "content-type":APPLICATION_X_WWW_FORM_URLENCODED
+            }
+        },function(data){
+            self.activeSession(sessionID)
+        },function(){
+            self.activeSession(sessionID)
+        })
+    }
     startRegClient(success,fail){
         let chatSessionID = this.getCurrChatSessionID()||""
+        this.activeSession(chatSessionID)
         new ModelAction("chat","chat").call("loadChannelMeta",{
             chatSessionID
         },(ret)=>{
