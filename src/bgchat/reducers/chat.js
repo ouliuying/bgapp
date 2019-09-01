@@ -191,7 +191,7 @@ function removeJoinModelFromChannel(clientChannels,channelUUID,joinModelUUID){
 function getClientMessage(clientChannels,serverMessage){
     let clientMessage={}
     clientMessage["__client__"]={
-        receiveTime:Date(),
+        receiveTime:new Date(),
     }
     clientMessage =  Object.assign({
     },serverMessage,clientMessage)

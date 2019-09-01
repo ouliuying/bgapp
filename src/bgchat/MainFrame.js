@@ -57,6 +57,8 @@ class MainFrame extends React.Component{
         this.state={
             message:""
         }
+        this.mainFrame = React.createRef()
+        this.messageWindow = React.createRef()
     }
     sendMessage(message){
         const {activeChannel,activeJoinModel,myUUID} = this.props
@@ -69,6 +71,40 @@ class MainFrame extends React.Component{
             message:""
         })
     }
+    componentDidMount(){
+        this.windowSizeUpdate()
+    }
+    componentWillUnmount(){
+         window.removeEventListener("resize", ()=>{this.windowSizeUpdate()});
+     }
+     componentWillMount(){
+        this.windowSizeUpdate();
+     }
+     componentDidUpdate(){
+        let lasChild =  this.messageWindow.current.lastChild
+        if(lasChild){
+            lasChild.scrollIntoView({
+                behavior:"smooth"
+            })
+        }
+     }
+     windowSizeUpdate(){
+         try
+         {
+             var w = window,
+             d = document,
+             documentElement = d.documentElement,
+             body = d.getElementsByTagName('body')[0],
+             width = w.innerWidth || documentElement.clientWidth || body.clientWidth,
+             height = w.innerHeight|| documentElement.clientHeight|| body.clientHeight;
+            // this.setState({width: width, height: height});
+            this.mainFrame.current.style=`height:${height-63}px;`
+            this.messageWindow.current.style=`height:${height-180};overflow:auto;`
+         }
+         catch(err){
+ 
+         }
+     }
     render(){
         const self =this
         const ChannelLogo = getSvg("/svg/chat-channel-logo.svg")
@@ -78,7 +114,7 @@ class MainFrame extends React.Component{
 
         const {channels,activeChannel,activeJoinModel,messageQueue,myUUID} = self.props
         const activeChannelJoinModels = (activeChannel||{}).joinModels||[]
-        return <div className="bg-chat-main-frame bg-flex-full">
+        return <div className="bg-chat-main-frame bg-flex-full" ref={this.mainFrame}>
            
             <div className="bg-chat_channel-members-area">
                 <div className="bg-chat-channel-bar">
@@ -154,7 +190,7 @@ class MainFrame extends React.Component{
                     }
                 </div>
 
-                <div className="bg-chat-channel-message-window-body">
+                <div className="bg-chat-channel-message-window-body"  ref={this.messageWindow}>
                     {
                         messageQueue.map(msg=>{
                             let isMe = msg.fromUUID == myUUID

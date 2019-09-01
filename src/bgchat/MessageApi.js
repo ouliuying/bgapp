@@ -1,7 +1,7 @@
 import { SEND_MESSAGE_TO_SERVER_TOPIC } from "./core/Chat";
 import { MessageBus } from "../mb/MessageBus";
 import { ReducerRegistry } from "../ReducerRegistry";
-import { getCurrChatSessionID } from "../reducers/partner";
+import { getCurrChatSessionID, getCurrChatUUID } from "../reducers/partner";
 let msgSeq=Math.floor(Math.random()*10000000)
 export class MessageApi{
     static send(msg){
@@ -27,7 +27,7 @@ export class MessageApi{
             type: 2,
             isResponse: 1,
             uuid: message.uuid,
-            timestamp: Date().getTime(),
+            timestamp:new Date().getTime(),
             confirm:confirmMessage,
             channelUUID:message.channelUUID,
             toUUID:message.fromUUID
@@ -39,7 +39,7 @@ export class MessageApi{
             type: 1,
             isResponse: 1,
             uuid: message.uuid,
-            timestamp: Date().getTime(),
+            timestamp: new Date().getTime(),
             channelUUID:message.channelUUID,
             toUUID:message.fromUUID
         }

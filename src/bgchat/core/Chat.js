@@ -77,7 +77,9 @@ export class ChatCore {
         this.initChatData(channelMeta).then(()=>{
             self.loadChannelJoinModels(channelMeta).then(()=>{
                 const address = "server.to.client." + chatSessionID
-                this._eb.registerHandler(address,(_, msg)=>{
+                this._eb.registerHandler(address,{
+                    fromUUID:self.getCurrChatUUID()
+                },(_, msg)=>{
                     MessageBus.ref.send(MESSAGE_COMMING_TOPIC,(msg||{}).body)
                 })
                 MessageBus.ref.consume(SEND_MESSAGE_TO_SERVER_TOPIC,(msg)=>{

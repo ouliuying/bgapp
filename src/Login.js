@@ -20,6 +20,7 @@ import {userNamePasswordSelector, statusSelector} from './reducers/partner'
 import {req,APPLICATION_X_WWW_FORM_URLENCODED} from './lib/http-helper'
 import {ModalSheetManager} from './app/modelView/ModalSheetManager'
 import { SYS_INIT, MessageBus } from './mb/MessageBus';
+import { WEB_TYPE } from './bgchat/devType';
 class Login extends Component {
     static propTypes = {
         store: PropTypes.object,
@@ -35,7 +36,7 @@ class Login extends Component {
     doLogin(){
        let self=this
         const {userName,password}=this.props
-        let devType=0
+        let devType= WEB_TYPE
         let pData={userName,password,devType}
         req("/login",pData,{
             headers:{
