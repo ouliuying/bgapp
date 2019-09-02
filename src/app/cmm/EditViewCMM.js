@@ -56,14 +56,14 @@ export class EditViewCMM extends ViewCMM{
         let ownerModelID = (data.record||{})["id"]
         return createViewParam(ownerField,ownerFieldValue,ownerModelID,undefined,undefined)
     }
-    getModelID(view){
+    getModelID(view,ownerField){
 
         let {modelID,viewParam} = view.props
         const {modelID:vModelID} = viewParam||{}
         if(vModelID){
             return vModelID
         }
-        if(!modelID){
+        if(!ownerField && !modelID){
             modelID = this.getModelIDFromPath(view)
         }
         return modelID
@@ -81,7 +81,7 @@ export class EditViewCMM extends ViewCMM{
     reloadEditContextData(view){
         let {viewParam,viewData,viewRefType}= view.props
         let {ownerField,ownerFieldValue,ownerModelID} = (viewParam||{})
-        let modelID = this.getModelID(view)
+        let modelID = this.getModelID(view,ownerField)
         let rawFieldValue = this.getOwnerFieldRawFieldValue(this.app,this.model,ownerField,ownerFieldValue)
         var reqParam={
             viewType:this.viewType,

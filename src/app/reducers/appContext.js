@@ -75,12 +75,12 @@ export function appContext(state,action){
                         viewData:{
                             data:{
                                 app:rootField.app,
-                                model:rootField.model
+                                model:rootField.model,
+                                record:{}
                             }
                         }
                       }
                       const [fd,value]=fv
-                      draft[EDIT_VIEW_DATA][key]["viewData"]["data"]["record"]=draft[EDIT_VIEW_DATA][key]["viewData"]["data"]["record"]||{}
                       draft[EDIT_VIEW_DATA][key]["viewData"]["data"]["record"][fd.name]=value
                     })
                 }
@@ -552,11 +552,15 @@ function buildServerModelDataObject(view,dataRecord,state,subViews){
                     })
                     if(subView){
                         let contextKey = getViewTypeViewDataContextkey(subView.refView.viewType)
-                        let createData=buildServerViewTypeData(app,model,subView.refView.viewType,contextKey,f,state)
-                        createData=removeRedundancyProperty(createData)
-                        if(createData.record && createData.record.length>0){
+                        let data=buildServerViewTypeData(app,model,subView.refView.viewType,contextKey,f,state)
+                        data=removeRedundancyProperty(data)
+                        let dataRecord=data.record
+                        if(data.record && !(data.record instanceof Array)){
+                          data.record=[dataRecord]
+                        }
+                        if(data.record && data.record.length>0){
                             record["relRegistries"]=record["relRegistries"]||{}
-                            record["relRegistries"][f.relationData.relationModel]=createData
+                            record["relRegistries"][f.relationData.relationModel]=data
                         }
                     }
                     else{
@@ -734,8 +738,10 @@ export function buildServerCreateData(app,model,viewType,ownerField,state){
 
 export function buildServerEditData(app,model,viewType,ownerField,state){
     let data= buildServerViewTypeData(app,model,viewType,EDIT_VIEW_DATA,ownerField,state)
+    console.log("preflush="+JSON.stringify(data))
     let newData={}
     flushServerData(data,newData)
+    console.log("afterflush="+JSON.stringify(newData))
     return newData
 }
 export function buildServerListData(app,model,viewType,ownerField,state){
