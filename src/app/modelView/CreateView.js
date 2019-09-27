@@ -9,7 +9,7 @@ import {
 import hookView from '../HookView'
 import { goBack,push } from 'connected-react-router';
 import Icon from '../../icon'
-import {Button,Form,Tabs,Table, MessageBox} from "../../ui"
+import {Button,Form,Tabs,Table, MessageBox, Icon as FontIcon} from "../../ui"
 import ViewFieldStyle from './ViewFieldStyle'
 import ViewFieldTypeRegistry from './ViewFieldTypeRegistry'
 import {mapStateToProps} from './createViewMapStateToProps'
@@ -19,6 +19,7 @@ import { Divider } from "../../ui"
 import { VIEW_COMMON_FIELDS_TAB_TITLE, VIEW_COMMON_FIELDS_TAB_KEY } from '../ReservedKeyword';
 import { testCriteria } from './ViewFieldCriteria';
 import { realpath } from 'fs';
+import { getSvg, getIcon } from '../../svg'
 class CreateView extends React.Component{
     constructor(props){
         super(props)
@@ -78,9 +79,17 @@ class CreateView extends React.Component{
                                         {
                                         mainActionGroup.triggers?(
                                             mainActionGroup.triggers.map(t=>{
-                                                    return <Button onClick={()=>{
+                                                    let IconCtrl = getIcon(t.icon)
+                                                    return <Button type="primary" onClick={()=>{
                                                         host.doAction(self, t)
-                                                    }} key={t.name}>{
+                                                    }} key={t.name}>
+                                                       
+                                                            {
+                                                                IconCtrl
+                                                            } 
+                                                       
+                                                       
+                                                    {
                                                         t.title
                                                     }
                                                     </Button>  

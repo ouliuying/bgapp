@@ -258,7 +258,7 @@ export class CreateViewCMM extends ViewCMM{
       goRoute(editPath,{id:id})
     }
   }
-  doCreate(view){
+  doCreate(view,trigger){
       let self=this
       const {viewParam,viewData} = view.props
       const {ownerField,orgState,external}=(viewParam||{})

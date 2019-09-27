@@ -77,7 +77,7 @@ class ModelLogListView extends React.Component{
           onChange: page => {
             console.log(page);
           },
-          pageSize: 3,
+          pageSize: pageSize,
         }}
         dataSource={listData}
         footer={

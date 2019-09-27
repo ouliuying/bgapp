@@ -1,3 +1,5 @@
+import React from 'react'
+import {Icon} from '../ui'
 import  { ReactComponent as CorpPartners }  from '../svg/corp-partners.svg'
 import  { ReactComponent as CorpRoleMag }  from '../svg/corp-role-mag.svg'
 import  { ReactComponent as CorpAppCore }  from '../svg/core-app.svg'
@@ -26,6 +28,15 @@ import {ReactComponent as ChatChannelOpMore} from '../svg/chat-channel-op-more.s
 import {ReactComponent as ChatChannelMembers} from '../svg/chat-channel-members.svg'//chat-channel-ent.svg
 import {ReactComponent as ChatChannelEntity} from '../svg/chat-channel-ent.svg'
 //
+
+
+//action icons
+import {ReactComponent as Action_Add} from '../svg/action/add.svg'
+import {ReactComponent as Action_Edit} from '../svg/action/edit.svg'
+import {ReactComponent as Action_Save} from '../svg/action/save.svg'
+import {ReactComponent as Action_Detail} from '../svg/action/detail.svg'
+import {ReactComponent as Action_SingleSel} from '../svg/action/singlesel.svg'
+import {ReactComponent as Action_Delete} from '../svg/action/delete.svg'
 const svgs={
     
 }
@@ -58,10 +69,26 @@ svgs["/svg/chat-channel-op-more.svg"]=ChatChannelOpMore
 svgs["/svg/chat-channel-members.svg"] = ChatChannelMembers
 svgs["/svg/chat-channel-ent.svg"] = ChatChannelEntity
 
+svgs["/svg/action/add.svg"] = Action_Add
+svgs["/svg/action/edit.svg"] = Action_Edit
+svgs["/svg/action/save.svg"] = Action_Save
+svgs["/svg/action/detail.svg"] = Action_Detail
+svgs["/svg/action/singlesel.svg"] = Action_SingleSel
+svgs["/svg/action/delete.svg"] = Action_Delete
+
 export function regSvg(path,component){
     svgs[path]=component
 }
 
 export function getSvg(path){
     return svgs[path]
+}
+
+export function getIcon(path){
+    console.log("get path "+path)
+   let svgIcon = svgs[path]
+   if(svgIcon){
+        return <Icon component={svgIcon}></Icon>
+   }
+   return <></>
 }

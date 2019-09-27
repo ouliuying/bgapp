@@ -114,7 +114,7 @@ class AppInContainer extends React.Component{
         new ModelAction("core","app").call("loadAppContainer",{
             app:routerApp,
             menu:{
-                app:routerApp||self.app.name,
+                app:self.app.name||routerApp,
                 menu:"main"
             }
         },function(data){

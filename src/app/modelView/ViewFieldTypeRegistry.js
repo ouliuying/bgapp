@@ -19,7 +19,9 @@ import {TextField,
     StaticField,
     EnumStaticTextField,
     ChinaFullAddress,
+    ChinaFullAddressStaticField,
     SelectField,
+    SelectModelFromListViewField,
     // ViewFieldType
     ViewFieldType,
     PasswordField,
@@ -83,8 +85,10 @@ registry.add(ViewFieldType.SingleCheckBoxField,SingleCheckBoxField)
 registry.add(ViewFieldType.StaticField,StaticField)
 registry.add(ViewFieldType.EnumStaticTextField,EnumStaticTextField)
 registry.add(ViewFieldType.ChinaFullAddress,ChinaFullAddress)
+registry.add(ViewFieldType.ChinaFullAddressStaticField,ChinaFullAddressStaticField)
 registry.add(ViewFieldType.SelectField,SelectField)
 registry.add(ViewFieldType.PasswordField,PasswordField)
+registry.add(ViewFieldType.SelectModelFromListViewField,SelectModelFromListViewField)
 
 registry.add(ViewFieldType.CriteriaEnumSelect,CriteriaEnumSelect)
 registry.add(ViewFieldType.CriteriaNumberRangeInput,CriteriaNumberRangeInput)

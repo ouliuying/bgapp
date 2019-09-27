@@ -30,6 +30,7 @@ import {getExpression} from '../../lib/criteria-helper'
 import { createCriteria } from "../modelView/ViewFieldCriteria";
 import ViewFieldTypeRegistry from '../modelView/ViewFieldTypeRegistry'
 import {original} from "immer"
+import { getIcon } from "../../svg"
 export class ListViewCMM extends  ViewCMM{
     constructor(app,model,viewType){
         super(app,model,viewType)
@@ -135,10 +136,15 @@ export class ListViewCMM extends  ViewCMM{
                 let tgs = triggerGroups.filter(x=>{
                     return excludeGroups.indexOf(x.name)<0
                 })
+                const {viewParam} = view.props
+                const {external} = (viewParam||{})
+                const hasSelectedItem = external && external.getSingleSelectItem()
+                let isSelected = hasSelectedItem?self.isSameItem(hasSelectedItem,record):false
                 return <span>
                     {
                         tgs && tgs.map(tg=>{
                             return tg.triggers.map(t=>{
+                                let IconCtrl =getIcon(t.icon)
                                 return <Button type="text" size="small" onClick={()=>{
                                     produce(t,draft=>{
                                         if(!draft.app || draft.app=="*"){
@@ -151,13 +157,14 @@ export class ListViewCMM extends  ViewCMM{
                                         self.doAction(view,draft)
                                     })
                                    
-                                }} key={t.name}>{t.title}</Button>
+                                }} key={t.name}>{IconCtrl}{t.title}</Button>
                             })
                         })
                     }
                     {
                         selSingleItemActionTg && selSingleItemActionTg.triggers.map(t=>{
-                            return <Button type="text" size="small" onClick={()=>{
+                            let IconCtrl =getIcon(t.icon)
+                            return !isSelected?<Button type="text" size="small" onClick={()=>{
                                 produce(t,draft=>{
                                     if(!draft.app || draft.app=="*"){
                                         draft.app = self.app
@@ -171,7 +178,7 @@ export class ListViewCMM extends  ViewCMM{
                                     external && external.close && external.close()
                                 })
                                
-                            }} key={t.name}>{t.title}</Button>
+                            }} key={t.name}>{IconCtrl}{t.title}</Button>:<span style={{color:"red"}}>当前设置</span>
                         })
                     }
                 </span>
@@ -181,7 +188,10 @@ export class ListViewCMM extends  ViewCMM{
         return {columns,rows,currentPage,totalCount,pageSize}
 
     }
-
+    isSameItem(hasSelectedItem,item){
+        let hasSelectedRecord = ((hasSelectedItem||{}).record)||{}
+        return item["id"] == hasSelectedRecord["id"]
+    }
     getCriteria(view){
         let expr=undefined
         const {viewData,localData}=view.props
@@ -573,7 +583,7 @@ export class ListViewCMM extends  ViewCMM{
         let arg = trigger[ARGS]
         const {viewParam} = view.props
         const {external} = (viewParam||{})
-        external && external.selSingleItemAction && external.selSingleItemAction(arg.data)
+        external && external.setSingleSelectItem && external.setSingleSelectItem(arg.data)
         external && external.close && external.close(view)
     }
 }

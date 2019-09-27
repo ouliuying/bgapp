@@ -52,8 +52,10 @@ export const ViewFieldType={
     StaticField:'static',
     EnumStaticTextField:"enumStatic",
     ChinaFullAddress:'chinaFullAddress',
+    ChinaFullAddressStaticField:"chinaFullAddressStatic",
     SelectField:"select",
     PasswordField:"password",
+    SelectModelFromListViewField:"selectModelFromListView",
 
     //criteria
     CriteriaEnumSelect:"criteriaSelect",
@@ -208,6 +210,7 @@ export class MultiLineTextField extends React.Component{
         </TextField>
     }
 }
+
 export class TelephoneField extends React.Component{
     getTelephone(value){
         return value
@@ -220,6 +223,7 @@ export class TelephoneField extends React.Component{
         }} placeholder="输入电话号码"></Input>
     }
 }
+
 export class MobileField extends React.Component{
     getMobile(value){
         return value
@@ -232,6 +236,7 @@ export class MobileField extends React.Component{
         }} placeholder="输入手机号码"></Input>
     }
 }
+
 export class NumberField extends React.Component{
     getNumber(value){
         return value
@@ -258,6 +263,7 @@ export class RealField extends React.Component{
         </NumberField>
     }
 }
+
 export class LongField extends React.Component{
     render(){
         const {enable,...rest} = this.props
@@ -398,9 +404,9 @@ export class Many2OneDataSetSelectField extends React.Component{
     }
     selMore(){
             let self=this
-            const {onChange,field,relationData} = this.props
+            const {onChange,field,value,relationData} = this.props
             let external = {
-                selSingleItemAction(data){
+                setSingleSelectItem(data){
                    let selItem={
                             app:relationData.targetApp,
                             model:relationData.targetModel,
@@ -410,6 +416,9 @@ export class Many2OneDataSetSelectField extends React.Component{
                         selItem:selItem
                     })
                    onChange && onChange(selItem)
+                },
+                getSingleSelectItem(){
+                    return value
                 }
               
             }
@@ -480,6 +489,65 @@ export class Many2OneDataSetSelectField extends React.Component{
       </div>
     }
 }
+
+export class SelectModelFromListViewField extends React.Component{
+    onChange(item){
+        const {onChange:fieldValueChange} = this.props
+        fieldValueChange && fieldValueChange(item)
+    }
+    showModelViewForSelect(){
+        const {value,meta,field,relationData,enable} = this.props
+        const text = ((value||{}).record||{})[(relationData||{}).toName]
+        const {app,model}=meta||{}
+        if(!enable){
+            return;
+        }
+        let self =this
+        let external = {
+            setSingleSelectItem(data){
+            let selItem={
+                        app:relationData.targetApp,
+                        model:relationData.targetModel,
+                        record:data
+                    }
+            self.onChange(selItem)
+            },
+            getSingleSelectItem(){
+                return value
+            }
+        }
+        let view = getModelView(relationData.targetApp,
+            relationData.targetModel,
+            ViewType.LIST)
+        let viewParam = createViewParam(undefined,
+            undefined,
+            undefined,
+            external,
+            undefined)
+        view && (
+            ModalSheetManager.openModal(view,{
+                app:relationData.targetApp,
+                model:relationData.targetModel,
+                viewType:ViewType.LIST,
+                viewParam,
+                viewRefType:ViewRefType.SINGLE_SELECTION
+            })
+        )
+    }
+    render(){
+        const {value,meta,field,relationData,enable} = this.props
+        const text = ((value||{}).record||{})[(relationData||{}).toName]
+        const {app,model}=meta||{}
+        let self =this
+        return enable?<Input onClick={()=>{
+            self.showModelViewForSelect()
+        }} placeholder="指定..." readOnly={true} value={text}   suffix ={ <FontIcon type="search" style={{color:"#1890ff"}}  onClick={()=>{
+               self.showModelViewForSelect()
+            }}
+        />}/>:<Input disabled={true} placeholder="指定..." readOnly={true} value={text}   suffix ={ <FontIcon type="search" disabled={true}/>}/>
+    }
+}
+
 
 export class SelectField extends React.Component{
     
@@ -795,6 +863,26 @@ export class ChinaFullAddress extends React.Component{
                    }></Input>
                 </div>
         </div>
+    }
+}
+
+export class ChinaFullAddressStaticField extends React.Component{
+    render(){
+        const {value,enable} = this.props
+        let jVal ={}
+        try
+        {
+            jVal=JSON.parse(value)
+        }
+        catch{
+            jVal={
+                province:"",
+                city:"",
+                district:"",
+                streetAddress:""
+            }
+        }
+        return <span>{jVal.province}/{jVal.city}/{jVal.district}/{jVal.streetAddress}</span>
     }
 }
 

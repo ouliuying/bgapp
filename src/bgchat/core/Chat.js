@@ -1,10 +1,10 @@
-import EventBus  from 'vertx3-eventbus-client'
+import EventBus from 'vertx3-eventbus-client'
 import { MessageBus } from '../../mb/MessageBus';
 import { ReducerRegistry } from '../../ReducerRegistry';
 import { ModelAction } from '../../app/mq/ModelAction';
 import { getCurrChatSessionID, getCurrChatUUID } from '../../reducers/partner';
 //import { initUIChannelList, initUIChannelJoinModelList } from '../actions/chat';
-import {MessageApi} from '../MessageApi'
+import { MessageApi } from '../MessageApi'
 import { req, APPLICATION_X_WWW_FORM_URLENCODED } from '../../lib/http-helper';
 export const MESSAGE_COMMING_TOPIC = "chat::message_comming_topic"
 export const SEND_MESSAGE_TO_SERVER_TOPIC = "chat::send_message_to_server_topic"
@@ -15,99 +15,99 @@ export const SET_ACTIVE_CHANNEL = "chat::set_active_channel"
 export const SET_ACTIVE_CHANNEL_ACTIVE_JOIN_MODEL = "chat::set_active_channel_active_join_model"
 
 export class ChatCore {
-    constructor(){
-      this._eb = new EventBus("http://localhost:8088/eventbus")
-      this._eb.onopen=()=>{
-          console.log("connect stable...")
-      }
+    constructor() {
+        this._eb = new EventBus("http://localhost:8088/eventbus")
+        this._eb.onopen = () => {
+            console.log("connect stable...")
+        }
     }
 
-    get eventBus(){
+    get eventBus() {
         return this._eb
     }
 
-    static get ref(){
+    static get ref() {
         return ChatCore.singleton || (ChatCore.singleton = new ChatCore())
     }
 
-    start(){
-         this.stableChatSession().then(channelMeta=>{
-             this.startChatSession(channelMeta)
-         })
+    start() {
+        this.stableChatSession().then(channelMeta => {
+            this.startChatSession(channelMeta)
+        })
     }
 
-    stableChatSession(){
-        let p =new Promise((resolve,reject)=>{
-            this.startRegClient(resolve,reject)
+    stableChatSession() {
+        let p = new Promise((resolve, reject) => {
+            this.startRegClient(resolve, reject)
         })
         return p
     }
-    activeSession(sessionID){
+    activeSession(sessionID) {
         setTimeout(() => {
             this.activeSessionImp(sessionID)
-        }, 1000*60*5);
+        }, 1000 * 60 * 5);
     }
-    activeSessionImp(sessionID){
+    activeSessionImp(sessionID) {
         let self = this
-        let pData={sessionID}
-        req("/ac/chat/chat/activeChatSession",pData,{
-            headers:{
-                "content-type":APPLICATION_X_WWW_FORM_URLENCODED
+        let pData = { sessionID }
+        req("/ac/chat/chat/activeChatSession", pData, {
+            headers: {
+                "content-type": APPLICATION_X_WWW_FORM_URLENCODED
             }
-        },function(data){
+        }, function(data) {
             self.activeSession(sessionID)
-        },function(){
+        }, function() {
             self.activeSession(sessionID)
         })
     }
-    startRegClient(success,fail){
-        let chatSessionID = this.getCurrChatSessionID()||""
-        this.activeSession(chatSessionID)
-        new ModelAction("chat","chat").call("loadChannelMeta",{
+    startRegClient(success, fail) {
+        let chatSessionID = this.getCurrChatSessionID() || ""
+        let self = this 
+        new ModelAction("chat", "chat").call("loadChannelMeta", {
             chatSessionID
-        },(ret)=>{
-            if(ret.errorCode!=0){
-                setTimeout(()=>{
-                    this.startRegClient(success,fail)
-                },5000)
-            }
-            else{
+        }, (ret) => {
+            if (ret.errorCode != 0) {
+                setTimeout(() => {
+                    self.startRegClient(success, fail)
+                }, 5000)
+            } else {
+                self.activeSession(chatSessionID)
                 success && success(ret.bag.channelMeta)
             }
-        },()=>{
-            setTimeout(()=>{
-                this.startRegClient(success,fail)
-            },5000)
+        }, () => {
+            setTimeout(() => {
+                self.startRegClient(success, fail)
+            }, 5000)
         })
     }
 
-    getCurrChatUUID(){
+    getCurrChatUUID() {
         const state = ReducerRegistry.Store.getState()
         return getCurrChatUUID(state)
     }
-    getCurrChatSessionID(){
+    getCurrChatSessionID() {
         const state = ReducerRegistry.Store.getState()
         return getCurrChatSessionID(state)
     }
 
-    startChatSession(channelMeta){
+    startChatSession(channelMeta) {
         let self = this
         let chatSessionID = this.getCurrChatSessionID()
-        this.initChatData(channelMeta).then(()=>{
-            self.loadChannelJoinModels(channelMeta).then(()=>{
+        this.initChatData(channelMeta).then(() => {
+            self.loadChannelJoinModels(channelMeta).then(() => {
                 const address = "server.to.client." + chatSessionID
-                this._eb.registerHandler(address,{
-                    fromUUID:self.getCurrChatUUID()
-                },(_, msg)=>{
-                    MessageBus.ref.send(MESSAGE_COMMING_TOPIC,(msg||{}).body)
+                this._eb.registerHandler(address, {
+                    fromUUID: self.getCurrChatUUID()
+                }, (_, msg) => {
+                    MessageBus.ref.send(MESSAGE_COMMING_TOPIC, (msg || {}).body)
                 })
-                MessageBus.ref.consume(SEND_MESSAGE_TO_SERVER_TOPIC,(msg)=>{
+                MessageBus.ref.consume(SEND_MESSAGE_TO_SERVER_TOPIC, (msg) => {
                     this.sendToServer(msg)
                 })
-                MessageBus.ref.consume(MESSAGE_COMMING_TOPIC,msg=>{
+                MessageBus.ref.consume(MESSAGE_COMMING_TOPIC, msg => {
                     this.dispatchResponeMessage(msg)
                 })
-                MessageBus.ref.consume(MESSAGE_COMMING_TOPIC,msg=>{
+                MessageBus.ref.consume(MESSAGE_COMMING_TOPIC, msg => {
                     //log add receive message
                     console.log(JSON.stringify(msg))
                 })
@@ -115,52 +115,52 @@ export class ChatCore {
 
         })
     }
-    dispatchResponeMessage(msg){
+    dispatchResponeMessage(msg) {
         let resp = this.createMessageResponse(msg)
-        if(resp){
+        if (resp) {
             this.sendToServer(resp)
         }
     }
-    createMessageResponse(message){
-        if(MessageApi.mustResponseReceiveStatus(message)){
+    createMessageResponse(message) {
+        if (MessageApi.mustResponseReceiveStatus(message)) {
             return MessageApi.createResponseReceiveSuccessMessage(message)
         }
         return null
     }
-    initChatData(channelMeta){
+    initChatData(channelMeta) {
         let self = this
-        return  new Promise((resolve,reject)=>{
-            console.log(JSON.stringify(channelMeta))
-            let myUUID = this.getCurrChatUUID()
-            MessageBus.ref.send(INIT_CHANNEL_LIST_UI,{channelMeta,myUUID})
+        return new Promise((resolve, reject) => {
+            //console.log(JSON.stringify(channelMeta))
+            let myUUID = self.getCurrChatUUID()
+            MessageBus.ref.send(INIT_CHANNEL_LIST_UI, { channelMeta, myUUID })
             resolve()
         })
     }
-    loadChannelJoinModels(channelMeta){
-        let tmpChannelMetas = channelMeta||[]
+    loadChannelJoinModels(channelMeta) {
+        let tmpChannelMetas = channelMeta || []
         let promises = []
-        tmpChannelMetas.map(ch=>{
-            promises.push(new Promise((resolve,reject)=>{
-                new ModelAction("chat","chatChannel").call("getChannelJoinModels",{
-                    uuid:ch.uuid
-                },data=>{
-                    if((data.bag||{}).joinModels){
-                        MessageBus.ref.send(INIT_CHANNEL_JOIN_MODEL_LIST_UI,{
-                            channelUUID:ch.uuid,joinModels:data.bag.joinModels
+        tmpChannelMetas.map(ch => {
+            promises.push(new Promise((resolve, reject) => {
+                new ModelAction("chat", "chatChannel").call("getChannelJoinModels", {
+                    uuid: ch.uuid
+                }, data => {
+                    if ((data.bag || {}).joinModels) {
+                        MessageBus.ref.send(INIT_CHANNEL_JOIN_MODEL_LIST_UI, {
+                            channelUUID: ch.uuid,
+                            joinModels: data.bag.joinModels
                         })
                     }
                     resolve()
-                },()=>{
+                }, () => {
                     resolve()
                 })
             }))
             return promises
         })
-        return  Promise.all(promises)
+        return Promise.all(promises)
     }
-    sendToServer(msg){
-        console.log("start send message"+new Date())
-        this._eb.publish("client.to.server",msg)
+    sendToServer(msg) {
+        console.log("start send message" + new Date())
+        this._eb.publish("client.to.server", msg)
     }
 }
-

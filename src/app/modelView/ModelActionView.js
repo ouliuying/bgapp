@@ -12,6 +12,7 @@ import hookView from '../../app/HookView'
 import ViewFieldStyle from './ViewFieldStyle'
 import {mapStateToProps} from './modelActionViewMapStateToProps'
 import { testCriteria } from './ViewFieldCriteria';
+import { getIcon } from '../../svg'
 class ModelActionView extends React.Component{
     constructor(props){
         super(props)
@@ -53,9 +54,10 @@ class ModelActionView extends React.Component{
                                         {
                                         mainActionGroup.triggers?(
                                             mainActionGroup.triggers.map(t=>{
+                                                let IconCtrl = getIcon(t.icon)
                                                     return <Button onClick={()=>{
                                                         host.doAction(self, t)
-                                                    }} key={t.name}>{
+                                                    }} key={t.name}>{IconCtrl}{
                                                         t.title
                                                     }
                                                     </Button>  

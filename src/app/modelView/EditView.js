@@ -17,6 +17,7 @@ import {getModelView} from './ModelViewRegistry'
 import {produce} from 'immer'
 import { VIEW_COMMON_FIELDS_TAB_TITLE, VIEW_COMMON_FIELDS_TAB_KEY } from '../ReservedKeyword';
 import { testCriteria } from './ViewFieldCriteria';
+import { getIcon } from '../../svg'
 class EditView extends React.Component{
     constructor(props){
         super(props)
@@ -82,9 +83,12 @@ class EditView extends React.Component{
                                         {
                                         mainActionGroup.triggers?(
                                             mainActionGroup.triggers.map(t=>{
-                                                    return <Button onClick={()=>{
+                                                let IconCtrl = getIcon(t.icon)
+                                                    return <Button type="primary" onClick={()=>{
                                                         host.doAction(self, t)
-                                                    }} key={t.name}>{
+                                                    }} key={t.name}>
+                                                    {IconCtrl}
+                                                    {
                                                         t.title
                                                     }
                                                     </Button>  

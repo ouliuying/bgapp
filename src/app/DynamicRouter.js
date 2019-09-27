@@ -3,49 +3,26 @@ import { Route, withRouter,Switch} from "react-router-dom"
 import {connect} from 'react-redux'
 import Loadable from 'react-loadable'
 import MainFrame from '../bgchat/MainFrame';
+import CoreInContainer from '../bgcore/CoreInContainer'
+import CorpInContainer from '../bgcorp/CorpInContainer'
+import ProductInContainer from '../bgproduct/ProductInContainer'
+import CrmInContainer from '../bgcrm/CrmInContainer'
+import AccountInContainer from '../bgaccount/AccountInContainer'
+import WorktableInContainer from '../bgworktable/WorktableInContainer'
+import SettingInContainer from '../bgsetting/SettingInContainer'
+import SmsInContainer from '../bgsms/SmsInContainer'
+import ChatInContainer from '../bgchat/ChatInContainer'
 const appInContainers={
-    "core":Loadable({
-        loader: () => import('../bgcore/CoreInContainer'),
-        loading: () => <div/>,
-    }),
-    "corp":Loadable({
-        loader: () => import('../bgcorp/CorpInContainer'),
-        loading: () => <div/>,
-    }),
-    "product":Loadable({
-        loader: () => import('../bgproduct/ProductInContainer'),
-        loading: () => <div/>,
-    })
-    ,
-    "crm":Loadable({
-        loader: () => import('../bgcrm/CrmInContainer'),
-        loading: () => <div/>,
-    })
-    ,
-    "account":Loadable({
-        loader: () => import('../bgaccount/AccountInContainer'),
-        loading: () => <div/>,
-    })
-    ,
-    "worktable":Loadable({
-        loader: () => import('../bgworktable/WorktableInContainer'),
-        loading: () => <div/>,
-    }),
-    "setting":Loadable({
-        loader: () => import('../bgsetting/SettingInContainer'),
-        loading: () => <div/>,
-    })
-    ,
-    "sms":Loadable({
-        loader: () => import('../bgsms/SmsInContainer'),
-        loading: () => <div/>,
-    })
-    ,
+    "core":CoreInContainer,
+    "corp":CorpInContainer,
+    "product":ProductInContainer,
+    "crm":CrmInContainer,
+    "account":AccountInContainer,
+    "worktable":WorktableInContainer,
+    "setting":SettingInContainer,
+    "sms":SmsInContainer,
     "im":MainFrame,
-    "chat":Loadable({
-        loader: () => import('../bgchat/ChatInContainer'),
-        loading: () => <div/>,
-    })
+    "chat":ChatInContainer
 }
 function TestApp(){
     return <div>test</div>

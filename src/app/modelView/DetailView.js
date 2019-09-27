@@ -18,6 +18,7 @@ import {produce} from 'immer'
 import { Divider } from "../../ui"
 import { VIEW_COMMON_FIELDS_TAB_TITLE, VIEW_COMMON_FIELDS_TAB_KEY } from '../ReservedKeyword';
 import { testCriteria } from './ViewFieldCriteria';
+import { getIcon } from '../../svg'
 class DetailView extends React.Component{
     constructor(props){
         super(props)
@@ -86,11 +87,14 @@ class DetailView extends React.Component{
                                             mainActionGroup.triggers.map(t=>{
                                                     let enable = testCriteria(t.enableCriteria,detailData)
                                                     let visible = testCriteria(t.visibleCriteria,detailData)
+                                                    let IconCtrl = getIcon(t.icon)
                                                     return visible?<Button disabled={!enable} onClick={()=>{
                                                         host.doAction(self, t)
-                                                    }} key={t.name}>{
-                                                        t.title
-                                                    }
+                                                    }} key={t.name}  type="primary">
+                                                        {IconCtrl}
+                                                        {
+                                                            t.title
+                                                        }
                                                     </Button>:null 
                                             })
                                         ):null 
@@ -113,9 +117,12 @@ class DetailView extends React.Component{
                                                                 sg.triggers.map((t)=>{
                                                                     let enable = testCriteria(t.enableCriteria,detailData)
                                                                     let visible = testCriteria(t.visibleCriteria,detailData)
+                                                                    let IconCtrl = getIcon(t.icon)
                                                                     return visible?<Button disabled={!enable} onClick={()=>{
                                                                                 host.doAction(self, t)
-                                                                            }} key={t.name}>{
+                                                                            }} key={t.name}  type="primary">
+                                                                            {IconCtrl}
+                                                                            {
                                                                                 t.title
                                                                             }
                                                                             </Button>:null

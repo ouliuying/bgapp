@@ -17,6 +17,7 @@ import {getRoutePath} from '../routerHelper'
 import {mapStateToProps} from './listViewMapStateToProps'
 import { RECORD_TAG } from '../ReservedKeyword';
 import { testCriteria } from './ViewFieldCriteria';
+import { getIcon } from '../../svg'
 class ListView extends React.Component{
     constructor(props){
         super(props)
@@ -106,9 +107,10 @@ class ListView extends React.Component{
                                     return <>
                                         {
                                              g.triggers.map(t=>{
-                                                return <Button type="danger" onClick={()=>{
+                                                let IconCtrl = getIcon(t.icon)
+                                                return <Button type="primary" onClick={()=>{
                                                     self.cmmHost.doAction(self,t)
-                                                }} key={t.name}>{t.title}</Button>
+                                                }} key={t.name}>{IconCtrl}{t.title}</Button>
                                             })
                                         }
                                     </>

@@ -20,5 +20,5 @@ function mapStateToProps(state){
     return state
  }
 
- ReducerRegistry.Add({core})
+ //ReducerRegistry.Add({core})
 export default withRouter(connect(mapStateToProps)(MainFrame))
