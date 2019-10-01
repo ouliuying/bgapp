@@ -6,6 +6,5 @@ const modelViews=[
     loadView("corp", "department","list",DepartmentListView),
 ]
 export default function CorpInContainer(props){
-
     return <AppInContainer app="corp" modelViews={modelViews}></AppInContainer>
 }

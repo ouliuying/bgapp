@@ -56,6 +56,8 @@ export const ViewFieldType={
     SelectField:"select",
     PasswordField:"password",
     SelectModelFromListViewField:"selectModelFromListView",
+    SelectImageField:"selectImage",
+    StaticImagePreviewField:"staticImagePreview",
 
     //criteria
     CriteriaEnumSelect:"criteriaSelect",
@@ -139,7 +141,37 @@ export class EnumStaticTextField extends React.Component{
         return <StaticField {...this.props} getText={()=>{return this.getText()}}></StaticField>
     }
 }
-
+export class StaticImagePreviewField extends React.Component{
+    getText(value){
+        if(typeof value ==="string"){
+            return value
+        }
+        const {relationData} = this.props
+        if(relationData){
+            if((value||{}).record){
+                if(value.record instanceof Array){
+                    if(value.record.length>0){
+                        return value.record[0][relationData.toName]
+                    }
+                }
+                else if(value.record instanceof Object){
+                    return value.record[relationData.toName]
+                }
+            }
+            return (value||{})[relationData.toName]
+        }
+        return JSON.stringify(value)
+    }
+    render(){
+        const {value,meta,getText:txtFn} = this.props
+        let {width,height}= meta||{}
+        width = width||32
+        height = height||32
+        const getText = txtFn||((value)=>{return this.getText(value)})
+        let requestName = getText(value)
+        return <img src={"/storage/file/"+requestName} alt="" style={{width:width+"px",height:height+"px"}}/>
+    }
+}
 export class TextField extends React.Component{
     render(){
         const {type,value,onChange,enable,relationData}=this.props
@@ -548,7 +580,67 @@ export class SelectModelFromListViewField extends React.Component{
     }
 }
 
-
+export class SelectImageField extends React.Component{
+    onChange(imageRequestName){
+        const {onChange:fieldValueChange} = this.props
+        fieldValueChange && fieldValueChange(imageRequestName)
+    }
+    showImageForSelect(){
+        const {value,meta,field,enable} = this.props
+        const {app,model}=meta||{}
+        if(!enable){
+            return;
+        }
+        let self =this
+        let external = {
+            setSingleSelectItem(data){
+                self.onChange(data)
+            },
+            getSingleSelectItem(){
+                return value
+            }
+        }
+        let callApp = "core"
+        let callModel = "partnerStorageEntityRel"
+        let view = getModelView(callApp,
+            callModel,
+            ViewType.LIST)
+        let viewParam = createViewParam(undefined,
+            undefined,
+            undefined,
+            external,
+            undefined)
+        view && (
+            ModalSheetManager.openModal(view,{
+                app:callApp,
+                model:callModel,
+                viewType:ViewType.LIST,
+                viewParam,
+                viewRefType:ViewRefType.SINGLE_SELECTION
+            })
+        )
+    }
+    render(){
+        const {value} = this.props
+        let self = this
+        return <div className="bg-select-image" onClick={()=>{
+            self.showImageForSelect()
+        }}>
+           {
+               value?<>
+                <img src ={`/storage/file/${value}`} alt=""/>
+                <div className="bg-select-overlay">
+                    <FontIcon type="redo"/>
+                </div>
+               </>:<>
+                <div className="bg-select-overlay-none-image">
+                    <FontIcon type="redo"/>
+                </div>
+               </>
+           }
+        </div>
+    }
+}
 export class SelectField extends React.Component{
     
     render(){

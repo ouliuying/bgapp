@@ -18,6 +18,8 @@ export class DepartmentListViewCMM extends ListViewCMM{
         let treeData =[]
         let record = (data||{}).record
         let allkeys=[]
+        let {viewParam}= view.props
+        const {ownerModelID}=viewParam||{}
         if(record){
             if(record instanceof Array){
                 allkeys=record.map(x=>x.id+"")
@@ -26,8 +28,9 @@ export class DepartmentListViewCMM extends ListViewCMM{
                     if(parentID && parentID instanceof Object){
                         parentID = parentID.record.id
                     }
-                    return parentID == 0 || parentID==undefined || parentID==null
+                    return parentID == 0 || parentID==undefined || parentID==null || parentID==ownerModelID
                 })
+               
                 let ids = []
                 topNodes.map(t=>{
                      let title=t.name

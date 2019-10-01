@@ -1264,3 +1264,66 @@ button:focus {
     display: inline-block;
     margin-left: 1rem;
 }
+
+.bg-select-image {
+    background-color: #fafafa;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+    border-radius: 2px;
+}
+
+.bg-select-image img {
+    width: 80px;
+    height: 80px;
+    border-radius: 2px;
+}
+
+.bg-select-image .bg-select-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 1;
+    display: none;
+    border-radius: 2px;
+}
+
+.bg-select-image:hover .bg-select-overlay {
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    display: block;
+}
+
+.bg-select-image:hover .bg-select-overlay {
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    display: block;
+}
+
+.bg-select-image:hover .bg-select-overlay i {
+    margin-left: 30px;
+    margin-top: 30px
+}
+
+.bg-select-image .bg-select-overlay-none-image {
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 1;
+    border-radius: 2px;
+}
+
+.bg-select-image .bg-select-overlay-none-image i {
+    margin-left: 30px;
+    margin-top: 30px
+}

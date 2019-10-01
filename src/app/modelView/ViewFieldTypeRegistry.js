@@ -22,6 +22,8 @@ import {TextField,
     ChinaFullAddressStaticField,
     SelectField,
     SelectModelFromListViewField,
+    SelectImageField,
+    StaticImagePreviewField,
     // ViewFieldType
     ViewFieldType,
     PasswordField,
@@ -89,6 +91,8 @@ registry.add(ViewFieldType.ChinaFullAddressStaticField,ChinaFullAddressStaticFie
 registry.add(ViewFieldType.SelectField,SelectField)
 registry.add(ViewFieldType.PasswordField,PasswordField)
 registry.add(ViewFieldType.SelectModelFromListViewField,SelectModelFromListViewField)
+registry.add(ViewFieldType.SelectImageField,SelectImageField)
+registry.add(ViewFieldType.StaticImagePreviewField,StaticImagePreviewField)
 
 registry.add(ViewFieldType.CriteriaEnumSelect,CriteriaEnumSelect)
 registry.add(ViewFieldType.CriteriaNumberRangeInput,CriteriaNumberRangeInput)
