@@ -10,7 +10,7 @@ import {Icon,Input,Button,Menu,Dropdown} from '../ui'
 import { getSvg } from "../svg"
 import { ReducerRegistry } from "../ReducerRegistry";
 import { push } from "connected-react-router";
-import { getChannels, getActiveChannel, getActiveJoinModel, getActiveChatSessionMessages } from "./reducers/chat";
+import { getChannels, getActiveChatSessionMessages, getActiveChannelAndJoinModel } from "./reducers/chat";
 import { getCurrChatUUID } from "../reducers/partner";
 import { MessageBus } from "../mb/MessageBus";
 import { MessageApi } from "./MessageApi";
@@ -18,6 +18,7 @@ import { TextMessageItem } from "./messageItem/TextMessageItem";
 import { TXT_MESSAGE, RECEIVE_MESSAGE_RESPONSE_SUCCESS_TYPE } from "./msgType";
 import { WEB_TYPE } from "./devType";
 import { SET_ACTIVE_CHANNEL, SET_ACTIVE_CHANNEL_ACTIVE_JOIN_MODEL } from "./core/Chat";
+import ChannelbroadcastType from "./ChannelbroadcastType"
 
 function  ChannelMenu(props){
     return <Menu theme="dark" onClick={(itemData)=>{
@@ -63,7 +64,12 @@ class MainFrame extends React.Component{
     sendMessage(message){
         const {activeChannel,activeJoinModel,myUUID} = this.props
         message.fromUUID = myUUID
-        message.toUUID = (activeJoinModel||{}).UUID
+        if(activeChannel && activeChannel.broadcastType == ChannelbroadcastType.P2P){
+            message.toUUID = (activeJoinModel||{}).UUID
+        }
+        else{
+            message.toUUID=""
+        }
         message.channelUUID = (activeChannel||{}).UUID
         message.fromDevType = WEB_TYPE
         MessageApi.send(message)
@@ -154,12 +160,13 @@ class MainFrame extends React.Component{
                         <ul className="bg-chat-channel-members-container">
                             {
                                 activeChannelJoinModels.map(jm=>{
-
-                                    return  <li className="bg-chat-channel-members-channel-item" onClick={()=>{
+                                    let icon = "/storage/file/"+jm.icon
+                                    let liClassName = jm.activeFlag?"bg-chat-channel-members-channel-item active":"bg-chat-channel-members-channel-item"
+                                    return  <li className={liClassName} onClick={()=>{
                                         MessageBus.ref.send(SET_ACTIVE_CHANNEL_ACTIVE_JOIN_MODEL,jm)
                                     }} key={jm.UUID}>
                                                     <div className="bg-chat-channel-members-item-icon">
-                                                        <img src="/images/Avatar.jpg" alt=""/>
+                                                        <img src={icon} alt=""/>
                                                     </div>
                                                     <div className="bg-chat-channel-members-item-userinfo">
                                                         <div className="bg-chat-channel-members-item-userinfo-nickname">
@@ -182,10 +189,9 @@ class MainFrame extends React.Component{
                 <div className="bg-chat-channel-header">
                     {
                         activeChannel && activeJoinModel && <>
-                        <img src="/images/Avatar.jpg" alt="" className="bg-channel-icon"/>
-                        <span className="bg-channel-name">{activeChannel.name}></span>
-                        <span className="bg-channel-member-nickname">对象昵称></span>
-                        <span className="bg-channel-member-status">{activeJoinModel.nickName}</span>
+                        <img src={"/storage/file/"+activeJoinModel.icon} alt="" className="bg-channel-icon"/>
+                        <span className="bg-channel-name">{activeChannel.name} > </span>
+                        <span className="bg-channel-member-nickname">{activeJoinModel.nickName}</span>
                         </>
                     }
                 </div>
@@ -232,8 +238,9 @@ class MainFrame extends React.Component{
 
 function mapStateToProps(state){
     let channels = getChannels(state)
-    let activeChannel = getActiveChannel(state)
-    let activeJoinModel = getActiveJoinModel(state)
+    let cj = getActiveChannelAndJoinModel(state)
+    let activeChannel=cj.clientChannel
+    let activeJoinModel=cj.joinModel
     let messageQueue = getActiveChatSessionMessages(state)
     let myUUID = getCurrChatUUID(state)
     return {channels,activeChannel,activeJoinModel,messageQueue,myUUID}

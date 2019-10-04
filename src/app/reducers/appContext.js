@@ -20,7 +20,7 @@ import produce from "immer"
 import { createSelector } from 'reselect'
 import memoize from 'lodash.memoize'
 import ViewType from '../modelView/ViewType'
-import {CREATE_VIEW_DATA, LIST_VIEW_DATA, DETAIL_VIEW_DATA, EDIT_VIEW_DATA,RECORD_TAG} from '../ReservedKeyword'
+import {CREATE_VIEW_DATA, LIST_VIEW_DATA, DETAIL_VIEW_DATA, EDIT_VIEW_DATA,RECORD_TAG, MODEL_FIELD_UPDATE_FLAG} from '../ReservedKeyword'
 import { ReducerRegistry } from '../../ReducerRegistry';
 import {nextRecordTag} from '../../lib/tag-helper'
 import { bindRecordTag } from '../fieldHelper';
@@ -57,6 +57,7 @@ export function appContext(state,action){
                     const [fd,value]=fv
                     draft[CREATE_VIEW_DATA][key]["viewData"]["data"]["record"]=draft[CREATE_VIEW_DATA][key]["viewData"]["data"]["record"]||{}
                     draft[CREATE_VIEW_DATA][key]["viewData"]["data"]["record"][fd.name]=value
+                    draft[CREATE_VIEW_DATA][key]["viewData"]["data"]["record"][MODEL_FIELD_UPDATE_FLAG]=true
                   })
                 }
             })
@@ -81,7 +82,8 @@ export function appContext(state,action){
                         }
                       }
                       const [fd,value]=fv
-                      draft[EDIT_VIEW_DATA][key]["viewData"]["data"]["record"][fd.name]=value
+                      draft[EDIT_VIEW_DATA][key]["viewData"]["data"]["record"][fd.name] = value
+                      draft[EDIT_VIEW_DATA][key]["viewData"]["data"]["record"][MODEL_FIELD_UPDATE_FLAG] = true
                     })
                 }
             })
@@ -461,9 +463,15 @@ function removeRedundancyProperty(modelData){
             }
             modelData.record.map(r=>{
                 if(r["id"]!=undefined){
-                    rModelData.record.push({
-                        id:modelData.record.id
-                    })
+                    if(r[MODEL_FIELD_UPDATE_FLAG]){
+                        let nr = removeRedundancyRecordProperty(r)
+                        rModelData.record.push(nr)
+                    }
+                    else{
+                        rModelData.record.push({
+                            id:r["id"]
+                        })
+                    }
                 }
                 else{
                     let nr = removeRedundancyRecordProperty(r)
@@ -474,13 +482,24 @@ function removeRedundancyProperty(modelData){
         }
         else{
             if(modelData.record["id"]!=undefined){
-                return {
-                    app:modelData.app,
-                    model:modelData.model,
-                    record:{
-                        id:modelData.record.id
+                if(modelData.record[MODEL_FIELD_UPDATE_FLAG]){
+                    let nr = removeRedundancyRecordProperty(modelData.record)
+                    return  {
+                             app:modelData.app,
+                             model:modelData.model,
+                             record:nr
+                            }
+                }
+                else{
+                    return {
+                        app:modelData.app,
+                        model:modelData.model,
+                        record:{
+                            id:modelData.record.id
+                        }
                     }
                 }
+               
             }
             else{
                 let nr = removeRedundancyRecordProperty(modelData.record)
@@ -507,10 +526,12 @@ function removeRedundancyRecordProperty(record){
     })
     return nr
 }
+
 function buildServerModelDataObject(view,dataRecord,state,subViews){
     let record={}
     if(dataRecord.hasOwnProperty("id")){
         record["id"]=dataRecord["id"]
+        record[MODEL_FIELD_UPDATE_FLAG]=dataRecord[MODEL_FIELD_UPDATE_FLAG]
     }
     view.fields.map(f=>{
         if(!f.relationData){
@@ -528,7 +549,7 @@ function buildServerModelDataObject(view,dataRecord,state,subViews){
                 else{
                     value={
                         app:f.relationApp.targetApp,
-                        app:f.relationApp.targetModel,
+                        model:f.relationApp.targetModel,
                         record:{
                             id:value
                         }

@@ -7,7 +7,7 @@ export class TextMessageItem extends React.Component{
                {
                   isMe? <><div className="msg-container-me">
                               <div className="msg-header">
-                                 <img src="/images/Avatar.jpg" alt=""></img>
+                                 <img src={"/storage/file/"+model.icon} alt=""></img>
                                  <span>{model.nickName}</span>
                                  <span>{date.toLocaleString()}</span>
                               </div>
@@ -27,7 +27,7 @@ export class TextMessageItem extends React.Component{
                            </div>
                      </>:<><div className="msg-container-other">
                               <div className="msg-header">
-                                 <img src="/images/Avatar.jpg" alt=""></img>
+                                 <img src={"/storage/file/"+model.icon} alt=""></img>
                                  <span>{model.nickName}</span>
                                  <span>{date.toLocaleString()}</span>
                               </div>

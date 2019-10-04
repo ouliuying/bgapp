@@ -15,13 +15,10 @@ import {CHAT_INIT_UI_CHANNEL_LIST,
 import producer from "immer"
 import {createSelector} from "reselect"
 import {original,isDraft} from "immer"
+import BroadcaskType from '../ChannelbroadcastType'
 const chatData = {
     myUUID:"",
-    clientChannels:[],
-    activeClientChannel:{
-        activeJoinModel:null,
-        clientChannel:null,
-    }
+    clientChannels:[]
 }
 export function chat(state,action){
     if(typeof state ==="undefined"){
@@ -35,6 +32,7 @@ export function chat(state,action){
                 payload.channelMeta.map(ch=>{
                     let clientChannel = getClientChannel(ch)
                     if(clientChannel){
+                        clientChannel.newMessageCount=0
                         draft.clientChannels.push(clientChannel)
                     }
                     return clientChannel
@@ -203,16 +201,26 @@ function addReceiveMessageToChannel(draft,serverMessage){
     if(channelUUID){
         let clientChannel = draft.clientChannels.find(x=>x.UUID == channelUUID)
         if(clientChannel){
-            if(clientChannel.messageQueue){
-                clientChannel.messageQueue.push(clientMessage)
-                if(draft.activeClientChannel.clientChannel && draft.activeClientChannel.clientChannel.UUID == channelUUID){
-                    draft.activeClientChannel.clientChannel.messageQueue.push(clientMessage)
+            clientChannel.newMessageCount++
+            if(clientChannel.broadcastType == BroadcaskType.BROADCAST){
+                if(clientChannel.messageQueue){
+                    clientChannel.messageQueue.push(clientMessage)
+                }
+                else{
+                    clientChannel.messageQueue = [clientMessage]
                 }
             }
-            else{
-                clientChannel.messageQueue = [clientMessage]
-                if(draft.activeClientChannel.clientChannel && draft.activeClientChannel.clientChannel.UUID == channelUUID){
-                    draft.activeClientChannel.clientChannel.messageQueue = [clientMessage]
+            else if(clientChannel.broadcastType == BroadcaskType.P2P){
+                let fromUUID = clientMessage.fromUUID
+                let joinModels = clientChannel.joinModels||[]
+                let joinModel = joinModels.find(x=>x.UUID == fromUUID)
+                if(joinModel){
+                    if(joinModel.messageQueue){
+                        joinModel.messageQueue.push(clientMessage)
+                    }
+                    else{
+                        joinModel.messageQueue=[clientMessage]
+                    }
                 }
             }
         }
@@ -225,16 +233,25 @@ function addSendMessageToChannel(draft,serverMessage){
     if(channelUUID){
         let clientChannel = draft.clientChannels.find(x=>x.UUID == channelUUID)
         if(clientChannel){
-            if(clientChannel.messageQueue){
-                clientChannel.messageQueue.push(clientMessage)
-                if(draft.activeClientChannel.clientChannel && draft.activeClientChannel.clientChannel.UUID == channelUUID){
-                    draft.activeClientChannel.clientChannel.messageQueue.push(clientMessage)
+            if(clientChannel.broadcastType == BroadcaskType.BROADCAST){
+                if(clientChannel.messageQueue){
+                    clientChannel.messageQueue.push(clientMessage)
+                }
+                else{
+                    clientChannel.messageQueue = [clientMessage]
                 }
             }
-            else{
-                clientChannel.messageQueue = [clientMessage]
-                if(draft.activeClientChannel.clientChannel && draft.activeClientChannel.clientChannel.UUID == channelUUID){
-                    draft.activeClientChannel.clientChannel.messageQueue = [clientMessage]
+            else if(clientChannel.broadcastType == BroadcaskType.P2P){
+                let toUUID = clientMessage.toUUID
+                let joinModels = clientChannel.joinModels||[]
+                let joinModel = joinModels.find(x=>x.UUID == toUUID)
+                if(joinModel){
+                    if(joinModel.messageQueue){
+                        joinModel.messageQueue.push(clientMessage)
+                    }
+                    else{
+                        joinModel.messageQueue=[clientMessage]
+                    }
                 }
             }
         }
@@ -242,19 +259,33 @@ function addSendMessageToChannel(draft,serverMessage){
 }
 
 function setActiveClientChannel(chatData,channelUUID){
-    let channel = chatData.clientChannels.find(x=>x.UUID == channelUUID)
+    let channels = chatData.clientChannels||[]
+    channels.map(x =>{
+        x.activeFlag = false
+    })
+    let channel = channels.find(x=>x.UUID == channelUUID)
     if(channel){
-        chatData.activeClientChannel.clientChannel = channel
-        let defActiveJoinModel = channel.joinModels && channel.joinModels[0]
-        chatData.activeClientChannel.activeJoinModel = defActiveJoinModel?defActiveJoinModel:null
+        channel.activeFlag = true
+        let joinModels = channel.joinModels||[]
+        let index = joinModels.findIndex(x=>x.activeFlag == true)
+        if(index<0){
+            if(joinModels.length>0){
+                joinModels[0].activeFlag = true
+            }
+        }
     }
 }
+
 function setActiveClientChannelJoinModel(chatData,joinModelUUID){
-    let clientChannel = chatData.activeClientChannel.clientChannel
-    if(clientChannel){
-        let joinModel = clientChannel.joinModels.find(x=>x.UUID == joinModelUUID)
+    let channels = chatData.clientChannels||[]
+    let index = channels.findIndex(x=>x.activeFlag == true)
+    if(index>-1){
+        let clientChannel = channels[index]
+        let joinModels = clientChannel.joinModels||[]
+        let joinModel = joinModels.find(x=>x.UUID == joinModelUUID)
         if(joinModel){
-            chatData.activeClientChannel.activeJoinModel = joinModel
+            joinModels.map(x=>x.activeFlag=false)
+            joinModel.activeFlag = true
         }
     }
 }
@@ -264,25 +295,31 @@ function updateSendMessageUUID(draft,respMsg){
   let channelUUID = respMsg.channelUUID
   let seq = respMsg.seq
   let uuid = respMsg.uuid
+  let toUUID = respMsg.toUUID
   let clientChannel = draft.clientChannels.find(x=>x.UUID == channelUUID)
-  let messageQueue  = clientChannel.messageQueue
-  let msg = findLastMessage((messageQueue||[]),myUUID,channelUUID,seq)
+ // let messageQueue  = clientChannel.messageQueue
+  let msg = findLastMessage(clientChannel,myUUID,toUUID,channelUUID,seq)
   if(msg){
       msg.UUID = uuid
   }
-  if(draft.activeClientChannel.clientChannel){
-    let messageQueue  = draft.activeClientChannel.clientChannel.messageQueue
-    let msg = findLastMessage((messageQueue||[]),myUUID,channelUUID,seq)
-    if(msg){
-        msg.UUID = uuid
-    }
-  }
 }
-function findLastMessage(messageQueue,myUUID,channelUUID,seq){
+
+function findLastMessage(clientChannel,myUUID,toUUID,channelUUID,seq){
+    let messageQueue=[]
+    if(clientChannel.broadcastType == BroadcaskType.P2P){
+        let joinModels = clientChannel.joinModels||[]
+        let joinModel = joinModels.find(x=>x.UUID == toUUID)
+        if(joinModel){
+            messageQueue = joinModel.messageQueue||[]
+        }
+    }
+    else{
+        messageQueue = clientChannel.messageQueue||[]
+    }
     var len = messageQueue.length
     for(let i = len-1;i>-1;i--){
         let m = messageQueue[i]
-        if(m.fromUUID == myUUID && m.channelUUID == channelUUID && m.seq == seq){
+        if(m.fromUUID == myUUID && m.toUUID == toUUID && m.channelUUID == channelUUID && m.seq == seq){
             return m
         }
     }
@@ -295,22 +332,50 @@ function getOriginalData(draft){
 }
 
 export const getChannels = createSelector(state=>state.chat,chat=>(chat.clientChannels))
-export const getActiveChannel = createSelector(state=>state.chat,chat=>(chat.activeClientChannel.clientChannel))
-export const getActiveJoinModel = createSelector(state=>state.chat,chat=>(chat.activeClientChannel && chat.activeClientChannel.activeJoinModel))
-export const getActiveChatSessionMessages = createSelector(state=>state.chat.activeClientChannel,activeClientChannel=>{
-    const {clientChannel,activeJoinModel} = activeClientChannel
-    const messageQueue = (clientChannel||{}).messageQueue
-    if(messageQueue && activeJoinModel){
-        if(clientChannel.broadcastType==1){
+
+export const getActiveChannel = createSelector(state=>state.chat,chat=>{
+    let clientChannels = chat.clientChannels||[]
+    return clientChannels.find(x=>x.activeFlag == true)
+})
+
+export const getActiveJoinModel = createSelector(state=>state.chat,chat=>{
+    let clientChannel = chat.clientChannels.find(x=>x.actvieFlag == true)
+    if(clientChannel){
+       let joinModels = clientChannel.joinModels||[]
+       return joinModels.find(x=>x.activeFlag == true) 
+    }
+})
+
+export const getActiveChannelAndJoinModel = createSelector(state=>state.chat, chat=>{
+    let clientChannels = chat.clientChannels||[]
+    let activeClientChannel =  clientChannels.find(x=>x.activeFlag == true)
+    if(activeClientChannel){
+        let joinModels = activeClientChannel.joinModels||[]
+        let activeJoinModel =  joinModels.find(x=>x.activeFlag == true)
+        return {clientChannel:activeClientChannel,joinModel:activeJoinModel}
+    }
+    return {}
+})
+
+
+export const getActiveChatSessionMessages = createSelector(state=>state.chat,chat=>{
+    let clientChannels = chat.clientChannels||[]
+    let activeChannel =  clientChannels.find(x=>x.activeFlag == true)
+    if(activeChannel){
+        if(activeChannel.broadcastType == BroadcaskType.BROADCAST){
+            let messageQueue = activeChannel.messageQueue||[]
             return messageQueue
         }
         else{
-            return messageQueue.filter(x=>x.fromUUID == activeJoinModel.UUID || x.toUUID == activeJoinModel.UUID)
+            let joinModels = activeChannel.joinModels||[]
+            let activeJoinModel = joinModels.find(x=>x.activeFlag == true)
+            if(activeJoinModel){
+                let messageQueue = activeJoinModel.messageQueue||[]
+                return messageQueue
+            }
         }
     }
-    else{
-        return []
-    }
+    return []
 })
 
 

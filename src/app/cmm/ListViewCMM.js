@@ -15,7 +15,7 @@ import {
 import { goBack,push } from 'connected-react-router';
 import {ViewFieldType} from '../modelView/ViewFieldType'
 import { ModelAction } from '../mq/ModelAction'
-import {CREATE_VIEW_DATA, RECORD_TAG,ARGS} from '../ReservedKeyword'
+import {CREATE_VIEW_DATA, RECORD_TAG,ARGS, MODEL_FIELD_UPDATE_FLAG} from '../ReservedKeyword'
 import { getRoutePath,goRoute } from '../routerHelper'
 import {viewDataFromListContext, localDataFromListContext} from '../reducers/appContext'
 import {ModalSheetManager} from '../modelView/ModalSheetManager'
@@ -548,6 +548,7 @@ export class ListViewCMM extends  ViewCMM{
     }
     setDatasource(view,data){
         let record = this.buildFromSingleDatasource(data)
+        record[MODEL_FIELD_UPDATE_FLAG] = true
         this.updateOrAddRecordToListViewData(view,record)
     }
     updateOrAddRecordToListViewData(view,record){

@@ -843,7 +843,7 @@ button:focus {
     margin: 0;
     padding: 0px;
     flex-direction: column;
-    flex: max-content;
+    flex-grow: 1;
 }
 
 .bg-worktable-header {
