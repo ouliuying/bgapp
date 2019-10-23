@@ -36,7 +36,7 @@ const IconText = ({ type, text }) => (
     })
   }
 
-class ModelLogListView extends React.Component{
+class NotifyListView extends React.Component{
     constructor(props){
         super(props)
         const {cmmHost,parent}=this.props
@@ -71,11 +71,9 @@ class ModelLogListView extends React.Component{
         const {visible:showSearchBox} = (searchBox||{})
         let listData=self.readListData(rows)
         return  <div className="bg-work-log-list-view">
-
-          <div className="area-header">
-                        <span><Icon type="calculator" /> 操作日志 </span> 
+                <div className="area-header">
+                        <span><Icon type="calculator" /> 通知信息 </span> 
                     </div>
-
         <List
         itemLayout="vertical"
         size="large"
@@ -111,5 +109,5 @@ function logListMapStateToProps(state,ownProps){
     let currPartner = getCurrPartner(state)
     return Object.assign({},props,{currCorp,currPartner})
 }
-export default hookView.withHook(withRouter(connect(logListMapStateToProps)(ModelLogListView)))
-regModelView("core","modelLog","list",ModelLogListView)
+export default hookView.withHook(withRouter(connect(logListMapStateToProps)(NotifyListView)))
+regModelView("core","modelLog","list",NotifyListView)

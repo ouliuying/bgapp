@@ -1,5 +1,5 @@
 import React from 'react'
-import {Avatar,Tabs} from '../ui'
+import {Avatar,Tabs, Row, Col} from '../ui'
 import hook from './ctrltype/hook'
 import {connect} from 'react-redux'
 import {
@@ -10,6 +10,10 @@ import ViewType from '../app/modelView/ViewType';
 import ModelLogListView from './ModelLogListView';
 import { getCurrCorp } from '../reducers/sys';
 import { getCurrPartner } from '../reducers/partner';
+import CrmStatisticSummaryView from './CrmStatisticSummaryView'
+import CrmSalesFunnelView from './CrmSalesFunnelView'
+import CrmSalesTopListView from './CrmSalesTopListView'
+import NotifyListView from './NotifyListView'
 class WorktableInContainer extends React.Component{
     render(){
         const{currCorp,currPartner} = this.props
@@ -28,12 +32,16 @@ class WorktableInContainer extends React.Component{
             </div>
         </div>
         <div className="bg-worktable-body">
-            <Tabs defaultActiveKey="1">
-                <Tabs.TabPane tab="日志" key="1">
-                   <ModelLogListView app="core" model="modelLog" viewType="list">
+           <CrmStatisticSummaryView></CrmStatisticSummaryView>
+            <div className="bg-worktable-sales-container">
+                <CrmSalesFunnelView></CrmSalesFunnelView>
+                <CrmSalesTopListView></CrmSalesTopListView>
+            </div>
+            <div className="bg-work-log-notify-container">
+                    <ModelLogListView app="core" model="modelLog" viewType="list">
                    </ModelLogListView>
-                </Tabs.TabPane>
-            </Tabs>
+                   <NotifyListView app="core" model="modelLog" viewType="list"></NotifyListView>
+            </div>
         </div>
         <div className="bg-worktable-footer">
 

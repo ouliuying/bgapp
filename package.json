@@ -4,6 +4,8 @@
     "private": true,
     "proxy": "http://localhost:8090/",
     "dependencies": {
+        "@antv/data-set": "^0.10.2",
+        "@antv/g2": "^3.5.9",
         "antd": "^3.23.5",
         "babel-plugin-import": "^1.12.2",
         "caniuse-lite": "^1.0.30000997",

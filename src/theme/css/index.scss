@@ -873,10 +873,8 @@ button:focus {
 }
 
 .bg-worktable-body {
-    background: white;
-    border: 1px solid #ddd;
     min-height: 600px;
-    padding: 0 10px;
+    padding: 10px 10px;
 }
 
 .bg-worktable-footer {
@@ -1326,4 +1324,95 @@ button:focus {
 .bg-select-image .bg-select-overlay-none-image i {
     margin-left: 30px;
     margin-top: 30px
+}
+
+.bg-worktable-crm-statistic-summary {
+    background-color: white;
+    border: 2px solid #e0e0e0;
+    padding: 10px;
+}
+
+.bg-worktable-body .area-header {
+    color: #373737;
+    font-size: 16px;
+    margin-bottom: 1rem;
+}
+
+.bg-worktable-body .area-header .ant-tag {
+    border: none;
+    user-select: none;
+}
+
+.bg-worktable-body .area-header .ant-tag:hover,
+.bg-worktable-body .area-header .ant-tag.active {
+    color: white;
+    background: rgb(16, 142, 233);
+}
+
+.bg-worktable-crm-statistic-summary-body {
+    display: flex;
+    flex-shrink: 1;
+}
+
+.bg-worktable-crm-statistic-summary-body>div {
+    display: flex;
+    padding: 10px;
+    flex-grow: 1;
+    border-left: #e8e8e8 1px solid
+}
+
+.bg-worktable-crm-statistic-summary-body>div:first-child {
+    border-left: none;
+}
+
+.bg-worktable-crm-statistic-summary-item-icon {
+    border-radius: 3rem;
+    height: 3rem;
+    width: 3rem;
+    color: white;
+    font-size: 1.2rem;
+    padding-left: 0.8rem;
+    line-height: 3rem;
+    margin-right: 0.5rem;
+}
+
+.bg-worktable-crm-statistic-summary-item h4 {
+    color: #676767;
+}
+
+.bg-worktable-crm-statistic-summary-item span {
+    color: #949494;
+}
+
+.bg-worktable-sales-container {
+    display: flex;
+}
+
+.bg-worktable-sales-container .bg-work-funnel-view {
+    flex-grow: 1;
+    background-color: white;
+    border: 2px solid #e0e0e0;
+    padding: 10px;
+}
+
+.bg-worktable-sales-container .bg-work-sales-top-list-view {
+    background-color: white;
+    border: 2px solid #e0e0e0;
+    padding: 10px;
+    flex-basis: 20rem;
+}
+
+.bg-work-worktable-salesfunnel-chart {
+    min-height: 18rem;
+}
+
+.bg-work-log-notify-container {
+    display: flex;
+}
+
+.bg-work-log-notify-container .bg-work-log-list-view {
+    flex-grow: 1;
+    background-color: white;
+    border: 2px solid #e0e0e0;
+    padding: 10px;
 }
