@@ -73,7 +73,7 @@ class ModelLogListView extends React.Component{
         return  <div className="bg-work-log-list-view">
 
           <div className="area-header">
-                        <span><Icon type="calculator" /> 操作日志 </span> 
+                        <span><Icon type="table" /> 操作日志 </span> 
                     </div>
 
         <List

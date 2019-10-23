@@ -72,7 +72,7 @@ class NotifyListView extends React.Component{
         let listData=self.readListData(rows)
         return  <div className="bg-work-log-list-view">
                 <div className="area-header">
-                        <span><Icon type="calculator" /> 通知信息 </span> 
+                        <span><Icon type="table" /> 通知信息 </span> 
                     </div>
         <List
         itemLayout="vertical"

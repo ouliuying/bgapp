@@ -86,7 +86,7 @@ class CrmSalesFunnelView extends React.Component{
     render(){
         return <div className="bg-work-funnel-view">
             <div className="area-header">
-                <span><Icon type="calculator" /> 销售漏斗 </span> 
+                <span><Icon type="filter" /> 销售漏斗 </span> 
                 <Tag color="blue" className="active" style={{marginLeft:10}}>本周</Tag>
                         <Tag color="blue">本月</Tag>
                         <Tag color="blue">本年</Tag>

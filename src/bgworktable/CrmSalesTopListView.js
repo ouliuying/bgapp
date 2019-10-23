@@ -31,7 +31,7 @@ class CrmSalesTopListView extends React.Component{
           ];
         return <div className="bg-work-sales-top-list-view">
             <div className="area-header">
-                <span><Icon type="calculator" /> 销售榜 </span> 
+                <span><Icon type="trophy" /> 销售榜 </span> 
                 <Tag color="blue" className="active" style={{marginLeft:10}}>本周</Tag>
                         <Tag color="blue">本月</Tag>
                         <Tag color="blue">本年</Tag>
