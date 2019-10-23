@@ -706,7 +706,8 @@ button:focus {
     background: $body-background-color;
 }
 
-.ant-table-thead>tr {
+.ant-table-thead>tr,
+.ant-table-thead>tr:hover {
     background: $table-header-background-color;
 }
 

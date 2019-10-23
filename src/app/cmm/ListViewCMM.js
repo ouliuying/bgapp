@@ -548,7 +548,9 @@ export class ListViewCMM extends  ViewCMM{
     }
     setDatasource(view,data){
         let record = this.buildFromSingleDatasource(data)
-        record[MODEL_FIELD_UPDATE_FLAG] = true
+        record = produce(record,draft=>{
+            draft[MODEL_FIELD_UPDATE_FLAG] = true
+        })
         this.updateOrAddRecordToListViewData(view,record)
     }
     updateOrAddRecordToListViewData(view,record){
