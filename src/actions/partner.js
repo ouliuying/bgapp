@@ -1,6 +1,7 @@
 import {ReducerRegistry} from '../ReducerRegistry'
 
 export const SET_PARTNER='INIT_PARTNER'
+export const LOGOUT='LOGOUT'
 
 export const SET_PARTNER_USERNAME_PASSWORD='SET_PARTNER_USERNAME_PASSWORD'
 
@@ -16,5 +17,12 @@ export function setPartnerUserNamePassword(data){
     store.dispatch({
         type:SET_PARTNER_USERNAME_PASSWORD,
         payload:data
+    })
+}
+export function logout(){
+    const {store}=ReducerRegistry
+    store.dispatch({
+        type:LOGOUT,
+        payload:{}
     })
 }

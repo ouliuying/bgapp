@@ -8,6 +8,7 @@ import { persistStore,persistReducer} from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
 import ViewContext from './app/modelView/ViewContext'
 import { MessageBus, SYS_INIT, PARTNER_INIT } from './mb/MessageBus';
+import {TOKEN_CHECK} from './bgcore/partnerMessage'
 import { getCurrPartner } from './reducers/partner';
 const persistConfig = {
     key: 'bgworkroot',
@@ -43,6 +44,7 @@ export class ReducerRegistry {
         )
         let persistor = persistStore(store,null,() => {
             let state = store.getState() 
+            MessageBus.ref.send(TOKEN_CHECK,{...state})
         })
         ReducerRegistry.store=store
         ReducerRegistry.history=history
@@ -60,7 +62,8 @@ export class ReducerRegistry {
          }
          ReducerRegistry.store.replaceReducer(persistReducer(persistConfig,combineReducers(ReducerRegistry.reducers)))
          persistStore(ReducerRegistry.store,null,() => {
-            ReducerRegistry.store.getState() 
+            ReducerRegistry.store.getState()
+
         })
     }
 }

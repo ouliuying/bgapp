@@ -1,4 +1,5 @@
 import {req,APPLICATION_JSON} from '../../lib/http-helper'
+import { logout } from '../../actions/partner'
  export class ModelAction{
     constructor(app,model){
         this.app=app
@@ -13,7 +14,13 @@ import {req,APPLICATION_JSON} from '../../lib/http-helper'
                 'content-type': APPLICATION_JSON
             }
         },function(res){
-            success(JSON.parse(res))
+            let resObj = JSON.parse(res)
+            if(resObj.errorCode==1){
+                logout()
+            }
+            else{
+                success(resObj)
+            }
         },function(err){
            // console.error(err)
             fail(err)

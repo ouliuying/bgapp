@@ -7,6 +7,7 @@ import {showGlobalOverlay } from './GlobalOverlay';
 const RESPONE_JSON='json'
 const HTTP_POST='POST'
 const HTTP_GET='GET'
+
 function req(url,data=null,reqInfo=null,successFun,failFun){
     for(let i=0;i<arguments.length;i++){
         if(TypeHelper.isFunction(arguments[i])){
@@ -78,7 +79,7 @@ function req(url,data=null,reqInfo=null,successFun,failFun){
         ).catch((res)=>{
                 hideGlobalOverlay()
                 failFun(res)
-            })
+        })
     }
 }
 

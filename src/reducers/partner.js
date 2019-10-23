@@ -1,6 +1,7 @@
 import {
     SET_PARTNER,
     SET_PARTNER_USERNAME_PASSWORD,
+    LOGOUT,
 
 } from '../actions/partner'
 import { createSelector } from 'reselect'
@@ -36,6 +37,10 @@ export function partner(state,action){
         {
             let newState=action.payload
             return  Object.assign({},state,newState)
+        }
+        case LOGOUT:
+        {
+            return  Object.assign({}, state, initPartner)
         }
         default:
            return state
