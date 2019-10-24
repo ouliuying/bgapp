@@ -20,7 +20,7 @@ class WorktableInContainer extends React.Component{
         return <div className="bg-worktable">
         <div className="bg-worktable-header">
             <div className="p-logo">
-                <Avatar size={100} src={"/storage/file/"+currPartner.icon}></Avatar>
+                <Avatar size={50} src={"/storage/file/"+currPartner.icon}></Avatar>
             </div>
             <div>
                 <span className="p-name">
