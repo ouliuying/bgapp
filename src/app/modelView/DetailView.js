@@ -45,6 +45,7 @@ class DetailView extends React.Component{
     componentWillReceiveProps(){
 
     }
+    
     render(){
         const self=this
         self.cmmHost.update(this)

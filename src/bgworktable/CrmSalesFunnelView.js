@@ -8,26 +8,29 @@ class CrmSalesFunnelView extends React.Component{
             DataView = _DataSet.DataView;
 
         var data = [{
-            action: '浏览网站',
-            pv: 50000
+            action: '线索/潜在客户',
+            pv: 1000
         }, {
-            action: '放入购物车',
-            pv: 35000
+            action: '联系/接触客户',
+            pv: 700
         }, {
-            action: '生成订单',
-            pv: 25000
+            action: '意向客户',
+            pv: 500
         }, {
-            action: '支付订单',
-            pv: 15000
+            action: '报价客户',
+            pv: 100
         }, {
-            action: '完成交易',
-            pv: 8000
+            action: '合同客户',
+            pv: 80
+        }, {
+            action: '成交客户',
+            pv: 60
         }];
         var dv = new DataView().source(data);
         dv.transform({
             type: 'map',
             callback: function callback(row) {
-            row.percent = row.pv / 50000;
+            row.percent = row.pv / 1000;
             return row;
             }
         });
