@@ -89,18 +89,28 @@ export class ChatCore {
         const state = ReducerRegistry.Store.getState()
         return getCurrChatSessionID(state)
     }
-
+    registerEndpoint(address){
+        let self = this
+        try{
+            self._eb.registerHandler(address, {
+                fromUUID: self.getCurrChatUUID()
+            }, (_, msg) => {
+                MessageBus.ref.send(MESSAGE_COMMING_TOPIC, (msg || {}).body)
+            })
+        }
+        catch(err){
+            setTimeout(()=>{
+                self.registerEndpoint(address)
+            },200)
+        }
+    }
     startChatSession(channelMeta) {
         let self = this
         let chatSessionID = this.getCurrChatSessionID()
         this.initChatData(channelMeta).then(() => {
             self.loadChannelJoinModels(channelMeta).then(() => {
                 const address = "server.to.client." + chatSessionID
-                this._eb.registerHandler(address, {
-                    fromUUID: self.getCurrChatUUID()
-                }, (_, msg) => {
-                    MessageBus.ref.send(MESSAGE_COMMING_TOPIC, (msg || {}).body)
-                })
+                self.registerEndpoint(address)
                 MessageBus.ref.consume(SEND_MESSAGE_TO_SERVER_TOPIC, (msg) => {
                     this.sendToServer(msg)
                 })

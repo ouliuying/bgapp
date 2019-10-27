@@ -10,6 +10,7 @@ import ViewContext from './app/modelView/ViewContext'
 import { MessageBus, SYS_INIT, PARTNER_INIT } from './mb/MessageBus';
 import {TOKEN_CHECK} from './bgcore/partnerMessage'
 import { getCurrPartner } from './reducers/partner';
+import { clearModalSheet } from './app/actions/modalSheetQueue';
 const persistConfig = {
     key: 'bgworkroot',
     storage:storage,
@@ -31,6 +32,9 @@ export class ReducerRegistry {
     static create(reducers){
         ReducerRegistry.reducers= reducers;
         const history = createBrowserHistory()
+        history.listen(()=>{
+            clearModalSheet()
+        })
         const middleware = routerMiddleware(history)
         ReducerRegistry.reducers={
             router: connectRouter(history),

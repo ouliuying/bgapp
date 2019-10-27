@@ -37,6 +37,10 @@ import {ReactComponent as Action_Save} from '../svg/action/save.svg'
 import {ReactComponent as Action_Detail} from '../svg/action/detail.svg'
 import {ReactComponent as Action_SingleSel} from '../svg/action/singlesel.svg'
 import {ReactComponent as Action_Delete} from '../svg/action/delete.svg'
+
+import {ReactComponent as Action_Chat_Join_Channel} from '../svg/action/chat-join-channel.svg'
+
+import {ReactComponent as Action_Chat_Exit_Channel} from '../svg/action/chat-exit-channel.svg'
 const svgs={
     
 }
@@ -75,6 +79,11 @@ svgs["/svg/action/save.svg"] = Action_Save
 svgs["/svg/action/detail.svg"] = Action_Detail
 svgs["/svg/action/singlesel.svg"] = Action_SingleSel
 svgs["/svg/action/delete.svg"] = Action_Delete
+
+
+svgs["/svg/action/chat-join-channel.svg"] = Action_Chat_Join_Channel
+svgs["/svg/action/chat-exit-channel.svg"] = Action_Chat_Exit_Channel
+
 
 export function regSvg(path,component){
     svgs[path]=component

@@ -48,6 +48,13 @@ class CreateView extends React.Component{
 
     }
     
+    getFieldContext(fieldType,field,value){
+        let {cmmHost} = this.props
+        return cmmHost.getFieldContext(this,
+            fieldType,
+            field,
+            value)
+    }
   
     onFieldValueChange(fd,value){
         this.cmmHost.onFieldValueChange(fd,value,this)
@@ -84,11 +91,9 @@ class CreateView extends React.Component{
                                                         host.doAction(self, t)
                                                     }} key={t.name}>
                                                        
-                                                            {
-                                                                IconCtrl
-                                                            } 
-                                                       
-                                                       
+                                                    {
+                                                        IconCtrl
+                                                    } 
                                                     {
                                                         t.title
                                                     }
@@ -139,7 +144,14 @@ class CreateView extends React.Component{
                                                                         return <Form.Item label={field.title} key={`form-item${key}`}>
                                                                                     <FieldComponent onChange={(value)=>{
                                                                                         self.onFieldValueChange(field,value)
-                                                                                    }} value={nValue } key={key} meta={meta} enable={enable} ctrlProps={ctrlProps} title={field.title} relationData={field.relationData} field={field}></FieldComponent>    
+                                                                                    }} value={nValue } 
+                                                                                    fieldContext={(fieldType,field,value)=>{self.getFieldContext(fieldType,field,value)}} 
+                                                                                    key={key} meta={meta} 
+                                                                                    enable={enable} 
+                                                                                    ctrlProps={ctrlProps} 
+                                                                                    title={field.title} 
+                                                                                    relationData={field.relationData} 
+                                                                                    field={field}></FieldComponent>    
                                                                             </Form.Item>
                                                                     })
                                                             }
@@ -161,7 +173,16 @@ class CreateView extends React.Component{
                                                                         return <Form.Item label={field.title} key={`form-item${key}`}>
                                                                                 <FieldComponent onChange={(value)=>{
                                                                                         self.onFieldValueChange(field,value)
-                                                                                    }} value={nValue} key={key} meta={meta} enable={enable} ctrlProps={ctrlProps} title={field.title} relationData={field.relationData} field={field}></FieldComponent>    
+                                                                                    }} 
+                                                                                     value={nValue} 
+                                                                                     fieldContext={(fieldType,field,value)=>{self.getFieldContext(fieldType,field,value)}} 
+                                                                                     key={key} 
+                                                                                     meta={meta} 
+                                                                                     enable={enable} 
+                                                                                     ctrlProps={ctrlProps} 
+                                                                                     title={field.title} 
+                                                                                     relationData={field.relationData} 
+                                                                                     field={field}></FieldComponent>    
                                                                             </Form.Item>
                                                                     })
                                                             } 
@@ -194,6 +215,7 @@ class CreateView extends React.Component{
                                                                             meta={meta}
                                                                             className="bg-op-label" 
                                                                             iconClassName="bg-op-label-icon"
+                                                                            fieldContext={(fieldType,field,value)=>{self.getFieldContext(fieldType,field,value)}}
                                                                             key={key}></FieldComponent>   
                                                         })
                                                 }
@@ -378,14 +400,27 @@ class CreateView extends React.Component{
                                                                                     <Form.Item label={gfs.fields[0].title}>
                                                                                         <Com1 {...props1} onChange={(value)=>{
                                                                                                     self.onFieldValueChange(gfs.fields[0],value)
-                                                                                                }} key={key1} value={value1} enable={enable1} meta={meta1} ctrlProps={ctrlProps1} relationData={gfs.fields[0].relationData} field={gfs.fields[0]}></Com1>
+                                                                                                }} 
+                                                                                                key={key1} value={value1} 
+                                                                                                 fieldContext={(fieldType,field,value)=>{self.getFieldContext(fieldType,field,value)}}
+                                                                                                  enable={enable1} meta={meta1} 
+                                                                                                  ctrlProps={ctrlProps1} 
+                                                                                                  relationData={gfs.fields[0].relationData} field={gfs.fields[0]}></Com1>
                                                                                     </Form.Item>
                                                                                     </div>
                                                                                     <div className="bg-model-op-view-body-common-two-col-second">
                                                                                     {Com2!=null && (<Form.Item label={gfs.fields[1].title}>
                                                                                         <Com2 {...props2} onChange={(value)=>{
                                                                                                     self.onFieldValueChange(gfs.fields[1],value)
-                                                                                                }} key={key2} value={value2} meta={meta2} enable={enable2}  ctrlProps={ctrlProps2} relationData={gfs.fields[1].relationData} field={gfs.fields[1]}></Com2>
+                                                                                                }} 
+                                                                                                key={key2} 
+                                                                                                value={value2}
+                                                                                                fieldContext={(fieldType,field,value)=>{self.getFieldContext(fieldType,field,value)}}
+                                                                                                meta={meta2}
+                                                                                                enable={enable2} 
+                                                                                                ctrlProps={ctrlProps2}
+                                                                                                relationData={gfs.fields[1].relationData}
+                                                                                                field={gfs.fields[1]}></Com2>
                                                                                     </Form.Item>)
                                                                                 }
                                                                                     </div>
@@ -397,7 +432,15 @@ class CreateView extends React.Component{
                                                                                 <Form.Item label={gfs.fields[0].title}>
                                                                                         <Com1 {...props1} onChange={(value)=>{
                                                                                                     self.onFieldValueChange(gfs.fields[0],value)
-                                                                                                }} key={key1} value={value1} meta={meta1} enable={enable1} ctrlProps={ctrlProps1} relationData={gfs.fields[0].relationData} field={gfs.fields[0]}></Com1>
+                                                                                                }} 
+                                                                                                key={key1} 
+                                                                                                value={value1}
+                                                                                                fieldContext={(fieldType,field,value)=>{self.getFieldContext(fieldType,field,value)}}
+                                                                                                meta={meta1} 
+                                                                                                enable={enable1} 
+                                                                                                ctrlProps={ctrlProps1} 
+                                                                                                relationData={gfs.fields[0].relationData} 
+                                                                                                field={gfs.fields[0]}></Com1>
                                                                                     </Form.Item>  
                                                                                 </div>
                                                                             

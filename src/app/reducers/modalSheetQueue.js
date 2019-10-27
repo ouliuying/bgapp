@@ -1,5 +1,5 @@
 
-import {OPEN_MODAL_SHEET,CLOSE_MODAL_SHEET} from '../actions/modalSheetQueue'
+import {OPEN_MODAL_SHEET,CLOSE_MODAL_SHEET,CLEAR_MODAL_SHEET} from '../actions/modalSheetQueue'
 
 import produce from "immer"
 import { createSelector } from 'reselect'
@@ -25,6 +25,10 @@ export function modalSheetQueue(state,action){
             const {modalSheet} = action.payload
             modalSheet && modalSheet.index && (delete state[modalSheet.index])
            return {...state}
+        }
+        case CLEAR_MODAL_SHEET:
+        {
+            return {}
         }
         default:
             return state

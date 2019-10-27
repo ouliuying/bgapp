@@ -29,7 +29,11 @@ export class ViewCMM{
     didMount(view){
 
     }
-
+    getFieldContext(view,fieldType,field,value){
+        return {
+            data:{}
+        }
+    }
     doAction(view, trigger){
         const f = this[trigger.name]
         if(f && f instanceof Function){

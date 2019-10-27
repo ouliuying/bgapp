@@ -504,29 +504,38 @@ export class ListViewCMM extends  ViewCMM{
         let self=this
         const {viewParam} = view.props
         const {ownerField,orgState}=(viewParam||{})
-        if(id){
-            new ModelAction(this.app,this.model).call("delete",{
-                id
-            },function(res){
-            if(res.errorCode==0){
-                removeListContextViewDataRecord(self.app,self.model,self.viewType,[tag],ownerField)
+        ModalSheetManager.confirm({
+            title:"确定删除?",
+            message:"确定要删除选中数据？",
+            ok:()=>{
+                if(id){
+                    new ModelAction(this.app,this.model).call("delete",{
+                        id
+                    },function(res){
+                    if(res.errorCode==0){
+                        removeListContextViewDataRecord(self.app,self.model,self.viewType,[tag],ownerField)
+                    }
+                    else{
+                        ModalSheetManager.openAlert({
+                            msg:res.description
+                        })
+                      
+                    }
+                    },function(err){
+                        ModalSheetManager.openAlert({
+                            msg:"通讯失败！"
+                        })
+                    })
+                }
+                else{
+                    removeListContextViewDataRecord(self.app,self.model,self.viewType,[tag],ownerField)
+                }
             }
-            else{
-                ModalSheetManager.openAlert({
-                    msg:res.description
-                })
-              
+            ,
+            cancel:()=>{
+
             }
-            },function(err){
-                ModalSheetManager.openAlert({
-                    msg:"通讯失败！"
-                })
-            })
-        }
-        else{
-            removeListContextViewDataRecord(self.app,self.model,self.viewType,[tag],ownerField)
-        }
-        
+        })
     }
 
     getDatasource(view,tag){

@@ -10,6 +10,7 @@ import {Input,
     Row,
     Col,
     Cascader,
+    Radio,
     Divider} from "../../ui"
 
 import {createIconFromSvg} from "../../icon/createIconFromSvg"
@@ -58,6 +59,7 @@ export const ViewFieldType={
     SelectModelFromListViewField:"selectModelFromListView",
     SelectImageField:"selectImage",
     StaticImagePreviewField:"staticImagePreview",
+    RadioCheckBoxGroupField:"radioCheckBoxGroup",
 
     //criteria
     CriteriaEnumSelect:"criteriaSelect",
@@ -348,6 +350,28 @@ export class SingleCheckBoxField extends React.Component{
         }>{label}</Checkbox>
     }
 }
+export class RadioCheckBoxGroupField extends React.Component{
+    render(){
+        const{meta,value,enable,onChange}=this.props
+        let tValue = value
+        let defaultValue =  (meta||{}).defaultValue
+        if(value===null || value===undefined || (value==="" && value!==defaultValue)){
+           tValue = defaultValue
+        }
+        let options = (meta||{}).options||[]
+        return <Radio.Group disabled ={!enable}  value={tValue}   onChange={
+            (evt)=>{
+                onChange && onChange(evt.target.value)
+            }
+        }>
+            {
+                options.map(r=>{
+                    return <Radio value={r.value}>{r.text}</Radio>
+                })
+            }
+        </Radio.Group>
+    }
+}
 
 export class DateField extends React.Component{
     toDate(value){
@@ -547,6 +571,15 @@ export class SelectModelFromListViewField extends React.Component{
             getSingleSelectItem(){
                 return value
             }
+        }
+        let {fieldContext} = this.props
+        let data = (fieldContext||function(){})(ViewFieldType.SelectModelFromListViewField,field,value)
+        if(data && data.errCode!==0){
+            ModalSheetManager.alert({
+                title:"提示",
+                msg:data.msg
+            })
+            return
         }
         let view = getModelView(relationData.targetApp,
             relationData.targetModel,

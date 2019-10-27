@@ -14,6 +14,7 @@ import {createViewParam,createEditParam, createDetailParam, createModelActionPar
 import ViewType from '../modelView/ViewType'
 import { createCriteria } from '../modelView/ViewFieldCriteria';
 import {original} from "immer"
+import { push } from 'connected-react-router'
 export class DetailViewCMM extends ViewCMM{
 
     constructor(app,model,viewType){
@@ -219,6 +220,22 @@ export class DetailViewCMM extends ViewCMM{
             let {ownerField,ownerFieldValue} = self.getFieldByFieldName(view,trigger.ownerField)
             let ownerModelID = self.getModelID(view)
             let subModelID = (ownerFieldValue!==null && ownerFieldValue!==undefined && ownerFieldValue instanceof Object)?((ownerFieldValue||{}).record||{}).id:undefined
+            
+            if(trigger.meta && trigger.meta.action){
+                if(trigger.meta.action == "redirect"){
+                    let {ownerFieldValue} = self.getFieldByFieldName(view,trigger.meta.fieldName)
+                    if(ownerFieldValue){
+                        if(ownerFieldValue instanceof Object){
+                            ownerFieldValue =(ownerFieldValue.record||{}).id
+                           
+                        }
+                        let router = getRoutePath(trigger.meta.toApp,trigger.meta.toModel,trigger.meta.toView)
+                        view.props.dispatch(push(router+"/"+ownerFieldValue))
+                    }
+                    return
+                }
+            }
+            
             if(ownerField){
                 if(!trigger.actionName){
                     if(trigger.viewType===ViewType.LIST){
@@ -261,12 +278,17 @@ export class DetailViewCMM extends ViewCMM{
                 switch(trigger.viewType){
                     case ViewType.MODEL_ACTION_CONFIRM:
                         {
+                         
                             let modelID = ownerModelID
+                            let triggerMeta = trigger.meta&&original(trigger.meta)
+                            if(!triggerMeta){
+                                triggerMeta = trigger.meta
+                            }
                             let modelActionParam = createModelActionParam(modelID,orgOwnerField,{
                                 reload:()=>{
                                     self.didMount(view)
                                 }
-                            },orgState,trigger.meta&&original(trigger.meta))
+                            },orgState,triggerMeta)
                             this.showAppModelViewModelActionInModalQueue(app,
                                 model,
                                 trigger.viewType,

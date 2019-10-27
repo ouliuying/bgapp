@@ -235,6 +235,10 @@ button:focus {
     border: 1px solid $border-color;
 }
 
+.bg-model-op-view-actions button {
+    margin-right: 0.5rem;
+}
+
 .bg-model-op-view-actions-main-group {
     display: flex;
 }

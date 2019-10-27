@@ -27,6 +27,7 @@ import {TextField,
     // ViewFieldType
     ViewFieldType,
     PasswordField,
+    RadioCheckBoxGroupField,
     //** criteria control  begin*/
     CriteriaEnumSelect,
     CriteriaNumberRangeInput,
@@ -93,6 +94,7 @@ registry.add(ViewFieldType.PasswordField,PasswordField)
 registry.add(ViewFieldType.SelectModelFromListViewField,SelectModelFromListViewField)
 registry.add(ViewFieldType.SelectImageField,SelectImageField)
 registry.add(ViewFieldType.StaticImagePreviewField,StaticImagePreviewField)
+registry.add(ViewFieldType.RadioCheckBoxGroupField,RadioCheckBoxGroupField)
 
 registry.add(ViewFieldType.CriteriaEnumSelect,CriteriaEnumSelect)
 registry.add(ViewFieldType.CriteriaNumberRangeInput,CriteriaNumberRangeInput)

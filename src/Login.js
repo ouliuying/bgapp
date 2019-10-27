@@ -70,7 +70,7 @@ class Login extends Component {
               }}/>):(<div>
                 <ThemeStyle body={`bg-login-body`} root={`bg-login-root`}/>
                 <div className="bg-login-bg">
-                    <h1>办公网</h1>
+                    <h1>金云办公</h1>
                     <h3><span>bg.work</span> -- 每个人的办公平台</h3>
                 </div>
     
@@ -88,15 +88,16 @@ class Login extends Component {
                     <div className="bg-login-form">
                         <div className="bg-login-form-group">
                             <label>用户名：</label>
-                            <input type="input" id="username" placeholder="请输入您的用户名"  value={this.props.userName}
+                            <input type="input" id="username" placeholder="默认：admin"  value={this.props.userName}
                                 onChange={(val)=>this.updateData("userName",val)}/>
                         </div>
                         <div className="bg-login-form-group">
                             <label>密    码:</label>
-                            <input type="password" id="password" placeholder="请输入您的密码" value={this.props.password}
+                            <input type="password" id="password" placeholder="默认：admin" value={this.props.password}
                                 onChange={(val)=>this.updateData("password",val)}/>
                         </div>
                         <div>
+                           
                             <button className="bg-login-form-btn" onClick={()=>this.doLogin()}>确 认 登 陆</button>
                         </div>
     
