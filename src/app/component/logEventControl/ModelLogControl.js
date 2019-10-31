@@ -1,12 +1,14 @@
-import React from 'react'
+
+import React from "react"
 import {connect} from 'react-redux'
-import { ModalSheetManager } from '../../app/modelView/ModalSheetManager';
-import { getModelView } from '../../app/modelView/ModelViewRegistry';
-import { createDetailParam } from '../../app/modelView/ViewParam';
-class LogView extends React.Component{
+import { createDetailParam } from "../../modelView/ViewParam"
+import { getModelView } from "../../modelView/ModelViewRegistry"
+import { ModalSheetManager } from "../../modelView/ModalSheetManager"
+
+class ModelLogControl extends React.Component{
     render(){
         const {data} = this.props
-        return <a onClick={()=>{
+        return <span className="bg-a" onClick={()=>{
             let {app,model,viewType,modelID}=data
             let viewParam = createDetailParam(undefined,undefined,undefined,modelID,{},{})
             let view = getModelView(app,model,viewType)
@@ -19,7 +21,7 @@ class LogView extends React.Component{
                     viewRefType:"none"
                 })
             )
-        }}>{data.title}</a>
+        }}>{data.text}</span>
     }
 }
 
@@ -27,4 +29,4 @@ function mapStateToProps(state){
     return state
 }
 
-export default connect(mapStateToProps)(LogView)
+export default connect(mapStateToProps)(ModelLogControl)

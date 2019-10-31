@@ -1420,3 +1420,69 @@ button:focus {
     border: 2px solid #e0e0e0;
     padding: 10px;
 }
+
+.bg-model-event-log-container {
+    padding: 2rem 3rem;
+    position: relative;
+    border-top: 1px solid #eee;
+}
+
+.bg-model-event-log-container-event {
+    position: relative;
+    padding: 2rem;
+}
+
+.bg-model-event-log-container-event::before {
+    content: ' ';
+    width: 1px;
+    background: #d3d1d7;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.bg-model-event-log-container-event-logo {
+    position: absolute;
+    top: 0;
+    left: -1rem;
+}
+
+.bg-model-event-log-container-event-logo-image {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 1rem;
+}
+
+.bg-model-event-log-container-event-logo-text {
+    font-size: 1rem;
+    background: #e67e22;
+    border-radius: 1rem;
+    display: inline-block;
+    padding: 0.15rem;
+    color: white;
+    width: 2rem;
+    height: 2rem;
+    text-align: center;
+}
+
+.bg-model-event-log-container-event-title {
+    position: absolute;
+    top: 0.3rem;
+    color: #2c3e50;
+}
+
+.bg-model-event-log-container-event-title-time {
+    font-size: 90%;
+    color: rgb(110, 109, 109);
+    margin-left: 3rem;
+}
+
+.bg-a {
+    color: #003e59;
+    cursor: pointer;
+}
+
+.bg-a:hover {
+    color: #1283ba;
+}

@@ -1,6 +1,6 @@
 import React from 'react'
 import {Avatar,Tabs, Row, Col} from '../ui'
-import hook from './ctrltype/hook'
+
 import {connect} from 'react-redux'
 import {
     withRouter
@@ -38,13 +38,12 @@ class WorktableInContainer extends React.Component{
                 <CrmSalesTopListView></CrmSalesTopListView>
             </div>
             <div className="bg-work-log-notify-container">
-                    <ModelLogListView app="core" model="modelLog" viewType="list">
-                   </ModelLogListView>
-                   <NotifyListView app="core" model="modelLog" viewType="list"></NotifyListView>
+                    <ModelLogListView/>
+                   {/* <NotifyListView app="core" model="modelLog" viewType="list"></NotifyListView> */}
             </div>
         </div>
         <div className="bg-worktable-footer">
-
+            
         </div>
     </div>
     }
@@ -54,5 +53,4 @@ function mapStateToProps(state){
     let currPartner = getCurrPartner(state)
     return {currCorp,currPartner}
 }
-hook()
 export default withRouter(connect(mapStateToProps)(WorktableInContainer))
