@@ -366,9 +366,11 @@ export class ListViewCMM extends  ViewCMM{
         this.fetchData({view})
     }
 
-    onCriteriaValueChange(data){
+    onCriteriaValueChange(view,data){
+        let {viewParam}= view.props
+        const {ownerField}=viewParam||{}
         let self=this
-        setListContextCriteria(self.app,self.model,self.viewType,data.name,data)
+        setListContextCriteria(self.app,self.model,self.viewType,ownerField,data.name,data)
     }
 
     doAction(view,trigger){

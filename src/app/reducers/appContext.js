@@ -4,6 +4,7 @@ import {
     SET_CREATE_CONTEXT_VIEW_DATA,
     SET_LIST_CONTEXT_CRITERIA,
     SET_LIST_CONTEXT_VIEW_DATA,
+    SET_EVENT_LOG_CONTEXT_VIEW_DATA,
     SET_DETAIL_CONTEXT_VIEW_DATA,
     SET_EDIT_CONTEXT_VIEW_DATA,
     SET_EDIT_CONTEXT_FIELD_VALUE,
@@ -13,14 +14,18 @@ import {
     SET_LIST_OP_SEARCH_BOX_CRITERIA_VALUE,
     SET_LIST_CURRENT_PAGE,
     SET_LIST_PAGE_SIZE,
-    UPDATE_CREATE_CONTEXT_FIELD_META
+    UPDATE_CREATE_CONTEXT_FIELD_META,
+    SET_EVENT_LOG_OP_SEARCH_BOX_VISIBLE,
+    SET_EVENT_LOG_PAGE_SIZE,
+    SET_EVENT_LOG_CURRENT_PAGE,
+    SET_EVENT_LOG_OP_SEARCH_BOX_CRITERIA_VALUE
 } from '../actions/appContext'
 import ViewContext from '../modelView/ViewContext'
 import produce from "immer"
 import { createSelector } from 'reselect'
 import memoize from 'lodash.memoize'
 import ViewType from '../modelView/ViewType'
-import {CREATE_VIEW_DATA, LIST_VIEW_DATA, DETAIL_VIEW_DATA, EDIT_VIEW_DATA,RECORD_TAG, MODEL_FIELD_UPDATE_FLAG} from '../ReservedKeyword'
+import {CREATE_VIEW_DATA, LIST_VIEW_DATA, DETAIL_VIEW_DATA, EDIT_VIEW_DATA,RECORD_TAG, MODEL_FIELD_UPDATE_FLAG, EVENT_LOG_VIEW_DATA} from '../ReservedKeyword'
 import { ReducerRegistry } from '../../ReducerRegistry';
 import {nextRecordTag} from '../../lib/tag-helper'
 import { bindRecordTag } from '../fieldHelper';
@@ -30,6 +35,7 @@ initAppContext[EDIT_VIEW_DATA]={}
 initAppContext[CREATE_VIEW_DATA]={}
 initAppContext[DETAIL_VIEW_DATA]={}
 initAppContext[LIST_VIEW_DATA]={}
+initAppContext[EVENT_LOG_VIEW_DATA]={}
 export function appContext(state,action){
     if(typeof state == "undefined"){
         return initAppContext
@@ -127,7 +133,7 @@ export function appContext(state,action){
         }
         case SET_LIST_CONTEXT_CRITERIA:
         {
-            const {app,model,viewType,ownerField,name,criteria} = state
+            const {app,model,viewType,ownerField,name,criteria} = action.payload
             return produce(state,draft=>{
                 setModelViewCriteria(draft,app,model,viewType,ownerField,name,criteria)
             })
@@ -138,6 +144,13 @@ export function appContext(state,action){
             updateViewField(viewData,ownerField)
             return produce(state,draft=>{
                 setListViewData(draft,viewData,ownerField)
+            })
+        }
+        case SET_EVENT_LOG_CONTEXT_VIEW_DATA:
+        {
+            const {app,model,viewType,eventLogs,totalCount,ownerField}=action.payload
+            return produce(state,draft=>{
+                setEventLogViewData(draft,eventLogs,totalCount,ownerField)
             })
         }
         case REMOVE_LIST_CONTEXT_VIEW_DATA_RECORD:
@@ -184,28 +197,56 @@ export function appContext(state,action){
         {
             const {app,model,viewType,ownerField,visible} = action.payload
             return produce(state,draft=>{
-                setModelViewListOpSearchBoxVisible(draft,app,model,viewType,ownerField,visible)
+                setModelViewListOpSearchBoxVisible(draft,app,model,viewType,LIST_VIEW_DATA,ownerField,visible)
             })
         }
         case SET_LIST_OP_SEARCH_BOX_CRITERIA_VALUE:
         {
             const {app,model,viewType,ownerField,fieldName,value} = action.payload
             return produce(state,draft=>{
-                setListOpSearchBoxCriteriaValue(draft,app,model,viewType,ownerField,fieldName,value)
+                setListOpSearchBoxCriteriaValue(draft,app,model,viewType,LIST_VIEW_DATA,ownerField,fieldName,value)
             })
         }
         case SET_LIST_CURRENT_PAGE:
         {
             const {app,model,viewType,ownerField,currentPage} = action.payload
             return produce(state,draft=>{
-                setModelViewListCurrentPage(draft,app,model,viewType,ownerField,currentPage)
+                setModelViewListCurrentPage(draft,app,model,viewType,LIST_VIEW_DATA,ownerField,currentPage)
             })
         }
         case SET_LIST_PAGE_SIZE:
         {
             const {app,model,viewType,ownerField,pageSize} = action.payload
             return produce(state,draft=>{
-                setModelViewListPageSize(draft,app,model,viewType,ownerField,pageSize)
+                setModelViewListPageSize(draft,app,model,viewType,LIST_VIEW_DATA,ownerField,pageSize)
+            })
+        }
+        case SET_EVENT_LOG_OP_SEARCH_BOX_VISIBLE:
+        {
+            const {app,model,viewType,ownerField,visible} = action.payload
+            return produce(state,draft=>{
+                setModelViewListOpSearchBoxVisible(draft,app,model,viewType,EVENT_LOG_VIEW_DATA,ownerField,visible)
+            })
+        }
+        case SET_EVENT_LOG_OP_SEARCH_BOX_CRITERIA_VALUE:
+        {
+            const {app,model,viewType,ownerField,fieldName,value} = action.payload
+            return produce(state,draft=>{
+                setListOpSearchBoxCriteriaValue(draft,app,model,viewType,EVENT_LOG_VIEW_DATA,ownerField,fieldName,value)
+            })
+        }
+        case SET_EVENT_LOG_CURRENT_PAGE:
+        {
+            const {app,model,viewType,ownerField,currentPage} = action.payload
+            return produce(state,draft=>{
+                setModelViewListCurrentPage(draft,app,model,viewType,EVENT_LOG_VIEW_DATA,ownerField,currentPage)
+            })
+        }
+        case SET_EVENT_LOG_PAGE_SIZE:
+        {
+            const {app,model,viewType,ownerField,pageSize} = action.payload
+            return produce(state,draft=>{
+                setModelViewListPageSize(draft,app,model,viewType,EVENT_LOG_VIEW_DATA,ownerField,pageSize)
             })
         }
         case SET_DETAIL_CONTEXT_VIEW_DATA:
@@ -280,32 +321,48 @@ function setListViewData(draft,viewData,ownerField){
     }
     draft[LIST_VIEW_DATA][key]["viewData"]["data"]=getInitListViewData(data, view, ownerField)
 }
-
-function setModelViewListOpSearchBoxVisible(draft,app,model,viewType,ownerField,visible){
+function setEventLogViewData(draft,eventLogs,totalCount,ownerField){
+     let app = "core"
+     let model = "modelLog"
+     let viewType = ViewType.EVENT_LOG_LIST
     let key = getAppModelViewKey(app,model,viewType,ownerField)
-    draft[LIST_VIEW_DATA][key]["localData"]=draft[LIST_VIEW_DATA][key]["localData"]||{}
-    draft[LIST_VIEW_DATA][key]["localData"]["searchBox"]=draft[LIST_VIEW_DATA][key]["localData"]["searchBox"]||{}
-    draft[LIST_VIEW_DATA][key]["localData"]["searchBox"]["visible"]=visible
+    let localData =(draft[EVENT_LOG_VIEW_DATA][key] && draft[EVENT_LOG_VIEW_DATA][key]["localData"])||{
+        visible:false,
+        criteria:{}
+    }
+    draft[EVENT_LOG_VIEW_DATA][key]={
+        app,
+        model,
+        localData:localData,
+        eventLogs,
+        totalCount
+    }
+}
+function setModelViewListOpSearchBoxVisible(draft,app,model,viewType,contextKey,ownerField,visible){
+    let key = getAppModelViewKey(app,model,viewType,ownerField)
+    draft[contextKey][key]["localData"]=draft[contextKey][key]["localData"]||{}
+    draft[contextKey][key]["localData"]["searchBox"]=draft[contextKey][key]["localData"]["searchBox"]||{}
+    draft[contextKey][key]["localData"]["searchBox"]["visible"]=visible
 }
 
-function setListOpSearchBoxCriteriaValue(draft,app,model,viewType,ownerField,fieldName,value){
+function setListOpSearchBoxCriteriaValue(draft,app,model,viewType,contextKey,ownerField,fieldName,value){
     let key = getAppModelViewKey(app,model,viewType,ownerField)
-    draft[LIST_VIEW_DATA][key]["localData"]=draft[LIST_VIEW_DATA][key]["localData"]||{}
-    draft[LIST_VIEW_DATA][key]["localData"]["searchBox"]=draft[LIST_VIEW_DATA][key]["localData"]["searchBox"]||{}
-    draft[LIST_VIEW_DATA][key]["localData"]["searchBox"]["criteria"]=draft[LIST_VIEW_DATA][key]["localData"]["searchBox"]["criteria"]||{}
-    draft[LIST_VIEW_DATA][key]["localData"]["searchBox"]["criteria"][fieldName]=value
+    draft[contextKey][key]["localData"]=draft[contextKey][key]["localData"]||{}
+    draft[contextKey][key]["localData"]["searchBox"]=draft[contextKey][key]["localData"]["searchBox"]||{}
+    draft[contextKey][key]["localData"]["searchBox"]["criteria"]=draft[contextKey][key]["localData"]["searchBox"]["criteria"]||{}
+    draft[contextKey][key]["localData"]["searchBox"]["criteria"][fieldName]=value
 }
-function setModelViewListCurrentPage(draft,app,model,viewType,ownerField,currentPage){
+function setModelViewListCurrentPage(draft,app,model,viewType,contextKey,ownerField,currentPage){
     let key = getAppModelViewKey(app,model,viewType,ownerField)
-    draft[LIST_VIEW_DATA][key]["localData"]=draft[LIST_VIEW_DATA][key]["localData"]||{}
-    draft[LIST_VIEW_DATA][key]["localData"]["pageData"]=draft[LIST_VIEW_DATA][key]["localData"]["pageData"]||{}
-    draft[LIST_VIEW_DATA][key]["localData"]["pageData"]["pageIndex"]=currentPage
+    draft[contextKey][key]["localData"]=draft[contextKey][key]["localData"]||{}
+    draft[contextKey][key]["localData"]["pageData"]=draft[contextKey][key]["localData"]["pageData"]||{}
+    draft[contextKey][key]["localData"]["pageData"]["pageIndex"]=currentPage
 }
-function setModelViewListPageSize(draft,app,model,viewType,ownerField,pageSize){
+function setModelViewListPageSize(draft,app,model,viewType,contextKey,ownerField,pageSize){
     let key = getAppModelViewKey(app,model,viewType,ownerField)
-    draft[LIST_VIEW_DATA][key]["localData"]=draft[LIST_VIEW_DATA][key]["localData"]||{}
-    draft[LIST_VIEW_DATA][key]["localData"]["pageData"]=draft[LIST_VIEW_DATA][key]["localData"]["pageData"]||{}
-    draft[LIST_VIEW_DATA][key]["localData"]["pageData"]["pageSize"]=pageSize
+    draft[contextKey][key]["localData"]=draft[contextKey][key]["localData"]||{}
+    draft[contextKey][key]["localData"]["pageData"]=draft[contextKey][key]["localData"]["pageData"]||{}
+    draft[contextKey][key]["localData"]["pageData"]["pageSize"]=pageSize
 }
 function getInitListViewData(data, view, ownerField){
     if(data && data.record){
@@ -441,6 +498,36 @@ export const localDataFromListContext = createSelector(state=>state[ViewContext.
     if(!appContext||!appContext[LIST_VIEW_DATA]||!(appContext[LIST_VIEW_DATA][key])||!(appContext[LIST_VIEW_DATA][key]["localData"])) return {}
     return appContext[LIST_VIEW_DATA][key]["localData"]
 }))
+
+export const viewDataFromEventLogContext = createSelector(state=>state[ViewContext.APP_CONTEXT],appContext=>memoize(({app,model,viewType,ownerField})=>{
+    let key=getAppModelViewKey(app,model,viewType, ownerField)
+    if(appContext){
+        let data = appContext[EVENT_LOG_VIEW_DATA]
+        if(data){
+            data = data[key]
+            if(data){
+                return data
+            }
+        }
+    }
+    return {eventLogs:[],totalCount:0}
+}))
+export const localDataFromEventLogContext = createSelector(state=>state[ViewContext.APP_CONTEXT],appContext=>memoize(({app,model,viewType,ownerField})=>{
+    let key=getAppModelViewKey(app,model,viewType, ownerField)
+    if(appContext){
+        let data = appContext[EVENT_LOG_VIEW_DATA]
+        if(data){
+            data = data[key]
+            if(data){
+                return data
+            }
+        }
+    }
+    return {}
+}))
+
+
+ 
 export const viewDataFromDetailContext = createSelector(state=>state[ViewContext.APP_CONTEXT],appContext=>memoize(({app,model,viewType,ownerField})=>{
     let key=getAppModelViewKey(app,model,viewType, ownerField)
     if(!appContext||!appContext[DETAIL_VIEW_DATA]||!(appContext[DETAIL_VIEW_DATA][key])||!(appContext[DETAIL_VIEW_DATA][key]["viewData"])) return {}

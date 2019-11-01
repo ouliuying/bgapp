@@ -1425,6 +1425,7 @@ button:focus {
     padding: 2rem 3rem;
     position: relative;
     border-top: 1px solid #eee;
+    flex-grow: 1;
 }
 
 .bg-model-event-log-container-event {

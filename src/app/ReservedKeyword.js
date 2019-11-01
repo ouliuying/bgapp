@@ -1,5 +1,6 @@
 export const CREATE_VIEW_DATA = "__createViewData__"
 export const LIST_VIEW_DATA = "__listViewData__"
+export const EVENT_LOG_VIEW_DATA = "__eventLogViewData__"
 export const DETAIL_VIEW_DATA = "__detailViewData__"
 export const EDIT_VIEW_DATA = "__editViewData__"
 export const RECORD_TAG = "__tag__"

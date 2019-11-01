@@ -5,6 +5,8 @@ export const SET_CREATE_CONTEXT_VIEW_DATA='setCreateContextViewData'
 export const UPDATE_CREATE_CONTEXT_FIELD_META = 'updateCreateContextViewData'
 export const SET_LIST_CONTEXT_CRITERIA='setListContextCtriteria'
 export const SET_LIST_CONTEXT_VIEW_DATA='setListContextData'
+export const SET_EVENT_LOG_CONTEXT_CRITERIA='setEventLogContextCtriteria'
+export const SET_EVENT_LOG_CONTEXT_VIEW_DATA = 'setEventLogContextData'
 export const UPDATE_LIST_CONTEXT_VIEW_DATA_RECORD='updateListContextViewDataRecord'
 
 //export const UPDATE_LIST_CONTEXT_VIEW_DATA='updateListContextData'
@@ -21,6 +23,11 @@ export const SET_LIST_OP_SEARCH_BOX_CRITERIA_VALUE='setListOpSearchBoxCriteriaVa
 export const SET_LIST_CURRENT_PAGE="setListCurrentPage"
 export const SET_LIST_PAGE_SIZE="setListPageSize"
 
+
+export const SET_EVENT_LOG_OP_SEARCH_BOX_VISIBLE= "setEventLogOpSearchBoxVisible"
+export const SET_EVENT_LOG_OP_SEARCH_BOX_CRITERIA_VALUE='setEventLogOpSearchBoxCriteriaValue'
+export const SET_EVENT_LOG_CURRENT_PAGE="setEventLogCurrentPage"
+export const SET_EVENT_LOG_PAGE_SIZE="setEventLogPageSize"
 
 
 function setContextDataAction(type,payload){
@@ -53,7 +60,7 @@ export function setCreateContextViewData(app,model,viewType, viewData,ownerField
     setContextDataAction(SET_CREATE_CONTEXT_VIEW_DATA, {app,model,viewType,viewData,ownerField})
 }
 
-export function setListContextCriteria(app,model,viewType,cKey,criteria){
+export function setListContextCriteria(app,model,viewType,ownerField,cKey,criteria){
     const {store}=ReducerRegistry
     store.dispatch({
         type:SET_LIST_CONTEXT_CRITERIA,
@@ -61,14 +68,39 @@ export function setListContextCriteria(app,model,viewType,cKey,criteria){
             app,
             model,
             viewType,
+            ownerField,
             cKey,
             criteria
         }
     })
 }
 
+
+export function setEventLogContextCriteria(app,model,viewType,ownerField,cKey,criteria){
+    const {store}=ReducerRegistry
+    store.dispatch({
+        type:SET_EVENT_LOG_CONTEXT_CRITERIA,
+        payload:{
+            app,
+            model,
+            viewType,
+            ownerField,
+            cKey,
+            criteria
+        }
+    })
+}
+
+
+
+
+
 export function setListContextData(app,model,viewType,viewData,ownerField){
    setContextDataAction(SET_LIST_CONTEXT_VIEW_DATA, {app,model,viewData,viewType,ownerField})
+}
+
+export function setEventLogContextData(app,model,viewType,eventLogs,totalCount,ownerField){
+    setContextDataAction(SET_EVENT_LOG_CONTEXT_VIEW_DATA, {app,model,eventLogs,viewType,totalCount,ownerField})
 }
 
 
@@ -109,6 +141,22 @@ export function setListCurrentPage(app,model,viewType,ownerField,currentPage){
 export function setListPageSize(app,model,viewType,ownerField,pageSize){
     setContextDataAction(SET_LIST_PAGE_SIZE, {app,model,viewType,ownerField,pageSize})
 }
+
+
+export function setEventLogOpSearchBoxCriteriaValue(app,model,viewType,ownerField,fieldName,value){
+    setContextDataAction(SET_EVENT_LOG_OP_SEARCH_BOX_CRITERIA_VALUE, {app,model,viewType,ownerField,fieldName,value})
+}
+export function setEventLogOpSearchBoxVisible(app,model,viewType,ownerField,visible){
+    setContextDataAction(SET_EVENT_LOG_OP_SEARCH_BOX_VISIBLE, {app,model,viewType,ownerField,visible})
+}
+export function setEventLogCurrentPage(app,model,viewType,ownerField,currentPage){
+    setContextDataAction(SET_EVENT_LOG_CURRENT_PAGE, {app,model,viewType,ownerField,currentPage})
+}
+export function setEventLogPageSize(app,model,viewType,ownerField,pageSize){
+    setContextDataAction(SET_EVENT_LOG_PAGE_SIZE, {app,model,viewType,ownerField,pageSize})
+}
+
+
 export function updateCreateContextViewData(app,model,viewType,ownerField,field,meta){
     setContextDataAction(UPDATE_CREATE_CONTEXT_FIELD_META, {app,model,viewType,ownerField,field,meta})
 }
