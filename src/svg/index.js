@@ -29,6 +29,9 @@ import {ReactComponent as ChatChannelMembers} from '../svg/chat-channel-members.
 import {ReactComponent as ChatChannelEntity} from '../svg/chat-channel-ent.svg'
 //
 
+import {ReactComponent as EventLogCreate} from './event-log-create.svg'
+import {ReactComponent as EventLogEdit} from './event-log-edit.svg'
+import {ReactComponent as EventLogComment} from './event-log-comment.svg'
 
 //action icons
 import {ReactComponent as Action_Add} from '../svg/action/add.svg'
@@ -83,6 +86,10 @@ svgs["/svg/action/delete.svg"] = Action_Delete
 
 svgs["/svg/action/chat-join-channel.svg"] = Action_Chat_Join_Channel
 svgs["/svg/action/chat-exit-channel.svg"] = Action_Chat_Exit_Channel
+
+svgs["/svg/event-log-create.svg"] = EventLogCreate
+svgs["/svg/event-log-edit.svg"] = EventLogEdit
+svgs["/svg/event-log-comment.svg"] = EventLogComment
 
 
 export function regSvg(path,component){

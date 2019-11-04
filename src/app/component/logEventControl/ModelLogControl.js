@@ -25,8 +25,6 @@ class ModelLogControl extends React.Component{
     }
 }
 
-function mapStateToProps(state){
-    return state
-}
 
-export default connect(mapStateToProps)(ModelLogControl)
+
+export default ModelLogControl

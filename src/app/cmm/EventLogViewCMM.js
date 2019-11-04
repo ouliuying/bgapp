@@ -62,13 +62,13 @@ export class EventLogViewCMM extends  ViewCMM{
     // const {columns,rows,currentPage,totalCount,pageSize} = self.cmmHost.getViewDatas(self,viewData)
     getViewDatas(view,viewData){
         let self =this
-        let {totalCount,eventLogs} = viewData
+        let {totalCount,eventLogs,triggerGroups} = viewData
         let {localData} = view.props
         let {pageData} = localData||{}
         let pageSize = (pageData && pageData.pageSize)||10
         let currentPage = (pageData && pageData.pageIndex)||1
         totalCount = totalCount||0
-        return {currentPage,totalCount,pageSize,totalCount,eventLogs}
+        return {currentPage,totalCount,pageSize,eventLogs,triggerGroups}
 
     }
     addDateControl(eventLogs){
@@ -159,8 +159,11 @@ export class EventLogViewCMM extends  ViewCMM{
             self.app,
             self.model,
             self.viewType,
-            self.addDateControl(data.bag.eventLogs),
-            data.bag.totalCount||0,
+            {
+                eventLogs:self.addDateControl(data.bag.eventLogs),
+                totalCount: data.bag.totalCount||0,
+                triggerGroups:data.bag.triggerGroups
+            },
             ownerField,
         )
         },function(err){

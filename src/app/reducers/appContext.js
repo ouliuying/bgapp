@@ -148,9 +148,9 @@ export function appContext(state,action){
         }
         case SET_EVENT_LOG_CONTEXT_VIEW_DATA:
         {
-            const {app,model,viewType,eventLogs,totalCount,ownerField}=action.payload
+            const {app,model,viewType,viewData,ownerField}=action.payload
             return produce(state,draft=>{
-                setEventLogViewData(draft,eventLogs,totalCount,ownerField)
+                setEventLogViewData(draft,app,model,viewType,viewData,ownerField)
             })
         }
         case REMOVE_LIST_CONTEXT_VIEW_DATA_RECORD:
@@ -321,10 +321,7 @@ function setListViewData(draft,viewData,ownerField){
     }
     draft[LIST_VIEW_DATA][key]["viewData"]["data"]=getInitListViewData(data, view, ownerField)
 }
-function setEventLogViewData(draft,eventLogs,totalCount,ownerField){
-     let app = "core"
-     let model = "modelLog"
-     let viewType = ViewType.EVENT_LOG_LIST
+function setEventLogViewData(draft,app,model,viewType,viewData,ownerField){
     let key = getAppModelViewKey(app,model,viewType,ownerField)
     let localData =(draft[EVENT_LOG_VIEW_DATA][key] && draft[EVENT_LOG_VIEW_DATA][key]["localData"])||{
         visible:false,
@@ -334,8 +331,7 @@ function setEventLogViewData(draft,eventLogs,totalCount,ownerField){
         app,
         model,
         localData:localData,
-        eventLogs,
-        totalCount
+        viewData
     }
 }
 function setModelViewListOpSearchBoxVisible(draft,app,model,viewType,contextKey,ownerField,visible){
@@ -505,12 +501,12 @@ export const viewDataFromEventLogContext = createSelector(state=>state[ViewConte
         let data = appContext[EVENT_LOG_VIEW_DATA]
         if(data){
             data = data[key]
-            if(data){
-                return data
+            if(data && data.viewData){
+                return data.viewData
             }
         }
     }
-    return {eventLogs:[],totalCount:0}
+    return {eventLogs:[],totalCount:0,triggerGroups:[]}
 }))
 export const localDataFromEventLogContext = createSelector(state=>state[ViewContext.APP_CONTEXT],appContext=>memoize(({app,model,viewType,ownerField})=>{
     let key=getAppModelViewKey(app,model,viewType, ownerField)
@@ -518,8 +514,8 @@ export const localDataFromEventLogContext = createSelector(state=>state[ViewCont
         let data = appContext[EVENT_LOG_VIEW_DATA]
         if(data){
             data = data[key]
-            if(data){
-                return data
+            if(data && data.localData){
+                return data.localData
             }
         }
     }

@@ -1,6 +1,8 @@
 
 import React from 'react'
 import ModelLogControl from './ModelLogControl'
+import ModelCommentControl from './ModelCommentControl'
+import ModelCommentControlEditor from './ModelCommentControlEditor'
 const eventRegistry={
     add(name,control){
         this.logEventControls[name]=control
@@ -15,4 +17,6 @@ const eventRegistry={
     logEventControls:{}
 }
 eventRegistry.add("modelLogControl",ModelLogControl)
+eventRegistry.add("modelCommentControl",ModelCommentControl)
+eventRegistry.add("modelCommentControlEditor",ModelCommentControlEditor)
 export default eventRegistry

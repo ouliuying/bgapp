@@ -1431,6 +1431,7 @@ button:focus {
 .bg-model-event-log-container-event {
     position: relative;
     padding: 2rem;
+    transition: all 0.6s ease-out 0.2s;
 }
 
 .bg-model-event-log-container-event::before {
@@ -1486,4 +1487,26 @@ button:focus {
 
 .bg-a:hover {
     color: #1283ba;
+}
+
+.bg-model-list-view-body-control .bg-model-event-log-container {
+    padding-top: 0;
+    border-top: none;
+}
+
+.bg-model-event-log-container-actions {
+    padding-bottom: 10px;
+}
+
+.bg-comment-control-editor {
+    padding: 10px 0;
+}
+
+.bg-model-event-log-container-event:hover {
+    background: rgb(234, 240, 239);
+    cursor: pointer;
+}
+
+.bg-model-event-log-container-event:hover::before {
+    background: transparent;
 }

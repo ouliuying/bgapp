@@ -99,8 +99,8 @@ export function setListContextData(app,model,viewType,viewData,ownerField){
    setContextDataAction(SET_LIST_CONTEXT_VIEW_DATA, {app,model,viewData,viewType,ownerField})
 }
 
-export function setEventLogContextData(app,model,viewType,eventLogs,totalCount,ownerField){
-    setContextDataAction(SET_EVENT_LOG_CONTEXT_VIEW_DATA, {app,model,eventLogs,viewType,totalCount,ownerField})
+export function setEventLogContextData(app,model,viewType,viewData,ownerField){
+    setContextDataAction(SET_EVENT_LOG_CONTEXT_VIEW_DATA, {app,model,viewType,viewData,ownerField})
 }
 
 
