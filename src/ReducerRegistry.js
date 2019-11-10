@@ -3,14 +3,17 @@ import { createStore, combineReducers, applyMiddleware ,compose} from 'redux'
 
 //import createHistory from 'history/createBrowserHistory'
 import { createBrowserHistory } from 'history';
-import { connectRouter, routerMiddleware} from 'connected-react-router'
+import { connectRouter, routerMiddleware, push} from 'connected-react-router'
 import { persistStore,persistReducer} from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
 import ViewContext from './app/modelView/ViewContext'
-import { MessageBus, SYS_INIT, PARTNER_INIT } from './mb/MessageBus';
+import { MessageBus, SYS_INIT, PARTNER_INIT, ROUTE_CHANGE } from './mb/MessageBus';
 import {TOKEN_CHECK} from './bgcore/partnerMessage'
 import { getCurrPartner } from './reducers/partner';
 import { clearModalSheet } from './app/actions/modalSheetQueue';
+import { routeChange } from './app/routerHelper';
+import createSagaMiddleware from 'redux-saga'
+import { call, put, takeEvery, takeLatest } from 'redux-saga/effects'
 const persistConfig = {
     key: 'bgworkroot',
     storage:storage,
@@ -32,10 +35,12 @@ export class ReducerRegistry {
     static create(reducers){
         ReducerRegistry.reducers= reducers;
         const history = createBrowserHistory()
-        history.listen(()=>{
+        history.listen((location)=>{
             clearModalSheet()
         })
         const middleware = routerMiddleware(history)
+        const routerMonitorMiddleware = routeChange(history)
+        const sagaMiddleware = createSagaMiddleware()
         ReducerRegistry.reducers={
             router: connectRouter(history),
             ...ReducerRegistry.reducers,
@@ -44,8 +49,13 @@ export class ReducerRegistry {
 
         const store = createStore(persistedReducer,
             {},
-            compose(applyMiddleware(middleware))
+            compose(applyMiddleware(sagaMiddleware),applyMiddleware(middleware),applyMiddleware(routerMonitorMiddleware))
         )
+        sagaMiddleware.run(function* (){
+            yield takeLatest("@@router/LOCATION_CHANGE", function* (action){
+                    yield 1
+            });
+        })
         let persistor = persistStore(store,null,() => {
             let state = store.getState() 
             MessageBus.ref.send(TOKEN_CHECK,{...state})

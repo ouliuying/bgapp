@@ -1,0 +1,1 @@
+export const CRM_CUSTOMER_FOLLOW_VIEW = "crmCustomerFollowView"

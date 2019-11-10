@@ -102,7 +102,7 @@ class Login extends Component {
                         </div>
     
                         <div className="bg-login-form-reg">
-                            <a href="https://bg.work">注册 <strong>办公网</strong>账号</a>
+                            <a href="https://oa.bg.work/xy">注册 <strong>金云办公</strong>账号</a>
                         </div>
                     </div>
                 </div>

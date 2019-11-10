@@ -466,10 +466,10 @@ export class ListViewCMM extends  ViewCMM{
         }
     }
     addCriteriaTag(){
-        ModalSheetManager.openAlert({
-            title:"提示",
-            msg:"赶工中..."
-        })
+        // ModalSheetManager.openAlert({
+        //     title:"提示",
+        //     msg:"赶工中..."
+        // })
     }
     toDetail(view,trigger){
         let self =this

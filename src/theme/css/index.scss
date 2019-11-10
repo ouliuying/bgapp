@@ -2,7 +2,7 @@
 html,
 body {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     flex-grow: 1;
     align-items: stretch;
     flex-shrink: 1;
@@ -1509,4 +1509,93 @@ button:focus {
 
 .bg-model-event-log-container-event:hover::before {
     background: transparent;
+}
+
+.bg-customer-follow-container {
+    background: white;
+    margin: 5px;
+    padding: 10px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.bg-customer-follow-actions {
+    padding-bottom: 4px;
+    border-bottom: #e8e8e8 1px solid;
+}
+
+.bg-customer-follow-body {
+    box-sizing: border-box;
+    min-height: 100vh;
+    display: flex;
+    justify-content: left;
+    align-items: stretch;
+    background: #f2f4f5;
+    flex-grow: 1;
+}
+
+.bg-customer-follow-body-step-body {
+    background: transparent;
+}
+
+.bg-customer-follow-body-step-header {
+    padding: 5px;
+    background: white;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-weight: 500;
+    font-size: 16px;
+    border-bottom: 1px solid #e8e8e8;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .3);
+    position: relative;
+}
+
+.bg-customer-follow-body-step-header-actions {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    z-index: 1;
+    cursor: pointer;
+}
+
+.bg-customer-follow-body-step-header-actions:hover {
+    color: $Font-icon-background-active-color;
+}
+
+.bg-customer-follow-body-step {
+    /*background-color: #1283ba;*/
+    width: 13rem;
+    margin: 10px;
+}
+
+.bg-customer-follow-body-step-customer {
+    margin: 10px;
+    padding: 10px;
+    background: white;
+    cursor: pointer;
+    user-select: none;
+}
+
+.bg-customer-follow-body-step-create {
+    background: white;
+    padding: 10px;
+    transition: all 0.6s ease-out 0.2s;
+}
+
+.bg-customer-follow-body-step-create .ant-rate {
+    font-size: 15px;
+}
+
+.bg-customer-follow-body-step-create .ant-form label {
+    font-size: 12px;
+}
+
+.bg-customer-follow-body-step-create .ant-btn-sm {
+    font-size: 12px;
+}
+
+.bg-customer-follow-body-step-create-action {
+    text-align: right;
 }

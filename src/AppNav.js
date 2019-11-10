@@ -35,7 +35,7 @@ export class AppNav extends Component {
                     let active=(self.props.currApp.name == sApp.name)?" active":""
                     return (<a className={"bg-app-shortcut-action-btn"+active} onClick={()=>{
                         setCurrApp(sApp)
-                        self.props.dispatch(push(`/app/dynamic/${sApp.name}`))}
+                        self.props.dispatch(push(`/app/dynamic/${sApp.name}/${sApp.modelUrl}`))}
                         } key={sApp.name}>
                             <Icon component={AppIcon}></Icon><span className="bg-app-shortcut-action-btn-title"> {sApp.title}</span>
                     </a>)

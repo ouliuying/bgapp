@@ -1,6 +1,7 @@
 import {SET_SYS,SET_PARTNER_CORPS,SET_PARTNER_CURR_CORP,UPDATE_SHORTCUT_APPS} from '../actions/sys'
 import { createSelector, createSelectorCreator } from 'reselect'
 import memoize from 'lodash.memoize'
+import produce from 'immer'
 //todo cache in memory, load after login/refresh page
 const initSys={
     installApps:{},
@@ -47,12 +48,19 @@ export function sys(state,action){
 
     
 export const getShortcutAppsSelector=createSelector(state=>state.sys.installApps,
-    state=>state.sys.shortcutApps,
-    (installApps,shortcutApps)=>{
+    state=>state.sys.shortcutApps,state=>state.sys.roleApps,
+    (installApps,shortcutApps,roleApps)=>{
         var apps=[]
-        for(var appName of shortcutApps){
-            apps.push(installApps[appName])
-        }
+        shortcutApps.map(name=>{
+            var roleApp = roleApps.find(x=>x.name == name)
+            if(roleApp){
+                var app = installApps[name]
+                app= produce(app, draft=>{
+                    draft.modelUrl = roleApp.modelUrl
+                })
+                apps.push(app)
+            }
+        })
         return apps
     })
 
@@ -61,10 +69,18 @@ export const getRoleAppsSelector=createSelector(state=>state.sys.installApps,
     state=>state.sys.roleApps,
     (installApps,roleApps)=>{
         var apps=[]
-        for(var appName of roleApps){
-            apps.push(installApps[appName])
-        }
+        roleApps.map(appData=>{
+            var app = installApps[appData.name]
+            if(app){
+                app= produce(app, draft=>{
+                    draft.modelUrl = appData.modelUrl
+                })
+                apps.push(app)
+            }
+            return app
+        })
         return apps
+
     })
 
 

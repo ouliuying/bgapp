@@ -1,6 +1,7 @@
 
 import {ChatCore} from '../bgchat/core/Chat'
 export const SYS_INIT = "kernel:sys_init"
+export const ROUTE_CHANGE = "kernel:route_change"
 export class MessageBus{
     constructor(){
         this._topicHandlersMap={}
