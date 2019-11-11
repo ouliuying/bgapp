@@ -1537,6 +1537,8 @@ button:focus {
 
 .bg-customer-follow-body-step-body {
     background: transparent;
+    min-height: 180px;
+    padding-bottom: 280px;
 }
 
 .bg-customer-follow-body-step-header {
@@ -1571,11 +1573,37 @@ button:focus {
 }
 
 .bg-customer-follow-body-step-customer {
-    margin: 10px;
-    padding: 10px;
+    margin: 2px 0;
+    padding: 0px;
     background: white;
     cursor: pointer;
     user-select: none;
+    border: 1px solid #d0d4d5;
+}
+
+.bg-customer-follow-body-step-customer .bg-step-customer-icon {
+    display: flex;
+    font-size: 1.5rem;
+    background: rgb(15, 228, 79);
+    color: white;
+    width: 3rem;
+    border-radius: 1.5rem;
+    height: 3rem;
+    justify-content: space-around;
+    text-align: center;
+}
+
+.bg-customer-follow-body-step-customer .bg-step-customer-icon>span {
+    line-height: 3rem;
+}
+
+.bg-customer-follow-body-step-customer .ant-card-body {
+    padding: 15px;
+}
+
+.bg-customer-follow-body-step-customer .bg-step-customer-rate {
+    text-align: center;
+    margin-top: 2rem;
 }
 
 .bg-customer-follow-body-step-create {
@@ -1584,6 +1612,7 @@ button:focus {
     transition: all 0.6s ease-out 0.2s;
 }
 
+.bg-customer-follow-body-step-customer .ant-rate,
 .bg-customer-follow-body-step-create .ant-rate {
     font-size: 15px;
 }

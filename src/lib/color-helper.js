@@ -215,6 +215,6 @@ const colorTable=[
 
 export function getColor(str){
     str = str||'a'
-    let colorIndex = str.charAt(0) % colorTable.length
+    let colorIndex = str.charCodeAt(0) % colorTable.length
     return colorTable[colorIndex]
 }

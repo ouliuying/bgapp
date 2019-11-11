@@ -7,17 +7,21 @@ import {
     Route
 } from 'react-router-dom'
 import { goBack,push } from 'connected-react-router';
-import { getIcon } from '../svg'
+import { getIcon, getSvg } from '../svg'
 import { Button } from 'antd';
-import {Icon,Form,InputNumber,Rate} from '../ui'
+import {Icon,Form,InputNumber,Rate,Card} from '../ui'
 import { ModelAction } from '../app/mq/ModelAction';
 import { DragDropContext, Droppable, Draggable} from 'react-beautiful-dnd';
 import { ModalSheetManager } from '../app/modelView/ModalSheetManager';
 import { CrmCustomerFollowStepList } from './CrmCustomerFollowStepList';
 import { CrmAddCustomerToFollowStepView } from './CrmAddCustomerToFollowStepView';
-import { createViewParam } from '../app/modelView/ViewParam';
+import { createViewParam, createDetailParam } from '../app/modelView/ViewParam';
 import produce from 'immer';
 import { SelectModelFromListViewField } from '../app/modelView/ViewFieldType';
+import { getColor } from '../lib/color-helper';
+import { getModelView } from '../app/modelView/ModelViewRegistry';
+import ViewType from '../app/modelView/ViewType';
+
 class CreateOrEditStepCustomer extends React.Component{
     constructor(props){
         super(props)
@@ -88,10 +92,18 @@ class StepCustomer extends React.Component{
             data,
             step,
             doCreate,
+            doDelete,
             isDragging,
             isGroupedOver,
             provided
           } = self.props;
+          let record = (data||{}).record||{}
+          let customer = record.customer||{}
+          let customerRecord = customer.record||{}
+          let detailSvg = getSvg("/svg/action/detail.svg")
+          let title = customerRecord.name
+          let color = getColor(title)
+          let iconTxt = (title||"").substring(0,1)
         return <div 
         className="bg-customer-follow-body-step-customer" 
         ref={provided.innerRef}  
@@ -101,15 +113,62 @@ class StepCustomer extends React.Component{
         {...provided.draggableProps}
         {...provided.dragHandleProps}
         >
-            <div>
-            <Button type="danger" onClick={()=>{
-               self.setState({
-                   showEdit:true
-               })
-            }}>xx</Button>
-            {data.name}
-            </div>
+          
+            <Card bordered={false}  actions={[
+                <Icon component={detailSvg}  key="detail"  onClick={
+                    ()=>{
+                        let id = customerRecord.id
+                        let app = "crm"
+                        let model = "customer"
+                        let dViewParam = createDetailParam(undefined,undefined,undefined,id,{},{})
+                        let view = getModelView(app,model,ViewType.DETAIL)
+                        ModalSheetManager.openModal(view,{
+                            app,
+                            model,
+                            viewType:ViewType.DETAIL,
+                            viewParam:dViewParam,
+                            viewRefType:"none"
+                        })
+                    }
+                }/>,
+                <Icon type="edit" key="edit"  onClick={
+                    ()=>{
+                        self.setState({
+                            showEdit:true
+                        })
+                    }
+                }/>,
+                <Icon type="delete" key="delete" onClick={
+                    ()=>{
+                        ModalSheetManager.confirm({
+                            title:"删除提示",
+                            msg:"确定要删除吗？",
+                            ok:()=>{
+                                let id = record.id
+                                doDelete && doDelete(id)
+                            }
+                        })
+                    }
+                } />,
+          ]}>
+                <Card.Meta
+                    avatar={
+                      <span className="bg-step-customer-icon" style={
+                          {color:color.color,background:color.background}
+                      }><span>
+                          {iconTxt.toUpperCase()}
+                          </span></span>
+                    }
+                    title={customerRecord.name}
+                    description={customerRecord.comment}
+                />
+                <div className = "bg-step-customer-rate">
+                     <Rate disabled  value={record.rate} size="small" />
+                </div>
+                
+            </Card>
            
+
        
         {
             this.state.showEdit && <CreateOrEditStepCustomer stepCustomer={
@@ -125,7 +184,7 @@ class StepCustomer extends React.Component{
 }
 class StepCustomerList extends React.Component{
     render(){
-        const {customers,step,doCreate} = this.props
+        const {customers,step,doCreate,doDelete} = this.props
         return customers.map((c,index)=>{
             return <Draggable
                     key={c.record.id+""}
@@ -141,6 +200,7 @@ class StepCustomerList extends React.Component{
                     data= {c}
                     step = {step} 
                     doCreate={doCreate}
+                    doDelete={doDelete}
                     key={c.record.id+""}
                     isDragging={dragSnapshot.isDragging}
                     isGroupedOver={dragSnapshot.combineTargetFor}
@@ -161,7 +221,7 @@ class StepContainer extends React.Component{
     
     render(){
         let self = this
-        const {data,doCreate} = this.props
+        const {data,doCreate,doDelete} = this.props
         let customers = data.record.customers||[]
         return <div className="bg-customer-follow-body-step">
                     <div className="bg-customer-follow-body-step-header" title={data.record.name}>
@@ -189,7 +249,7 @@ class StepContainer extends React.Component{
                                 <div className="bg-customer-follow-body-step-body"
                                     ref = {dropProvided.innerRef}
                                     {...dropProvided.droppableProps}>
-                                     <StepCustomerList customers={customers} step = {data} doCreate={doCreate}/>
+                                     <StepCustomerList customers={customers} step = {data} doCreate={doCreate}  doDelete={doDelete}/>
                                     {dropProvided.placeholder}
                                 </div>
                             )
@@ -233,7 +293,7 @@ class CrmCustomerFollowView extends React.Component{
                     })
                 }
             },err=>{
-
+                
             })
         }
         else{
@@ -241,6 +301,25 @@ class CrmCustomerFollowView extends React.Component{
                 msg:"先指定客户！"
             })
         }
+    }
+    doDelete(id){
+        let self = this
+        new ModelAction("crm","customerFollowStep").call("deleteCustomerFollowStepCustomer",{
+            id
+        },ret=>{
+            if(ret.errorCode == 0) {
+                self.loadFollowStepCustomers()
+            }
+            else{
+                ModalSheetManager.alert({
+                    msg:ret.description
+                })
+            }
+        },err=>{
+            ModalSheetManager.alert({
+                msg:"通讯失败！"
+            })
+        })
     }
     loadFollowStepCustomers(){
         let self = this
@@ -256,6 +335,86 @@ class CrmCustomerFollowView extends React.Component{
 
         })
     }
+    reOrderStepCustomer(data){
+        // {"draggableId":"10","type":"DEFAULT",
+        //"source":{"index":0,"droppableId":"11"},
+       // "reason":"DROP","mode":"FLUID",
+       // "destination":{"droppableId":"8","index":0},"combine":null}
+        let self = this
+        let steps = produce(this.state.steps,draft=>{
+            return draft
+        })
+        let source = data.source
+        let destination = data.destination
+        let draggableData={}
+        if(destination){
+            if(source.droppableId == destination.droppableId){
+                let step = steps.find(x=>x.record.id == source.droppableId)
+                if(step && source.index != destination.index){
+                    step.record = step.record||{}
+                    const cloneCustomers = Array.from(step.record.customers||[])
+                    const [removed] = cloneCustomers.splice(data.source.index, 1)
+                    cloneCustomers.splice(destination.index, 0, removed)
+                    step.record.customers = cloneCustomers
+                    draggableData.stepCustomerID = data.draggableId
+                    draggableData.fromStep = {
+                        index: source.index,
+                        stepID: source.droppableId
+                    }
+                    draggableData.toStep = {
+                        index: destination.index,
+                        stepID:destination.droppableId
+                    }
+                }
+            }
+            else{
+                let fromStep = steps.find(x=>x.record.id == source.droppableId)
+                let toStep = steps.find(x=>x.record.id == destination.droppableId)
+                if(fromStep && toStep && destination){
+                    fromStep.record = fromStep.record||{}
+                    const fromCloneCustomers = Array.from(fromStep.record.customers||[])
+                    const [removed] = fromCloneCustomers.splice(data.source.index, 1)
+                    fromStep.record.customers = fromCloneCustomers
+                    toStep.record = toStep.record||{}
+                    const toCloneCustomers = Array.from(toStep.record.customers||[])
+                    toCloneCustomers.splice(destination.index,0,removed)
+                    toStep.record.customers = toCloneCustomers
+
+                    draggableData.stepCustomerID = data.draggableId
+                    draggableData.fromStep = {
+                        index: source.index,
+                        stepID: source.droppableId
+                    }
+                    draggableData.toStep = {
+                        index: destination.index,
+                        stepID:destination.droppableId
+                    }
+                }
+            }
+            self.setState({
+                steps
+            })
+            self.forceUpdate()
+            if(draggableData.stepCustomerID){
+                new ModelAction("crm","customerFollowStep").call("switchFollowStepCustomerSeq",{
+                ...draggableData
+                },ret=>{
+                    if(ret.errorCode==0){
+
+                    }
+                    else{
+                        ModalSheetManager.alert({
+                            msg:ret.description
+                        })
+                    }
+                },err=>{
+                    ModalSheetManager.alert({
+                        msg:"通讯失败"
+                    })
+                })
+            }
+        }
+    }
     customerChange(step, customer){
 
     }
@@ -263,14 +422,16 @@ class CrmCustomerFollowView extends React.Component{
     
     };
     
-    onDragStart() {
-   
+    onDragStart(data) {
+      
     };
     onDragUpdate(){
      
     };
-    onDragEnd(){
-       
+    onDragEnd(data){
+       // alert(JSON.stringify(data))
+        let self = this
+        self.reOrderStepCustomer(data)
     };
     shouldComponentUpdate(){
         return false
@@ -315,16 +476,20 @@ class CrmCustomerFollowView extends React.Component{
                         </div>
                         <DragDropContext
                             onBeforeDragStart={()=>this.onBeforeDragStart()}
-                            onDragStart={()=>this.onDragStart()}
+                            onDragStart={(data)=>this.onDragStart(data)}
                             onDragUpdate={()=>this.onDragUpdate()}
-                            onDragEnd={()=>this.onDragEnd()}
+                            onDragEnd={(data)=>this.onDragEnd(data)}
                         >
                             <div className="bg-customer-follow-body">
                                 {
                                     steps.map(s=>{
                                         return <StepContainer data={s} key={s.id} doCreate={(stepCustomer,step,callback)=>{
                                             self.doCreate(stepCustomer,step,callback)
-                                        }}></StepContainer>
+                                        }} doDelete={
+                                            (id)=>{
+                                                self.doDelete(id)
+                                            }
+                                        }></StepContainer>
                                     })
                                 }
                             </div>
