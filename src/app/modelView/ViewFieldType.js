@@ -55,6 +55,7 @@ export const ViewFieldType={
     ChinaFullAddress:'chinaFullAddress',
     ChinaFullAddressStaticField:"chinaFullAddressStatic",
     SelectField:"select",
+    MultiSelectField:"multiSelect",
     PasswordField:"password",
     SelectModelFromListViewField:"selectModelFromListView",
     SelectImageField:"selectImage",
@@ -686,6 +687,21 @@ export class SelectField extends React.Component{
                         return <Select.Option value={o.value}>{o.text}</Select.Option>
                     })
                 }
+        </Select>
+    }
+}
+export class MultiSelectField extends React.Component{
+    render(){
+        const {meta,value,onChange} = this.props
+        let rValue =  value||[]
+        return <Select  mode="tags" defaultValue={[]} value={rValue} onChange={value=>{
+            onChange && onChange(value)
+        }}>
+            {
+                ((meta||{}).options||[]).map(o=>{
+                    return <Select.Option key={o}>{o}</Select.Option>
+                })
+            }
         </Select>
     }
 }

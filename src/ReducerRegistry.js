@@ -17,7 +17,7 @@ import { call, put, takeEvery, takeLatest } from 'redux-saga/effects'
 const persistConfig = {
     key: 'bgworkroot',
     storage:storage,
-    blacklist: [ViewContext.APP_CONTEXT,"router","modalSheetQueue","chat"]
+    blacklist: [ViewContext.APP_CONTEXT,"router","modalSheetQueue","chat","config"]
 }
 
 export class ReducerRegistry {

@@ -183,7 +183,7 @@ export class CreateViewCMM extends ViewCMM{
       //const {viewParam,viewData} = view.props
       let {ownerField,ownerFieldValue} = (viewParam||{})
       if(ownerField){
-        if(ownerField.relationData.targetApp==this.app && ownerField.relationData.targetModel==this.model){
+        if((ownerField.relationData||{}).targetApp==this.app && (ownerField.relationData||{}).targetModel==this.model){
           if(ownerFieldValue instanceof Object){
              let rawValue = ownerFieldValue.record?ownerFieldValue.record[ownerField.relationData.targetField]:ownerFieldValue[ownerField.relationData.targetField]
              if(rawValue){
@@ -198,7 +198,7 @@ export class CreateViewCMM extends ViewCMM{
             }
           }
        }
-       else if(ownerField.relationData.relationApp==this.app && ownerField.relationData.relationModel == this.model){
+       else if((ownerField.relationData||{}).relationApp==this.app && (ownerField.relationData||{}).relationModel == this.model){
          if(ownerFieldValue instanceof Object){
            let rawValue = ownerFieldValue.record?ownerFieldValue.record[ownerField.relationData.relationField]:ownerFieldValue[ownerField.relationData.relationField]
            if(rawValue){

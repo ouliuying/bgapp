@@ -21,6 +21,7 @@ import {TextField,
     ChinaFullAddress,
     ChinaFullAddressStaticField,
     SelectField,
+    MultiSelectField,
     SelectModelFromListViewField,
     SelectImageField,
     StaticImagePreviewField,
@@ -93,6 +94,7 @@ registry.add(ViewFieldType.SelectField,SelectField)
 registry.add(ViewFieldType.PasswordField,PasswordField)
 registry.add(ViewFieldType.SelectModelFromListViewField,SelectModelFromListViewField)
 registry.add(ViewFieldType.SelectImageField,SelectImageField)
+registry.add(ViewFieldType.MultiSelectField,MultiSelectField)
 registry.add(ViewFieldType.StaticImagePreviewField,StaticImagePreviewField)
 registry.add(ViewFieldType.RadioCheckBoxGroupField,RadioCheckBoxGroupField)
 
