@@ -118,7 +118,7 @@ class ImportSendSmsView extends React.Component{
                   else{
                     self.setState({
                         uploadFile:[info.file],
-                        mobileDesc:`上传手机号码${info.response.bag.mobileCount}个`
+                        mobileDesc:`上传手机号码${info.file.response.bag.mobileCount}个`
                     })
                     message.success(`${info.file.name} 上传成功.`);
                     return;
