@@ -171,6 +171,11 @@ export class ChatCore {
     }
     sendToServer(msg) {
         console.log("start send message" + new Date())
-        this._eb.publish("client.to.server", msg)
+        try{
+            this._eb.publish("client.to.server", msg)
+        }
+        catch(err){
+
+        }
     }
 }
