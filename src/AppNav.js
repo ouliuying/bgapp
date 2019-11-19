@@ -1,19 +1,21 @@
+/* eslint-disable eqeqeq */
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import {
     withRouter
 } from 'react-router-dom'
-import {push} from "connected-react-router"
-import {getShortcutAppsSelector} from './reducers/sys'
+import { push } from "connected-react-router"
+import { getShortcutAppsSelector } from './reducers/sys'
 //import Icon from './icon'
-import {createIconFromSvg} from './icon/createIconFromSvg'
-import {setCurrApp} from './actions/config'
-import {getCurrentApp} from './reducers/config'
+import { createIconFromSvg } from './icon/createIconFromSvg'
+import { setCurrApp } from './actions/config'
+import { getCurrentApp } from './reducers/config'
 import AppSetting from './AppSetting'
 import { ModalSheetManager } from './app/modelView/ModalSheetManager';
 import { getSvg } from './svg';
-import {Icon} from './ui'
+import { Icon } from './ui'
 export class AppNav extends Component {
     static propTypes = {
         store: PropTypes.object,
@@ -22,39 +24,45 @@ export class AppNav extends Component {
     static contextTypes = {
         store: PropTypes.object,
     }
-    showAppSetting(){
-        ModalSheetManager.openModal(AppSetting,{})
+    showAppSetting() {
+        ModalSheetManager.openModal(AppSetting, {})
     }
     render() {
-        let self =this
-        let MoreApp=getSvg("/svg/more-app.svg")
+        let self = this
+        let MoreApp = getSvg("/svg/more-app.svg")
         return <div className="bg-app-nav-button-bar">
             {
-                self.props.shortcutApps.map(sApp=>{
-                    const AppIcon=getSvg(sApp.icon)
-                    let active=(self.props.currApp.name == sApp.name)?" active":""
-                    return (<a className={"bg-app-shortcut-action-btn"+active} onClick={()=>{
+                self.props.shortcutApps.map(sApp => {
+                    const AppIcon = getSvg(sApp.icon)
+                    let active = (self.props.currApp.name == sApp.name) ? " active" : ""
+                    return (<a className={"bg-app-shortcut-action-btn" + active} onClick={() => {
                         setCurrApp(sApp)
-                        self.props.dispatch(push(`/app/dynamic/${sApp.name}/${sApp.modelUrl}`))}
-                        } key={sApp.name}>
-                            <Icon component={AppIcon}></Icon><span className="bg-app-shortcut-action-btn-title"> {sApp.title}</span>
+                        if (sApp.modelUrl.indexOf("/")!=0) {
+                            self.props.dispatch(push(`/app/dynamic/${sApp.name}/${sApp.modelUrl}`))
+                        }
+                        else {
+                            self.props.dispatch(push(`/app/dynamic${sApp.modelUrl}`))
+                        }
+                    }
+                    } key={sApp.name}>
+                        <Icon component={AppIcon}></Icon><span className="bg-app-shortcut-action-btn-title"> {sApp.title}</span>
                     </a>)
                 })
             }
-            
-            <a className="bg-app-shortcut-action-btn" onClick={()=>{
+
+            <a className="bg-app-shortcut-action-btn" onClick={() => {
                 self.showAppSetting()
             }}>
-               <Icon component={MoreApp}/>
+                <Icon component={MoreApp} />
             </a>
 
-         
+
         </div>
-        
+
     }
 }
-function mapState(state){
+function mapState(state) {
     let currApp = getCurrentApp(state)
-    return {shortcutApps:getShortcutAppsSelector(state),...currApp}
+    return { shortcutApps: getShortcutAppsSelector(state), ...currApp }
 }
 export default withRouter(connect(mapState)(AppNav))

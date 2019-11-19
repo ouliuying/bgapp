@@ -13,7 +13,8 @@ import { getCurrPartner } from './reducers/partner';
 import { clearModalSheet } from './app/actions/modalSheetQueue';
 import { routeChange } from './app/routerHelper';
 import createSagaMiddleware from 'redux-saga'
-import { call, put, takeEvery, takeLatest } from 'redux-saga/effects'
+import { call, put, take,select, takeLatest } from 'redux-saga/effects'
+import { appModelViewDataStoreEffectMonitor } from './app/reducers/appModelViewDataStore';
 const persistConfig = {
     key: 'bgworkroot',
     storage:storage,
@@ -52,9 +53,15 @@ export class ReducerRegistry {
             compose(applyMiddleware(sagaMiddleware),applyMiddleware(middleware),applyMiddleware(routerMonitorMiddleware))
         )
         sagaMiddleware.run(function* (){
-            yield takeLatest("@@router/LOCATION_CHANGE", function* (action){
-                    yield 1
-            });
+
+            while (true) {
+                const action = yield take('*')
+                const state = yield select()
+                if(action.isAppModelViewStoreAction){
+                    const {type,data} = action
+                    yield appModelViewDataStoreEffectMonitor(type,data,state)
+                }
+            }
         })
         let persistor = persistStore(store,null,() => {
             let state = store.getState() 

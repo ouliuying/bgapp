@@ -12,6 +12,7 @@ import WorktableInContainer from '../bgworktable/WorktableInContainer'
 import SettingInContainer from '../bgsetting/SettingInContainer'
 import SmsInContainer from '../bgsms/SmsInContainer'
 import ChatInContainer from '../bgchat/ChatInContainer'
+import AdminInContainer from '../bgadmin/AdminInContainer'
 const appInContainers={
     "core":CoreInContainer,
     "corp":CorpInContainer,
@@ -22,7 +23,11 @@ const appInContainers={
     "setting":SettingInContainer,
     "sms":SmsInContainer,
     "im":MainFrame,
-    "chat":ChatInContainer
+    "chat":ChatInContainer,
+    "admin":Loadable({
+       loader: () => import('../bgadmin/AdminInContainer'),
+       loading:() => <div/>,
+    })
 }
 function TestApp(){
     return <div>test</div>

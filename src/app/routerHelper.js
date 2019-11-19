@@ -18,14 +18,6 @@ export function routeChange(history){
     return ({ getState, dispatch })=>{
         return next => action => {
            const result = next(action)
-        //    if("@@router/LOCATION_CHANGE"==action.type){
-        //         let appName = getAppFromPath(action.payload.location.pathname)
-        //         const {store} = ReducerRegistry
-        //         let state = store.getState()
-        //         let apps = getAppsSelector(state)
-        //         let app = apps.installApps[appName]||{}
-        //         setCurrApp(app)
-        //    }
            return result
          }
     }

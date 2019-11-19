@@ -44,6 +44,9 @@ import {ReactComponent as Action_Delete} from '../svg/action/delete.svg'
 import {ReactComponent as Action_Chat_Join_Channel} from '../svg/action/chat-join-channel.svg'
 
 import {ReactComponent as Action_Chat_Exit_Channel} from '../svg/action/chat-exit-channel.svg'
+
+import {ReactComponent as AdminManagerLogo} from '../svg/admin-manager-logo.svg'
+
 const svgs={
     
 }
@@ -90,7 +93,7 @@ svgs["/svg/action/chat-exit-channel.svg"] = Action_Chat_Exit_Channel
 svgs["/svg/event-log-create.svg"] = EventLogCreate
 svgs["/svg/event-log-edit.svg"] = EventLogEdit
 svgs["/svg/event-log-comment.svg"] = EventLogComment
-
+svgs["/svg/admin-manager-logo.svg"] = AdminManagerLogo
 
 export function regSvg(path,component){
     svgs[path]=component
