@@ -1,9 +1,15 @@
-import {req,APPLICATION_JSON} from '../../lib/http-helper'
+import {req,genReq,APPLICATION_JSON} from '../../lib/http-helper'
 import { logout } from '../../actions/partner'
  export class ModelAction{
     constructor(app,model){
         this.app=app
         this.model=model
+    }
+    *genCall(action,opts){
+        var url=`/ac/${this.app}/${this.model}/${action}`
+        let msg = yield* genReq(url,opts)
+        let jObj = JSON.parse(msg)
+        return jObj
     }
     call(action,opts,success,fail){
         var url=`/ac/${this.app}/${this.model}/${action}`

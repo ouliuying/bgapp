@@ -1629,3 +1629,11 @@ button:focus {
 .bg-customer-follow-body-step-create-action {
     text-align: right;
 }
+
+.bg-v-form {
+    position: relative;
+}
+
+.bg-v-form .ant-form-item {
+    padding: 0.2rem 0rem;
+}

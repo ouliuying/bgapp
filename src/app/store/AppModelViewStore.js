@@ -5,22 +5,31 @@ export class AppModelViewStore{
         this.app = app
         this.model = model
         this.viewType = viewType
-        this.reducers = {}
-        this.effects = {}
+        this.propsCache={}
     }
-    put(type,data){
+
+    reducer(state,data){
+
+    }
+
+    * effect(state,data){
+    }
+    put(action){
+        let {type} = action
         let fullType = type
         if(type.indexOf("/")!==0){
-            fullType =  `${this.app}/${this.model}/${this.viewType}/${type}`
+            fullType =  `/${this.app}/${this.model}/${this.viewType}/${type}`
         }
         const {store} = ReducerRegistry
-        store.dispatch({
+        store.dispatch(Object.assign({},action,{
             type:fullType,
-            data,
             isAppModelViewStoreAction:true
-        })
+        }))
     }
     mapStateToProps(state){
-        return {appModelViewStore:this}
+        let props =  {appModelViewStore:this}
+        props = Object.assign({},state.appModelViewDataStore[`/${this.app}/${this.model}/${this.viewType}`]||{},props)
+        this.propsCache = props
+        return props
     }
 }

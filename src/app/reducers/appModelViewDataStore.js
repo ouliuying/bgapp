@@ -1,43 +1,60 @@
 import produce from "immer"
 import { select, take ,takeEvery,call} from 'redux-saga/effects'
 
-let _appModelViewDataStoreReducers = {
+let _appModelViewDataStores = {
 
 }
-let _appModelViewDataStoreEffects={
-
+function getKeyFromActionType(actionType){
+    let index = actionType.lastIndexOf("/")
+    if(index>0){
+        let key= actionType.substring(0,index)
+        let shortActionType = actionType.substring(index+1)
+        return {key,actionType:shortActionType}
+    }
+    else{
+        return {key:actionType,actionType:actionType}
+    }
 }
 export function addAppModelViewStore(appModelViewStore){
-    if(appModelViewStore.reducers){
-        Object.keys(appModelViewStore.reducers).map(key=>{
-            var type = `${appModelViewStore.app}/${appModelViewStore.model}/${appModelViewStore.viewType}/${key}`
-            _appModelViewDataStoreReducers[type]=appModelViewStore.reducers[key]
-        })
-    }
-    if(appModelViewStore.effects){
-        Object.keys(appModelViewStore.effects).map(key=>{
-            var type = `${appModelViewStore.app}/${appModelViewStore.model}/${appModelViewStore.viewType}/${key}`
-            _appModelViewDataStoreEffects[type]=appModelViewStore.effects[key]
-        })
-    }
+    let key=`/${appModelViewStore.app}/${appModelViewStore.model}/${appModelViewStore.viewType}`
+    _appModelViewDataStores[key] = appModelViewStore
 }
-
 export function appModelViewDataStore(state,action){
     if(typeof state == "undefined"){
         return {}
     }
-    let appModelViewReducer=_appModelViewDataStoreReducers[action.type]
-    if(appModelViewReducer){
-        return produce(state,draft=>{
-            draft[action.type] = appModelViewReducer(state[action.type])
-        })
+    if(action.isAppModelViewStoreAction){
+        let storeKey = getKeyFromActionType(action.type)
+        let avd=_appModelViewDataStores[storeKey.key]
+        if(avd){
+            let newState =  produce(state,draft=>{
+                let newAction = {...action}
+                newAction.type=storeKey.actionType
+                newAction.type = storeKey.actionType
+                draft[storeKey.key] = avd.reducer(state[storeKey.key],newAction)
+            })
+            return newState
+        }
     }
+    
     return state
 }
-
-export function *appModelViewDataStoreEffectMonitor(type,data,state){
-   let effect = _appModelViewDataStoreEffects[type]
-   if(effect){
-       yield call(effect,data,state)
-   }
+function *tx(ff){
+   yield alert(ff)
+}
+export function *appModelViewDataStoreEffectMonitor(state,action){
+    let storeKey = getKeyFromActionType(action.type)
+    let avd = _appModelViewDataStores[storeKey.key]
+    if(avd){
+        try{
+            //global state
+            let newAction = {...action}
+            newAction.type=storeKey.actionType
+            yield* avd.effect(state,newAction)
+        }
+        catch(err){
+            console.error(err)
+        }
+        
+    }
 }

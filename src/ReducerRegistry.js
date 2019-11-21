@@ -18,7 +18,7 @@ import { appModelViewDataStoreEffectMonitor } from './app/reducers/appModelViewD
 const persistConfig = {
     key: 'bgworkroot',
     storage:storage,
-    blacklist: [ViewContext.APP_CONTEXT,"router","modalSheetQueue","chat","config"]
+    blacklist: [ViewContext.APP_CONTEXT,"router","modalSheetQueue","chat","config","appModelViewDataStore"]
 }
 
 export class ReducerRegistry {
@@ -58,8 +58,7 @@ export class ReducerRegistry {
                 const action = yield take('*')
                 const state = yield select()
                 if(action.isAppModelViewStoreAction){
-                    const {type,data} = action
-                    yield appModelViewDataStoreEffectMonitor(type,data,state)
+                    yield* appModelViewDataStoreEffectMonitor(state,action)
                 }
             }
         })
