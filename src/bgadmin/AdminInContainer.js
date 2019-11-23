@@ -5,6 +5,7 @@ import PartnerRuleCreate from './views/PartnerRuleCreate'
 import PartnerRuleList from './views/PartnerRuleList'
 const modelViews=[
     loadView("admin", "partnerRuleApi","create",PartnerRuleCreate),
+    loadView("admin", "partnerRuleApi","edit",PartnerRuleCreate),
     loadView("admin", "partnerRuleApi","list",PartnerRuleList),
 ]
 export default function AdminInContainer(props){

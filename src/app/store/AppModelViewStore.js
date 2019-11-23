@@ -14,6 +14,10 @@ export class AppModelViewStore{
 
     * effect(state,data){
     }
+    get dispatch(){
+        const {store} = ReducerRegistry
+        return store.dispatch
+    }
     put(action){
         let {type} = action
         let fullType = type

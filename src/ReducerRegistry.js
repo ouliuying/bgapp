@@ -57,6 +57,7 @@ export class ReducerRegistry {
             while (true) {
                 const action = yield take('*')
                 const state = yield select()
+                console.log(action)
                 if(action.isAppModelViewStoreAction){
                     yield* appModelViewDataStoreEffectMonitor(state,action)
                 }

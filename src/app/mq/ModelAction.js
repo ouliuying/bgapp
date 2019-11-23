@@ -7,7 +7,11 @@ import { logout } from '../../actions/partner'
     }
     *genCall(action,opts){
         var url=`/ac/${this.app}/${this.model}/${action}`
-        let msg = yield* genReq(url,opts)
+        let msg = yield* genReq(url,opts,{
+            headers: {
+                'content-type': APPLICATION_JSON
+            }
+        })
         let jObj = JSON.parse(msg)
         return jObj
     }
