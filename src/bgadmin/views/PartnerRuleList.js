@@ -1,16 +1,15 @@
 import React from "react"
-import PartnerRuleLisetStore from "../store/PartnerRuleListStore"
+import PartnerRuleListStore from "../store/PartnerRuleListStore"
 import { addAppModelViewStore } from "../../app/reducers/appModelViewDataStore"
 import {connect} from 'react-redux'
 import { BaseTemplateView } from "../../app/template/BaseTemplateView"
 import {Table,Pagination} from '../../ui'
 
 
-const store = new PartnerRuleLisetStore()
+const store = new PartnerRuleListStore()
 
 class PartnerRuleList extends React.Component{
     componentDidMount(){
-        console.log("didAmount")
         store.didMount(this)
     }
     render(){

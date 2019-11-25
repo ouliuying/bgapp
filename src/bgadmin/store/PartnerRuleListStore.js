@@ -6,7 +6,7 @@ import produce from "immer"
 import { ModelAction } from "../../app/mq/ModelAction"
 import {Button} from '../../ui'
 import { push } from 'connected-react-router'
-export default class PartnerRuleLisetStore extends AppModelViewStore{
+export default class PartnerRuleListStore extends AppModelViewStore{
     constructor(){
         super("admin","partnerRuleApi","list")
         this.columns=[
@@ -55,7 +55,6 @@ export default class PartnerRuleLisetStore extends AppModelViewStore{
         this.dispatch(push("/app/dynamic/admin/partnerRuleApi/edit",{id}))
     }
     didMount(view){
-        console.log("didMount")
         this.put({
             type:"loadPartnerRulePage",
             data:{
@@ -63,7 +62,6 @@ export default class PartnerRuleLisetStore extends AppModelViewStore{
                 pageIndex:1
             }
         })
-        console.log("didMount2")
     }
 
     reducer(state,action){
