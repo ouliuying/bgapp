@@ -62,7 +62,9 @@ class PartnerMenuRuleCreate extends React.Component{
         }>
                    <Form labelCol={{ span: 4 }} wrapperCol={{ span: 14 }} className="bg-v-form">
                         <Form.Item label="角色">
-                         <Select value={store.getFieldValue(self,"currentRole")} onChange={
+                         <Select value={store.getFieldValue(self,"currentRole")} 
+                         disabled={store.isDisable(self,"currentRole")}
+                         onChange={
                              value=> store.onFieldChange(self,"currentRole",value)
                          }>
                              {
@@ -77,9 +79,11 @@ class PartnerMenuRuleCreate extends React.Component{
                         </Form.Item>
 
                         <Form.Item label="应用">
-                         <Select value={store.getFieldValue(self,"currentApp")} onChange={
-                             value=> store.onFieldChange(self,"currentApp",value)
-                         }>
+                         <Select value={store.getFieldValue(self,"currentApp")} 
+                            disabled={store.isDisable(self,"currentApp")}
+                            onChange={
+                                value=> store.onFieldChange(self,"currentApp",value)
+                            }>
                              {
                                  appMenus.map(r=>{
                                  return <Select.Option  value={r.name}>{
@@ -114,6 +118,7 @@ class PartnerMenuRuleCreate extends React.Component{
         </BaseTemplateView>
     }
 }
+
 addAppModelViewStore(store)
 
 export default connect(state => {

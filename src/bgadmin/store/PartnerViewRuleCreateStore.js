@@ -156,7 +156,7 @@ export default class PartnerViewRuleCreateStore extends AppModelViewStore{
                     if(ret.errorCode==0){
                         ModalSheetManager.alert({
                             title:"提示",
-                            msg:"添加成功"
+                            msg:ret?ret.description:"保存成功"
                         })
                     }
                     else{

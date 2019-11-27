@@ -26,15 +26,17 @@ export class PartnerMenuRuleCreateStore extends AppModelViewStore{
     }
     
     isDisable(view,name){
-        const {id} = view.props.location.state||{}
+        const {id} = ((view.props||{}).location||{}).state||{}
         if(id!=null && id>0){
             return true
         }
         return false
     }
     buildCreateData(view){
+        const {id} = view.props.location.state||{}
         const {currentRole,currentApp,menuKeys} = view.props
         return {
+            id:id,
             roleID: currentRole,
             app:currentApp,
             rule:menuKeys
@@ -85,7 +87,7 @@ export class PartnerMenuRuleCreateStore extends AppModelViewStore{
                 return produce(state||{},draft=>{
                     let data = action.data.data
                     draft["metaData"] = action.data
-                    let cData = this.createFromServerData(data)
+                    let cData = this.createFromServerData(data||{})
                     Object.keys(cData).map(key=>{
                         draft[key] = cData[key]
                     })
@@ -128,7 +130,7 @@ export class PartnerMenuRuleCreateStore extends AppModelViewStore{
                         if(ret.errorCode==0){
                             ModalSheetManager.alert({
                                 title:"提示",
-                                msg:"添加成功"
+                                msg:ret?ret.description:"保存成功"
                             })
                         }
                         else{
@@ -163,7 +165,7 @@ export class PartnerMenuRuleCreateStore extends AppModelViewStore{
         return {
             currentRole:data.roleID,
             currentApp:data.app,
-            menuKeys:JSON.parse(data.rule)
+            menuKeys:JSON.parse(data.rule||'[]')
         }
     }
 }
