@@ -272,7 +272,7 @@ class PartnerRuleCreate extends React.Component {
             <Form labelCol={{ span: 4 }} wrapperCol={{ span: 14 }} className="bg-v-form">
                 <Form.Item label="角色">
                     <Select
-                        disabled={store.isDisable(self,"currentModel")}
+                        disabled={store.isDisable(self,"currentRole")}
                         style={{ width: 200 }}
                         placeholder="选择一个角色"
                         value={self.getFieldValue("currentRole")}

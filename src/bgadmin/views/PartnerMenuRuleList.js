@@ -5,10 +5,10 @@ import { addAppModelViewStore } from "../../app/reducers/appModelViewDataStore"
 import {connect} from 'react-redux'
 import { BaseTemplateView } from "../../app/template/BaseTemplateView"
 import {Table,Pagination} from '../../ui'
-import PartnerViewRuleListStore from "../store/PartnterViewRuleListStore"
+import PartnerMenuRuleListStore from "../store/PartnerMenuRuleListStore"
 
-const store = new PartnerViewRuleListStore()
-class PartnerViewRuleList extends React.Component{
+const store = new PartnerMenuRuleListStore()
+class PartnerMenuRuleList extends React.Component{
     componentDidMount(){
         store.didMount(this)
     }
@@ -46,7 +46,7 @@ addAppModelViewStore(store)
 
 export default connect(state=>{
     return store.mapStateToProps(state)
-})(PartnerViewRuleList)
+})(PartnerMenuRuleList)
 
 
 

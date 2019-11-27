@@ -6,9 +6,9 @@ import produce from "immer"
 import { ModelAction } from "../../app/mq/ModelAction"
 import {Button} from '../../ui'
 import { push } from 'connected-react-router'
-export default class PartnerViewRuleListStore extends AppModelViewStore{
+export default class PartnerMenuRuleListStore extends AppModelViewStore{
     constructor(){
-        super("admin","partnerViewRuleApi","list")
+        super("admin","partnerMenuRuleApi","list")
         this.columns=[
             {
                 title:"标识",
@@ -28,11 +28,6 @@ export default class PartnerViewRuleListStore extends AppModelViewStore{
                 key:"app"
             }
             ,
-            {
-                title:"Model",
-                dataIndex:"model",
-                key:"model"
-            },
             {
                 title:"操作",
                 dataIndex:"x",
@@ -54,12 +49,12 @@ export default class PartnerViewRuleListStore extends AppModelViewStore{
     }
 
     gotoEdit(id){
-        this.dispatch(push("/app/dynamic/admin/partnerViewRuleApi/edit",{id}))
+        this.dispatch(push("/app/dynamic/admin/partnerMenuRuleApi/edit",{id}))
     }
 
     didMount(view){
         this.put({
-            type:"loadPartnerViewRulePage",
+            type:"loadPartnerMenuRulePage",
             data:{
                 pageSize:view.props.pageSize||10,
                 pageIndex:1
@@ -71,14 +66,14 @@ export default class PartnerViewRuleListStore extends AppModelViewStore{
     getPageInfo(view){
         const rows = (view.props.pageData||{}).rows||[]
         const totalCount = (view.props.pageData||{}).totalCount||0
-        const pageIndex = (view.props.loadPartnerViewRulePage||{}).pageIndex||1
+        const pageIndex = (view.props.loadPartnerMenuRulePage||{}).pageIndex||1
         const pageSize = view.props.pageSize||10
         return {rows,totalCount,pageIndex,pageSize,columns:this.columns}
     }
 
     onCurrentChange(view,pageIndex){
         this.put({
-            type:"loadPartnerViewRulePage",
+            type:"loadPartnerMenuRulePage",
             data:{
                 pageSize:view.props.pageSize||10,
                 pageIndex:pageIndex
@@ -99,8 +94,8 @@ export default class PartnerViewRuleListStore extends AppModelViewStore{
     *effect(state,action){
         console.log("effect " +action.type)
         switch(action.type){
-            case "loadPartnerViewRulePage":
-                let pageInfo = yield* new ModelAction("admin","partnerViewRuleApi").genCall("loadPartnerViewRulePage",{
+            case "loadPartnerMenuRulePage":
+                let pageInfo = yield* new ModelAction("admin","partnerMenuRuleApi").genCall("loadPartnerMenuRulePage",{
                    ...action.data
                 })
                 if(pageInfo.errorCode==0){
