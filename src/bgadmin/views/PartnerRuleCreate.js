@@ -69,8 +69,22 @@ class AccessTypePanel extends React.Component {
 </Form.Item>
 }
 
+
+
+           {(__access_key__==="create")?<></>:<Form.Item label="限制范围(A)">
+                <Radio.Group value={self.getFieldValue("isolocation")}  onChange={
+                    evt=>{
+                        self.onFieldChange("isolocation",evt.target.value)
+                    }
+                }>
+                    <Radio value="partner">本人</Radio>
+                    <Radio value="corp">公司</Radio>
+                </Radio.Group>
+            </Form.Item>
+            } 
+
 {
-                (__access_key__==="create")?<></>:<Form.Item label="限制角色">
+                (__access_key__==="create")?<></>:<Form.Item label="限制角色(B)">
                 <Select
                     mode="tags"
                     value={self.getFieldValue("targetRoles")}
@@ -89,7 +103,7 @@ class AccessTypePanel extends React.Component {
             }
 
             {
-                (__access_key__==="create")?<></>:<Form.Item label="限制部门">
+                (__access_key__==="create")?<></>:<Form.Item label="限制部门(C)">
                  <TreeSelect
                     showSearch
                     style={{ width: '100%' }}
@@ -112,7 +126,7 @@ class AccessTypePanel extends React.Component {
             
 
             {
-                (__access_key__==="create")?<></>: <Form.Item label="限制用户">
+                (__access_key__==="create")?<></>: <Form.Item label="限制用户(D)">
                 <Select
                     mode="tags"
                     value={self.getFieldValue("targetPartners")}
@@ -167,7 +181,7 @@ class AccessTypePanel extends React.Component {
             </Form.Item>
 
             {
-                (__access_key__==="create")?<></>: <Form.Item label="附加条件">
+                (__access_key__==="create")?<></>: <Form.Item label="附加条件(E)">
                 <Input.TextArea
                     value={self.getFieldValue("criteria")}
                     placeholder=""

@@ -146,7 +146,7 @@ export default class PartnerRuleCreateStore extends AppModelViewStore{
             }
             if(actObj){
                 typeData.enable = actObj.enable
-                typeData.isolocation = actObj.isolocation
+                typeData.isolation = actObj.isolation
                 typeData.targetPartners = actObj.targetRoles
                 typeData.targetDepartments = actObj.targetDepartments
                 typeData.targetPartners = actObj.targetPartners
@@ -267,7 +267,7 @@ export default class PartnerRuleCreateStore extends AppModelViewStore{
                 })
 
                 data.disableFields = disableFields
-                data.isolocation = atData.isolocation
+                data.isolation = atData.isolation
                 data.departments = atData.targetDepartments
                 data.roles = atData.targetRoles
                 data.partners= atData.targetPartners
@@ -286,7 +286,7 @@ export default class PartnerRuleCreateStore extends AppModelViewStore{
                     createData.model = appModel[1]
                 }
                 data.enable = atData.enable
-                data.isolocation = atData.isolocation
+                data.isolation = atData.isolation
                 data.departments = atData.targetDepartments
                 data.roles = atData.targetRoles
                 data.partners= atData.targetPartners
@@ -323,7 +323,7 @@ export default class PartnerRuleCreateStore extends AppModelViewStore{
                return v||"read"
             case "enable":
                 return (v==undefined||v==null)?true:v
-            case "isolocation":
+            case "isolation":
                 return v||"corp"
             case "field-check":
                 return (view.props[name]||{})[value.name]

@@ -10,6 +10,7 @@ export class PartnerMenuRuleCreateStore extends AppModelViewStore{
     constructor(){
         super("admin","partnerMenuRuleApi","create")
     }
+
     didMount(view){
         const {id} = view.props.location.state||{}
         this.put({
@@ -17,6 +18,7 @@ export class PartnerMenuRuleCreateStore extends AppModelViewStore{
             data:id
         })
     }
+
     disableResetButton(view){
         const {id} = view.props.location.state||{}
         if(id!=null && id>0){
@@ -32,6 +34,9 @@ export class PartnerMenuRuleCreateStore extends AppModelViewStore{
         }
         return false
     }
+    doReset(view){
+        
+    }
     buildCreateData(view){
         const {id} = view.props.location.state||{}
         const {currentRole,currentApp,menuKeys} = view.props
@@ -42,6 +47,7 @@ export class PartnerMenuRuleCreateStore extends AppModelViewStore{
             rule:menuKeys
         }
     }
+
     doSave(view){
         let createData = this.buildCreateData(view)
         if(createData){
@@ -161,6 +167,7 @@ export class PartnerMenuRuleCreateStore extends AppModelViewStore{
                 return yield 1
         }
     }
+    
     createFromServerData(data){
         return {
             currentRole:data.roleID,
