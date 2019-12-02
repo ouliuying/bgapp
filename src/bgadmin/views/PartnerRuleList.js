@@ -3,7 +3,7 @@ import PartnerRuleListStore from "../store/PartnerRuleListStore"
 import { addAppModelViewStore } from "../../app/reducers/appModelViewDataStore"
 import {connect} from 'react-redux'
 import { BaseTemplateView } from "../../app/template/BaseTemplateView"
-import {Table,Pagination} from '../../ui'
+import {Table,Pagination,Button} from '../../ui'
 
 
 const store = new PartnerRuleListStore()
@@ -15,7 +15,19 @@ class PartnerRuleList extends React.Component{
     render(){
         let self = this
         const {rows,columns,pageSize,pageIndex,totalCount} = store.getPageInfo(self)
-        return <BaseTemplateView>
+        return <BaseTemplateView actions={
+            <>
+            <Button type="danger" onClick={
+                    () => {
+                        //self.props.appModelViewStore.put({ type: "doSave" })
+                        store.reloadCorpRule(self)
+                    }
+                }>
+                    重载配置
+                </Button>
+            </>
+        }
+        >
                             <Table style={{width:'100%'}}
                                     columns={columns}
                                     dataSource={rows}

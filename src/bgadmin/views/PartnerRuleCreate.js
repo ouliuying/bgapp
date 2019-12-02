@@ -17,11 +17,13 @@ import { Icon } from "antd"
 const store = new PartnerRuleCreateStore()
 class AccessTypePanel extends React.Component {
     onFieldChange(name, value, extra) {
-        store.onFieldChange(this, name, value, extra)
+        const {__access_key__} = this.props
+        store.onFieldChange(this, name, value, extra,__access_key__)
 
     }
     getFieldValue(name, value) {
-        return store.getFieldValue(this, name, value)
+        const {__access_key__} = this.props
+        return store.getFieldValue(this, name, value,__access_key__)
     }
     render() {
         let self = this
@@ -72,9 +74,9 @@ class AccessTypePanel extends React.Component {
 
 
            {(__access_key__==="create")?<></>:<Form.Item label="限制范围(A)">
-                <Radio.Group value={self.getFieldValue("isolocation")}  onChange={
+                <Radio.Group value={self.getFieldValue("isolation")}  onChange={
                     evt=>{
-                        self.onFieldChange("isolocation",evt.target.value)
+                        self.onFieldChange("isolation",evt.target.value)
                     }
                 }>
                     <Radio value="partner">本人</Radio>
@@ -323,17 +325,17 @@ class PartnerRuleCreate extends React.Component {
 
             <Form labelCol={{ span: 4 }} wrapperCol={{ span: 14 }} className="bg-v-form">
                 <Form.Item label=" " colon={false}>
-                    <Tabs defaultActiveKey={self.getFieldValue("accessType")} onChange={(value) => {
+                    <Tabs  activeKey={self.getFieldValue("accessType")} onChange={(value) => {
                         self.onFieldChange("accessType", value)
                     }}>
                         <Tabs.TabPane tab="读取" key="read">
-                            <AccessTypePanel {...self.props} />
+                            <AccessTypePanel {...self.props} __access_key__="read"/>
                         </Tabs.TabPane>
                         <Tabs.TabPane tab="添加" key="create">
                             <AccessTypePanel {...self.props}   __access_key__="create"/>
                         </Tabs.TabPane>
                         <Tabs.TabPane tab="更新" key="edit">
-                            <AccessTypePanel {...self.props} />
+                            <AccessTypePanel {...self.props}  __access_key__="edit"/>
                         </Tabs.TabPane>
                         <Tabs.TabPane tab="删除" key="delete">
                             <AccessTypePanel {...self.props}   __access_key__="delete"/>

@@ -1,3 +1,4 @@
+/* eslint-disable array-callback-return */
 import { AppModelViewStore } from "../../app/store/AppModelViewStore"
 import { call, put } from 'redux-saga/effects'
 import { ModelAction } from "../../app/mq/ModelAction"
@@ -13,99 +14,69 @@ export default class PartnerRuleCreateStore extends AppModelViewStore{
             current:"read"
         }
     }
-    updateAccessType(action){
-        let self = this
-        Object.keys(self.accessTypeData).map(key=>{
-            if(key!=="current"){
-                self.accessTypeData[key] = produce(self.accessTypeData[key]||{},draft=>{
-                    draft[action.type]=action.data
-                }) 
-                if(action.type==="currentModel"){
-                    self.accessTypeData[key]=produce(self.accessTypeData[key]||{},draft=>{
-                        draft["field-check"] = {}
-                    })
-                }
-            }
-        })
-    }
+
     reducer(state,action){
         let ret = super.reducer(state,action)
         if(ret!==undefined){
             return ret
         }
         switch(action.type){
-            case "accessType":
-                this.accessTypeData[this.accessTypeData.current] = produce(state,draft=>{
-
-                })
-                let oldState = this.accessTypeData[this.accessTypeData.current]
-                this.accessTypeData.current = action.data
-                return produce(this.accessTypeData[this.accessTypeData.current]||{
-                    createMeta:oldState.createMeta,
-                    currentModel:oldState.currentModel,
-                    currentRole:oldState.currentRole
-                },draft=>{
-                    draft.createMeta = oldState.createMeta
-                    draft[action.type]=action.data
-                    draft.currentModel = oldState.currentModel
-                    draft.currentRole=oldState.currentRole
-                })
             case "ruleClassID":
                 return produce(state,draft=>{
-                    let clientData = draft["__client_data__"]||{}
-                    draft["__client_data__"]=Object.assign({},clientData,{ruleClassID:action.data})
+                    let accessType = draft.accessType||"read"
+                    draft[accessType]=draft[accessType]||{}
+                    draft[accessType]["__client_data__"]= draft[accessType]["__client_data__"]||{}
+                    let clientData = draft[accessType]["__client_data__"]
+                    draft[accessType]["__client_data__"]=Object.assign({},clientData,{ruleClassID:action.data})
                 })
             case "__client_data__":
                 return produce(state,draft=>{
-                        let clientData = draft[action.type]||{}
-                        draft[action.type]=Object.assign({},clientData,action.data)
+                        let accessType = draft.accessType||"read"
+                        draft[accessType]=draft[accessType]||{}
+                        let clientData = draft[accessType][action.type]||{}
+                        draft[accessType][action.type]=Object.assign({},clientData,action.data)
                     })
             case "field-check":
                  return produce(state,draft=>{
-                    let newFieldCheck = draft[action.type]||{}
-                    newFieldCheck[action.data.name]=action.data.value
-                    draft[action.type]=newFieldCheck
+                     let accessType = draft.accessType||"read"
+                     draft[accessType]=draft[accessType]||{}
+                     draft[accessType][action.type]=draft[accessType][action.type]||{}
+                     draft[accessType][action.type][action.data.name]=action.data.value
                  })
             case "currentModel":
-                this.updateAccessType(action)
                 return produce(state,draft=>{
                     draft[action.type]=action.data
-                    draft["field-check"]={}
+                    let accessTypes = ["read","create","edit","delete"]
+                    accessTypes.map(x=>{
+                        draft[x]={}
+                     })
                 })
 
             case "currentRole":
-                this.updateAccessType(action)
                 return produce(state||{},draft=>{
                     draft[action.type] = action.data
+                    let accessTypes = ["read","create","edit","delete"]
+                    accessTypes.map(x=>{
+                        draft[x]={}
+                     })
                 })
             case "__reset__":
-                this.accessTypeData={
-                    read:{},
-                    current:"read"
-                }
                 return produce(state||{},draft=>{
                     let newDraft = {}
                     newDraft.createMeta = draft.createMeta
                     draft = newDraft
                     return draft
                 })
-            case "_effect_do_save":
-                {
-                    const {accessType} = state
-                    this.accessTypeData[accessType||"read"]= state
-                    return state
-                }
-            case "_effect_do_save_and_create":
-                {
-                    const {accessType} = state
-                    this.accessTypeData[accessType||"read"]= state
-                    return state
-                }
             case "createMeta":
                 {
-                    return produce(state,draft=>{
+                    return produce(state, draft=>{
                         draft[action.type] = action.data
                         let initData = action.data.data
+                        let accessTypes = ["read","create","edit","delete"]
+                        draft.accessType="read"
+                        accessTypes.map(x=>{
+                            draft[x]={}
+                         })
                         if(initData){
                             this.buildInitData(draft,initData)
                         }
@@ -114,10 +85,17 @@ export default class PartnerRuleCreateStore extends AppModelViewStore{
                 }
             default:
                 return produce(state||{},draft=>{
-                    draft[action.type] = action.data
+                    if(action.accessType){
+                        draft[action.accessType] = draft[action.accessType]||{}
+                        draft[action.accessType][action.type] = action.data
+                    }
+                    else{
+                        draft[action.type] = action.data
+                    }
                 })
         }
     }
+
     isDisable(view,name){
         const {id} = view.props.location.state||{}
         if(id!=null && id>0){
@@ -125,10 +103,8 @@ export default class PartnerRuleCreateStore extends AppModelViewStore{
         }
         return false
     }
-    buildInitData(state,initData){
-        this.accessTypeData={
-            current:"read"
-        }
+
+    buildInitData(draft,initData){
         const {app,model,roleID,rule} = initData
         let ruleObj = []
         try{
@@ -137,45 +113,32 @@ export default class PartnerRuleCreateStore extends AppModelViewStore{
         catch(err){
 
         }
-        ["read","create","edit","delete"].map(act=>{
+        draft.accessType="read"
+        let acts =  ["read","create","edit","delete"]
+        acts.map(act=>{
             var actObj = ruleObj.find(x=>x.accessType == act)
-            let typeData={
-                accessType:act,
-                currentModel: app+"/"+model,
-                currentRole:roleID
-            }
+            draft.currentModel=app+"/"+model
+            draft.currentRole=roleID
+            draft[act]={}
             if(actObj){
-                typeData.enable = actObj.enable
-                typeData.isolation = actObj.isolation
-                typeData.targetPartners = actObj.targetRoles
-                typeData.targetDepartments = actObj.targetDepartments
-                typeData.targetPartners = actObj.targetPartners
-                typeData.criteria = actObj.criteria
-                typeData.overrideCriteria = actObj.overrideCriteria
-                typeData["__rules__data__"] = actObj.rules
+                draft[act]={}
+                draft[act].enable = actObj.enable
+                draft[act].isolation = actObj.isolation
+                draft[act].targetRoles = actObj.targetRoles
+                draft[act].targetDepartments = actObj.targetDepartments
+                draft[act].targetPartners = actObj.targetPartners
+                draft[act].criteria = actObj.criteria
+                draft[act].overrideCriteria = actObj.overrideCriteria
+                draft[act]["__rules__data__"] = actObj.rules
                 if(act!=="delete"){
                     let fieldChecks = {}
                     actObj.disableFields.map(f=>{
                         fieldChecks[f]=true
                     })
-                    typeData["field-check"] = fieldChecks
+                    draft[act]["field-check"] = fieldChecks
                 }
-                this.accessTypeData[act] = typeData
-            }
-            else{
-                this.accessTypeData[act]=typeData
             }
         })
-       
-            const {accessType} = state
-            let currentData = this.accessTypeData[accessType||"read"]
-            this.accessTypeData.current=accessType||"read"
-            Object.keys(currentData).map(key=>{
-                state[key]= currentData[key]
-            })
-            return state
-       
-       
     }
 
     *effect(state,action){
@@ -239,25 +202,25 @@ export default class PartnerRuleCreateStore extends AppModelViewStore{
             default:
         }
     }
-    createCreateData(data){
+
+    createCreateData(storeData){
         let createData={
-            id:data
+            id:storeData.id
         }
-
         createData.accessTypes=[]
-
-        Object.keys(this.accessTypeData).map(key=>{
-            let atData = this.accessTypeData[key]
-            if(["read","create","edit"].indexOf(key)>-1){
-                let data={}
-                data.accessType = key
-                createData.roleID = atData.currentRole
-                let appModel = (atData.currentModel||"").split("/")
-                if(appModel.length==2){
-                    createData.app = appModel[0]
-                    createData.model = appModel[1]
-                }
-                data.enable = atData.enable
+        let acts = ["read","create","edit","delete"]
+        acts.map(act=>{
+            let atData = storeData[act]
+            let data={}
+            data.accessType = act
+            createData.roleID = storeData.currentRole
+            let appModel = (storeData.currentModel||"").split("/")
+            if(appModel.length==2){
+                createData.app = appModel[0]
+                createData.model = appModel[1]
+            }
+            data.enable = atData.enable
+            if(act !== "delete"){
                 let disableFields = []
                 atData["field-check"]= atData["field-check"]||{}
                 Object.keys(atData["field-check"]).map(key=>{
@@ -267,34 +230,15 @@ export default class PartnerRuleCreateStore extends AppModelViewStore{
                 })
 
                 data.disableFields = disableFields
-                data.isolation = atData.isolation
-                data.departments = atData.targetDepartments
-                data.roles = atData.targetRoles
-                data.partners= atData.targetPartners
-                data.rules=atData["__rules__data__"]||[]
-                data.criteria = atData.criteria
-                data.overrideCriteria = atData.overrideCriteria
-                createData.accessTypes.push(data)
             }
-            else if(key === "delete"){
-                let data = {}
-                data.accessType = key
-                createData.roleID = atData.currentRole
-                let appModel = (atData.currentModel||"").split("/")
-                if(appModel.length==2){
-                    createData.app = appModel[0]
-                    createData.model = appModel[1]
-                }
-                data.enable = atData.enable
-                data.isolation = atData.isolation
-                data.departments = atData.targetDepartments
-                data.roles = atData.targetRoles
-                data.partners= atData.targetPartners
-                data.rules=atData["__rules__data__"]
-                data.criteria = atData.criteria
-                data.overrideCriteria = atData.overrideCriteria
-                createData.accessTypes.push(data)
-            }
+            data.isolation = atData.isolation!=="partner"?"corp":"partner"
+            data.departments = atData.targetDepartments
+            data.roles = atData.targetRoles
+            data.partners= atData.targetPartners
+            data.rules=atData["__rules__data__"]||[]
+            data.criteria = atData.criteria
+            data.overrideCriteria = atData.overrideCriteria
+            createData.accessTypes.push(data)
         })
         return createData
     }
@@ -304,31 +248,43 @@ export default class PartnerRuleCreateStore extends AppModelViewStore{
         this.put({type:"loadCreateMeta",data:id})
     }
 
-    onFieldChange(view,name,value,extra){
+    onFieldChange(view,name,value,extra,accessType){
         switch(name){
             default:
                 this.put({
                     type:name,
-                    data:value
+                    data:value,
+                    accessType:accessType
                 })
         }
         
     }
-    getFieldValue(view,name,value){
+    getFieldValue(view,name,value,accessType){
         let v = view.props[name]
        switch(name){
            case "ruleClassID":
-               return (view.props["__client_data__"]||{})[name]
+               const gAccessType = view.props.accessType
+               return ((view.props[gAccessType]||{})["__client_data__"]||{})[name]
            case "accessType":
                return v||"read"
             case "enable":
-                return (v==undefined||v==null)?true:v
+                v = (view.props[accessType]||{})[name]
+                return (v===undefined||v===null)?true:v
             case "isolation":
-                return v||"corp"
+                v = (view.props[accessType]||{})[name]
+                console.log("isolation = "+ v + "accessType="+accessType)
+                return v!=="partner"?"corp":"partner"
             case "field-check":
-                return (view.props[name]||{})[value.name]
+                    v = (view.props[accessType]||{})[name]
+                return (v||{})[value.name]
            default:
-               return view.props[name]
+               if(accessType){
+                return (view.props[accessType]||{})[name]
+               }
+               else{
+                return view.props[name]
+               }
+             
        }
     }
     getCreatMeta(view){
@@ -362,7 +318,8 @@ export default class PartnerRuleCreateStore extends AppModelViewStore{
     }
 
     getRules(view){
-        return view.props["__rules__data__"]
+        const accessType = view.props.accessType||"read"
+        return (view.props[accessType]||{})["__rules__data__"]
     }
 
     showAddRuleDialog(view,visible){
@@ -378,25 +335,30 @@ export default class PartnerRuleCreateStore extends AppModelViewStore{
     showEditRuleDialog(view,index){
 
     }
+
     deleteRule(view,index){
-        let rules =  view.props["__rules__data__"]||[]
+        const accessType = view.props.accessType||"read"
+        let rules =  (view.props[accessType]||{})["__rules__data__"]||[]
         rules=produce(rules,draft=>{
             draft = draft.splice(index,1)
         })
         this.put({
             type:"__rules__data__",
-            data:rules
+            data:rules,
+            accessType
         })
     }
     getAddRuleDialogVisible(view){
-        let clientData = view.props["__client_data__"]||{}
+        const accessType = view.props.accessType||"read"
+        let clientData = (view.props[accessType]||{})["__client_data__"]||{}
         return clientData.visible||false
     }
 
     addRule(view){
-        let clientData =  view.props["__client_data__"]||{}
+        const accessType = view.props.accessType||"read"
+        let clientData =  (view.props[accessType]||{})["__client_data__"]||{}
         if(clientData.ruleClassID){
-            let rules = view.props["__rules__data__"]||[]
+            let rules = (view.props[accessType]||{})["__rules__data__"]||[]
             let newRules = []
             for(let r of rules){
                 newRules.push(r)
@@ -404,16 +366,18 @@ export default class PartnerRuleCreateStore extends AppModelViewStore{
             newRules.push(clientData.ruleClassID)
             this.put({
                 type:"__rules__data__",
-                data:newRules
+                data:newRules,
+                accessType
             })
         }
         this.showAddRuleDialog(view,false)
     }
     doSave(view){
         const {id} = view.props.location.state||{}
+        let data={id,...view.props}
         this.put({
             type:"_effect_do_save",
-            data:id
+            data:data
         })
     }
     disableResetButton(view){
@@ -425,6 +389,7 @@ export default class PartnerRuleCreateStore extends AppModelViewStore{
     }
     doReset(view){
         const {id} = view.props.location.state||{}
+     
         this.put({
             type:"__reset__",
             data:id
@@ -432,9 +397,10 @@ export default class PartnerRuleCreateStore extends AppModelViewStore{
     }
     doSaveAndCreate(view){
         const {id} = view.props.location.state||{}
+        let data={id,...view.props}
         this.put({
             type:"_effect_do_save_and_create",
-            data:id
+            data:data
         })
     }
 }

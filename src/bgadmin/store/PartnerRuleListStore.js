@@ -6,6 +6,7 @@ import produce from "immer"
 import { ModelAction } from "../../app/mq/ModelAction"
 import {Button} from '../../ui'
 import { push } from 'connected-react-router'
+import { ModalSheetManager } from '../../app/modelView/ModalSheetManager'
 export default class PartnerRuleListStore extends AppModelViewStore{
     constructor(){
         super("admin","partnerRuleApi","list")
@@ -88,6 +89,13 @@ export default class PartnerRuleListStore extends AppModelViewStore{
                     })
                 }
                 return 1
+            case "reloadCorpRule":
+                        yield* new ModelAction("admin","partnerRuleApi").genCall("reloadRule",{})
+                        ModalSheetManager.alert({
+                            title:"提示",
+                            msg:"重载成功"
+                        })
+                        return 1
             default:
                 return 1
         }
@@ -101,7 +109,11 @@ export default class PartnerRuleListStore extends AppModelViewStore{
         const pageSize = view.props.pageSize||10
         return {rows,totalCount,pageIndex,pageSize,columns:this.columns}
     }
-
+    reloadCorpRule(view){
+        this.put({
+            type:"reloadCorpRule"
+        })
+    }
     onCurrentChange(view,pageIndex){
         this.put({
             type:"loadPartnerRulePage",
